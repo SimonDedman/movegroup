@@ -1,0 +1,669 @@
+"GPS.N","GPS.W","location","location.code","mooring","Hobo.present","Agency","depth","habitattype","year"
+"25.73795","-79.24519","Aya entrance","Aya.entr","concrete casing","n","BBFSF.Bim","1","seagrass bed","2017"
+"25.74004","-79.243496","Aya inside","Aya.in","concrete casing","n","BBFSF.Bim","0.5","seagrass bed","2017"
+"25.69792","-79.31699","bimini barge","BBGE","auger","n","BBFSF.Bim","27",NA,"2014"
+"25.73044","-79.24995","bonefish hole","BFH","concrete casing","y","BBFSF.Bim","2",NA,"2015"
+"25.73464","-79.23384","bonefish hole channel flag","BFH CHF","concrete casing","y","BBFSF.Bim","1",NA,"2014"
+"25.54572","-79.2872","CAT","CAT","auger","n","BBFSF.Bim","8",NA,"2017"
+"25.54587","-79.29751","Cat West","CATW","auger","n","BBFSF.Bim","16",NA,"2017"
+"25.736668","-79.25357","Drug entrance","drug.ent","concrete casing","n","BBFSF.Bim","1.5","seagrass bed","2017"
+"25.743743","-79.260114","Drug lake","drug.lake","concrete casing","n","BBFSF.Bim","1","seagrass bed","2017"
+"25.69541","-79.2916","Duck Pond","DP","concrete casing","n","BBFSF.Bim","1.5","sand/seagrass","2016"
+"25.73086","-79.24273","east","east","concrete casing","n","BBFSF.Bim","0.5","seagrass bed","2017"
+"25.69331","-79.30022","East Round Rock","ERR","concrete casing","n","BBFSF.Bim","1.5","seagrass/sand","2016"
+"25.7923","-79.24265","east wells north east","EWNE","auger","n","BBFSF.Bim","4",NA,"2014"
+"25.70287","-79.31134","grate west","GRTEW","float","n","BBFSF.Bim","6",NA,"2014"
+"26.02694","-79.08398","Great Isaac's South East","GISE","auger","n","BBFSF.Bim","4",NA,"2016"
+"26.02288","-79.09042","Great Isaac's South West","GISW","auger","n","BBFSF.Bim","4",NA,"2016"
+"26.03497","-79.08408","Great Isacs NE","GINE","auger","n","BBFSF.Bim","15",NA,"2017"
+"26.0313","-79.09427","Great Isacs NW","GINW","auger","n","BBFSF.Bim","15",NA,"2017"
+"25.57718","-79.30363","GUN","GUN","auger","n","BBFSF.Bim","10",NA,"2017"
+"25.57494","-79.31396","GUN WEST","GUNW","auger","n","BBFSF.Bim","28.7",NA,"2017"
+"25.80426","-79.11283","hesperus","HES","auger","n","BBFSF.Bim","4","sandy, 100m away from wreck","2015"
+"25.724844","-79.252768","lagoon","lagoon","concrete casing","n","BBFSF.Bim","1","seagrass bed","2017"
+"25.70641","-79.23304","longline a","LLA","concrete casing","n","BBFSF.Bim","1.5",NA,"2014"
+"25.70588","-79.21245","longline a east","LLAE","auger","y","BBFSF.Bim","1.5",NA,"2015"
+"25.70106","-79.23595","longline a south","LLAS","auger","n","BBFSF.Bim","1.5",NA,"2014"
+"25.71305","-79.22998","longline b","LLB","auger","y","BBFSF.Bim","1.5",NA,"2014"
+"25.71193","-79.21042","longline b east","LLBE","auger","n","BBFSF.Bim","1.5",NA,"2015"
+"25.71884","-79.22916","longline c","LLC","auger","n","BBFSF.Bim","1.5",NA,"2014"
+"25.71782","-79.20853","longline c east","LLCE","auger","y","BBFSF.Bim","1.5",NA,"2015"
+"25.72484","-79.22817","longline d","LLD","concrete casing","n","BBFSF.Bim","1.5",NA,"2014"
+"25.729899","-79.257352","Mangrove edge","man.edge","concrete casing","n","BBFSF.Bim","1","seagrass bed","2017"
+"25.726661","-79.263517","Mangrove edge west","man.w","concrete casing","n","BBFSF.Bim","1","seagrass bed","2017"
+"25.743863","-79.248148","Maze","Maze","concrete casing","n","BBFSF.Bim","1","seagrass bed","2017"
+"25.72441","-79.30922","mini barge west","BMBW","auger","y","BBFSF.Bim","14",NA,"2014"
+"25.81482","-79.28847","mini wall","MW","auger","y","BBFSF.Bim","26",NA,"2015"
+"25.81069","-79.27121","mozel bank","MOZ","auger","n","BBFSF.Bim","4",NA,"2015"
+"25.74273","-79.30235","new barge","BNB","auger","n","BBFSF.Bim","12",NA,"2014"
+"25.74705","-79.22639","north finger 1","NF1","auger","n","BBFSF.Bim","3",NA,"2014"
+"25.76929","-79.23306","north finger 2","NF2","auger","y","BBFSF.Bim","3",NA,"2014"
+"25.78801","-79.28249","north pier","NP","auger","y","BBFSF.Bim","7",NA,"2015"
+"25.80005","-79.25846","north rock","BNR","auger","y","BBFSF.Bim","4",NA,"2014"
+"25.76629","-79.2625","north sound 1","NS1-New","concrete casing","y","BBFSF.Bim","1",NA,"2015"
+"25.75243","-79.26749","north sound 2","NS2-New","concrete casing","n","BBFSF.Bim","1",NA,"2015"
+"25.67416","-79.30888","northwest turtle rock","NWT","auger","n","BBFSF.Bim","14.4",NA,"2014"
+"25.64669","-79.23573","Nurse Wing","NW","auger","n","BBFSF.Bim","2","sand/seagrass/wreck","2016"
+"25.76453","-79.29315","pier","PIER","auger","y","BBFSF.Bim","6",NA,"2015"
+"25.7265","-79.27508","pigeon cay","PIG","concrete casing","n","BBFSF.Bim","1",NA,"2014"
+"25.69425","-79.28177","Plane Wreck","PW","concrete casing","n","BBFSF.Bim","1","sand/seagrass","2016"
+"25.70446","-79.25301","radio channel 1","RAD1","concrete casing","n","BBFSF.Bim","1",NA,"2014"
+"25.70908","-79.26305","radio channel 2","RAD2","concrete casing","y","BBFSF.Bim","1",NA,"2014"
+"25.71104","-79.27592","radio channel 3","RAD3","concrete casing","n","BBFSF.Bim","1",NA,"2014"
+"25.71648","-79.28352","radio channel 4","RAD4","concrete casing","y","BBFSF.Bim","1",NA,"2014"
+"25.66516","-79.29208","Sapona 1","Sap1","auger","n","BBFSF.Bim","3","seagrass","2017"
+"25.65604","-79.2923","Sapona 2","Sap2","auger","n","BBFSF.Bim","4","seagrass","2017"
+"25.72249","-79.27496","sharkland","SLA","concrete casing","n","BBFSF.Bim","1",NA,"2014"
+"25.73988","-79.27431","sharkland marsh","SLM","concrete casing","y","BBFSF.Bim","1",NA,"2015"
+"25.68261","-79.30132","south bimini 1","SB1","housing","n","BBFSF.Bim","5",NA,"2014"
+"25.67316","-79.30154","south bimini 1 south","SB1S","auger","n","BBFSF.Bim","4",NA,"2015"
+"25.68264","-79.29156","south bimini 2","SB2","auger","n","BBFSF.Bim","3",NA,"2014"
+"25.67334","-79.29142","south bimini 2 south","SB2S","auger","y","BBFSF.Bim","3",NA,"2015"
+"25.68256","-79.2818","south bimini 3","SB3","auger","y","BBFSF.Bim","2",NA,"2014"
+"25.67332","-79.28196","south bimini 3 south","SB3S","concrete casing","n","BBFSF.Bim","4",NA,"2015"
+"25.68037","-79.27218","south bimini 4","SB4","auger","n","BBFSF.Bim","2",NA,"2014"
+"25.67133","-79.27232","south bimini 4 south","SB4S","auger","n","BBFSF.Bim","3",NA,"2015"
+"25.67363","-79.25302","South Bimini 5 South","SB5S","auger","n","BBFSF.Bim","2","sand/seagrass","2017"
+"25.69699","-79.24097","south bimini north east","SBNE","auger","y","BBFSF.Bim","2",NA,"2014"
+"25.70022","-79.21594","south longline a east","SLLAE","auger","n","BBFSF.Bim","2",NA,"2015"
+"25.65654","-79.3227","south west south turtle","SWST","auger","n","BBFSF.Bim","27.8",NA,"2015"
+"25.65662","-79.31325","south west turtle","SWT","auger","y","BBFSF.Bim","10",NA,"2015"
+"25.66594","-79.25105","Tigtanic","TIG","auger","n","BBFSF.Bim","2","sand/seagrass","2016"
+"25.64675","-79.32095","TR West","TRW","auger","n","BBFSF.Bim","20.8",NA,"2017"
+"25.64908","-79.31411","Triangle Rocks","TR","concrete casing","n","BBFSF.Bim","13.4","coral/sand","2016"
+"25.69085","-79.26656","Turtle Honey Hole","THH","concrete casing","n","BBFSF.Bim","1.5","patchy seagrass, artificial reef, mangrove edge","2016"
+"25.67408","-79.31871","west north west turtle","WNWT","auger","y","BBFSF.Bim","28",NA,"2015"
+"25.68646","-79.31012","west round rock","WRR","auger","y","BBFSF.Bim","8",NA,"2014"
+"25.66495","-79.31092","west turtle","WT","auger","n","BBFSF.Bim","16.6",NA,"2015"
+"25.68681","-79.32016","west west round rock","WWRR","auger","n","BBFSF.Bim","28",NA,"2015"
+"25.66513","-79.32057","west west turtle","WWT","auger","n","BBFSF.Bim","28.2",NA,"2015"
+"26.71256","-80.01745","BR","BR",NA,"n","BBFSF.Jup","17.1","reef",NA
+"26.92803","-80.02165","CK","CK",NA,"n","BBFSF.Jup","27.4","artificial reef",NA
+"26.96361","-80.00678","EB","EB",NA,"n","BBFSF.Jup","29","artificial reef",NA
+"27.05063","-80.04261","HS","HS",NA,"n","BBFSF.Jup","22","reef",NA
+"27.04461","-80.03125","HSO","HSO",NA,"n","BBFSF.Jup","18.3","reef",NA
+"26.62466","-80.02291","HSR","HSR",NA,"n","BBFSF.Jup","18.3","reef",NA
+"26.97911","-80.02435","MGE","MGE",NA,"n","BBFSF.Jup","19.8","artificial reef",NA
+"26.97726","-80.0266","MGW","MGW",NA,"n","BBFSF.Jup","19.8","artificial reef",NA
+"26.87215","-80.0138","MR","MR",NA,"n","BBFSF.Jup","27.4","reef",NA
+"26.79275","-80.00358","PA","PA",NA,"n","BBFSF.Jup","29","artificial reef",NA
+"26.47778","-80.03951","PG","PG",NA,"n","BBFSF.Jup","26.5","artificial reef",NA
+"26.65175","-80.02136","PR","PR",NA,"n","BBFSF.Jup","18.3","reef",NA
+"26.99012","-80.02497","PTR","PTR",NA,"n","BBFSF.Jup","19.2","reef",NA
+"26.75248","-80.00922","SSN","SSN",NA,"n","BBFSF.Jup","27.1","artificial reef",NA
+"26.9769","-80.01606","TB","TB",NA,"n","BBFSF.Jup","21.3","artificial reef",NA
+"25.53583","-76.75086","R14 Deep Creek","R14",NA,"n","CEI","2.4","Seagrass",NA
+"25.5364","-76.745","R15 Plum Point","R15",NA,"n","CEI","2.4","Seagrass, sand",NA
+"25.55121","-76.74298","R19 LH Beach","R19",NA,"n","CEI","3.05","sand",NA
+"25.56891","-76.72741","R21 Cotton Bay","R21",NA,"n","CEI","10.67","Sand, nearby reef",NA
+"25.46621","-76.61865","R39 Glass Window North","39",NA,"n","CEI","6.7","thick turtle grass","n"
+"25.51858","-76.62981","R41 HI North Channel","41",NA,"n","CEI","6.1","sand","n"
+"25.52803","-76.63049","R42 HI North","42",NA,"n","CEI","3","sand,manatee grass, algae","n"
+"25.55514","-76.64508","R43 Man Island","43",NA,"n","CEI","4.6","sand, algae","n"
+"25.55841","-76.7402","R45 Spanish Wells Point","45",NA,"n","CEI","3.7","sand","n"
+"25.55514","-76.75503","R46 Spanish Wells Inside","46",NA,"n","CEI","1.5","sand, seagrass","n"
+"25.54337","-76.81297","R47 Spanish Wells West","47",NA,"n","CEI","3.7","sand","n"
+"38.36903","-74.79847","AN2","AN2",NA,"n","Chesapeake Biological Lab",NA,NA,NA
+"38.30405","-74.76174","AS3","AS3",NA,"n","Chesapeake Biological Lab",NA,NA,NA
+"26.3513","-80.06557","Boca Raton South Beach Park","BRSB",NA,"n","FAU","7.6","sandy area with no reef in sight of the receiver itself",NA
+"27.4715","-80.28425","Fort Pierce Line 1","FPL1",NA,"n","FAU",NA,NA,NA
+"27.47216","-80.27912","Fort Pierce Line 2","FPL2",NA,"n","FAU",NA,NA,NA
+"27.473","-80.27385","Fort Pierce Line 3","FPL3",NA,"n","FAU",NA,NA,NA
+"27.47348","-80.26867","Fort Pierce Line 4","FPL4",NA,"n","FAU",NA,NA,NA
+"27.47462","-80.26355","Fort Pierce Line 5","FPL5",NA,"n","FAU",NA,NA,NA
+"25.0655","-80.32467","Key Largo Sandy Bottom","KELA",NA,"n","FAU",NA,"sand","n"
+"26.61262","-80.03091","Lake Worth Pier","LAWP",NA,"n","FAU",NA,NA,NA
+"27.7911","-80.44488","SBPI","SBPI",NA,"n","FAU",NA,NA,NA
+"27.90041","-80.49421","SCLN","SCLN",NA,"n","FAU",NA,NA,NA
+"26.78465","-80.02727","Singer Island","SIIS",NA,"n","FAU",NA,NA,NA
+"27.76548","-80.41981","WBNE","WBNE",NA,"n","FAU",NA,NA,NA
+"27.75918","-80.41548","WBSE","WBSE",NA,"n","FAU",NA,NA,NA
+"24.94994","-80.45356","ARB-01","ARB-01",NA,"n","FIUARBR",NA,NA,NA
+"24.94994","-80.45356","ARB-02","ARB-02",NA,"n","FIUARBR",NA,NA,NA
+"24.95007","-80.4555","ARB-05","ARB-05",NA,"n","FIUARBR",NA,NA,NA
+"24.9464","-80.45979","ARB-07","ARB-07",NA,"n","FIUARBR",NA,NA,NA
+"24.94264","-80.4651","ARB-08","ARB-08",NA,"n","FIUARBR",NA,NA,NA
+"24.93856","-80.47784","ARB-09","ARB-09",NA,"n","FIUARBR",NA,NA,NA
+"24.9455","-80.46931","ARB-10","ARB-10",NA,"n","FIUARBR",NA,NA,NA
+"24.9495","-80.46349","ARB-11","ARB-11",NA,"n","FIUARBR",NA,NA,NA
+"24.95502","-80.45781","ARB-12","ARB-12",NA,"n","FIUARBR",NA,NA,NA
+"24.95779","-80.45224","ARB-14","ARB-14",NA,"n","FIUARBR",NA,NA,NA
+"27.0054","-80.0671","3Holes","3Holes",NA,"n","FSU","16.8","natural reef",NA
+"27.0253","-80.02183","GarysGreys","GarysGreys",NA,"n","FSU","25.9","natural reef",NA
+"27.01283","-80.08562","Gulfland","Gulfland",NA,"n","FSU","9.1","Artificial reef",NA
+"27.0672","-80.044383","Hobe1","Hobe1",NA,"n","FSU","19.8","natural reef",NA
+"26.8937","-79.9858","Hole-In-Wall","Hole-In-Wall",NA,"n","FSU","37.2","natural reef",NA
+"27.0504","-80.0325","RCubero","RCubero",NA,"n","FSU","19.8","natural reef",NA
+"26.9746","-80.0016","SunTug","SunTug",NA,"n","FSU","21.9","artificial reef",NA
+"26.9627","-80.0072","Zion","Zion",NA,"n","FSU","28","artificial reef",NA
+"27.08772","-80.03191","18HO","18HO",NA,"n","FWC",NA,NA,NA
+"26.9745","-80.07912","BLRO","BLRO",NA,"n","FWC",NA,NA,NA
+"27.13701","-80.12241","BSBA","BSBA",NA,"n","FWC",NA,NA,NA
+"27.21065","-80.10998","CEBA","CEBA",NA,"n","FWC",NA,NA,NA
+"27.44612","-80.17043","Civic Center Reef","FPCC",NA,"n","FWC",NA,NA,NA
+"27.2253","-80.10233","Clifton Perry Reef","CPRE",NA,"n","FWC",NA,NA,NA
+"27.2253","-80.10233","CPRE","CPRE",NA,"n","FWC",NA,NA,NA
+"27.20376","-80.04736","DAVT","DAVT",NA,"n","FWC",NA,NA,NA
+"26.91253","-80.03388","DBNO","DBNO",NA,"n","FWC",NA,NA,NA
+"27.15572","-80.05632","EVCA","EVCA",NA,"n","FWC",NA,NA,NA
+"26.94536","-80.0742","FIJI","FIJI",NA,"n","FWC",NA,NA,NA
+"27.44485","-80.17218","FPCC","FPCC",NA,"n","FWC",NA,NA,NA
+"27.44485","-80.17218","FPL Reef","FPLR",NA,"n","FWC",NA,NA,NA
+"27.01383","-80.08562","GNWR","GNWR",NA,"n","FWC",NA,NA,NA
+"27.18133","-80.19238","Hell's gate east","GGHE",NA,"n","FWC","<3","Sand, mud, hash",NA
+"27.1782","-80.19686","Hell's gate west","GGHW",NA,"n","FWC","<3","Sand, mud, hash",NA
+"26.79068","-80.01223","LAVA","LAVA",NA,"n","FWC",NA,NA,"n"
+"27.04505","-80.04326","MIBA","MIBA",NA,"n","FWC",NA,NA,NA
+"27.00286","-80.02556","NORO","NORO",NA,"n","FWC",NA,NA,NA
+"26.7715","-80.032","Palm Beach Inlet","PBIS",NA,"n","FWC","8","Sand and rocks",NA
+"26.79133","-80.00715","PBR1","PBR1",NA,"n","FWC",NA,NA,"n"
+"26.78216","-80.02256","PBR2","PBR2",NA,"n","FWC",NA,NA,"n"
+"27.12212","-80.12803","Peck's Lake","PELA",NA,"n","FWC",NA,NA,"n"
+"27.22275","-80.11605","PIBA","PIBA",NA,"n","FWC",NA,NA,NA
+"27.86253","-80.44516","Sebastian Inlet North Jetty","SINJ",NA,"n","FWC","5","Sand, rocks",NA
+"27.85725","-80.45115","Sebastian Inlet South","SISO",NA,"n","FWC",NA,NA,"n"
+"27.8602","-80.44933","Sebastian Inlet Wading Pool","SIWP",NA,"n","FWC",NA,NA,"n"
+"27.1665","-80.14886","SL Detached Jetty","SLDJ",NA,"n","FWC","<3","Sand",NA
+"27.1652","-80.16315","SL Weather Station","SLWS",NA,"n","FWC","<3","Sand, mud",NA
+"27.20075","-80.09491","SLIB","SLIB",NA,"n","FWC",NA,NA,NA
+"26.86307","-80.02078","SNSO","SNSO",NA,"n","FWC",NA,NA,NA
+"27.20068","-80.15405","St Lucie Recon 1","SLR1",NA,"n","FWC",NA,NA,"n"
+"27.20386","-80.0548","St Lucie Recon 10","SLR10",NA,"n","FWC",NA,NA,NA
+"27.20235","-80.1461","St Lucie Recon 2","SLR2",NA,"n","FWC",NA,NA,"n"
+"27.20446","-80.13725","St Lucie Recon 3","SLR3",NA,"n","FWC",NA,NA,"n"
+"27.20636","-80.12725","St Lucie Recon 4","SLR4",NA,"n","FWC",NA,NA,"n"
+"27.20811","-80.11861","St Lucie Recon 5","SLR5",NA,"n","FWC",NA,NA,"n"
+"27.20221","-80.08743","St Lucie Recon 6","SLR6",NA,"n","FWC",NA,NA,NA
+"27.20241","-80.07931","St Lucie Recon 7","SLR7",NA,"n","FWC",NA,NA,NA
+"27.20278","-80.07046","St Lucie Recon 8","SLR8",NA,"n","FWC",NA,NA,NA
+"27.20366","-80.06233","St Lucie Recon 9","SLR9",NA,"n","FWC",NA,NA,NA
+"26.78981","-80.0169","TECO","TECO",NA,"n","FWC",NA,NA,NA
+"27.19195","-80.10846","TERE","TERE",NA,"n","FWC",NA,NA,NA
+"27.00541","-80.06711","THCE","THCE",NA,"n","FWC",NA,NA,NA
+"27.00456","-80.06661","THSO","THSO",NA,"n","FWC",NA,NA,NA
+"27.46043","-80.3179","TUBA","TUBA",NA,"n","FWC",NA,NA,NA
+"26.94715","-80.03178","TUCA","TUCA",NA,"n","FWC",NA,NA,NA
+"26.95273","-80.03245","TUCAN","TUCAN",NA,"n","FWC",NA,NA,NA
+"27.23243","-80.11173","UPDB","UPDB",NA,"n","FWC",NA,NA,NA
+"27.65132","-80.37415","VBNB","VBNB",NA,"n","FWC",NA,NA,NA
+"27.8868","-83.86615","1","1",NA,"n","FWC",NA,NA,NA
+"27.535667","-82.809833","13","13",NA,"n","FWC",NA,NA,NA
+"27.452833","-82.73","17","17",NA,"n","FWC",NA,NA,NA
+"27.3965","-82.678333","19","19",NA,"n","FWC",NA,NA,NA
+"27.8903","-83.87345","2","2",NA,"n","FWC",NA,NA,NA
+"26.8915","-82.415883","235","235",NA,"n","FWC",NA,NA,NA
+"26.807367","-82.406483","237","237",NA,"n","FWC",NA,NA,NA
+"27.642183","-82.8684","24","24",NA,"n","FWC",NA,NA,NA
+"26.720033","-82.294067","242","242",NA,"n","FWC",NA,NA,NA
+"26.628067","-82.355367","243","243",NA,"n","FWC",NA,NA,NA
+"26.628383","-82.312883","244","244",NA,"n","FWC",NA,NA,NA
+"26.628367","-82.273367","245","245",NA,"n","FWC",NA,NA,NA
+"26.535267","-82.312883","246","246",NA,"n","FWC",NA,NA,NA
+"26.5352","-82.270617","247","247",NA,"n","FWC",NA,NA,NA
+"26.66625","-82.34305","249","249",NA,"n","FWC",NA,NA,NA
+"26.55215","-82.284867","250","250",NA,"n","FWC",NA,NA,NA
+"27.514867","-82.844983","27","27",NA,"n","FWC",NA,NA,NA
+"34.57016","-77.34408","27","27",NA,"n","UNC Institute of Marine Science",NA,NA,NA
+"27.472533","-82.7553","28","28",NA,"n","FWC",NA,NA,NA
+"34.55588","-77.36723","28","28",NA,"n","UNC Institute of Marine Science",NA,NA,NA
+"26.582833","-82.311883","283","283",NA,"n","FWC",NA,NA,NA
+"27.00025","-82.466933","285","285",NA,"n","FWC",NA,NA,NA
+"26.975","-82.512517","286","286",NA,"n","FWC",NA,NA,NA
+"26.79805","-82.375","288","288",NA,"n","FWC",NA,NA,NA
+"27.457183","-82.8234","29","29",NA,"n","FWC",NA,NA,NA
+"34.55996","-77.34738","29","29",NA,"n","UNC Institute of Marine Science",NA,NA,NA
+"27.8944","-83.92093","3","3",NA,"n","FWC",NA,NA,NA
+"27.424517","-82.76415","30","30",NA,"n","FWC",NA,NA,NA
+"34.53024","-77.37393","30","30",NA,"n","UNC Institute of Marine Science",NA,NA,NA
+"27.379233","-82.729717","31","31",NA,"n","FWC",NA,NA,NA
+"34.53759","-77.36752","31","31",NA,"n","UNC Institute of Marine Science",NA,NA,NA
+"27.377533","-82.7733","32","32",NA,"n","FWC",NA,NA,NA
+"27.433733","-82.804467","33","33",NA,"n","FWC",NA,NA,NA
+"27.9014","-83.90618","4","4",NA,"n","FWC",NA,NA,NA
+"27.8842","-83.8995","5","5",NA,"n","FWC",NA,NA,NA
+"27.88908","-83.86775","7","7",NA,"n","FWC",NA,NA,NA
+"27.88681","-83.86894","8","8",NA,"n","FWC",NA,NA,NA
+"27.8882","-83.87154","9","9",NA,"n","FWC",NA,NA,NA
+"24.83175","-80.62876667","60","60",NA,"n","FWC","35.4","inshore",NA
+"24.85643333","-80.64843333","66","66",NA,"n","FWC",NA,NA,NA
+"24.84866667","-80.64215","67","67",NA,"n","FWC",NA,NA,NA
+"24.84056667","-80.63573333","68","68",NA,"n","FWC",NA,NA,NA
+"24.59558333","-80.59265","H409","H409",NA,"n","FWC",NA,NA,NA
+"24.80336667","-80.44455","HIS","HIS",NA,"n","FWC",NA,NA,NA
+"25.01391667","-80.28378333","HKL","HKL",NA,"n","FWC","27.12","seamount",NA
+"24.9064","-80.52633333","IS01","IS01",NA,"n","FWC",NA,NA,NA
+"24.90863","-80.51893","IS02","IS02",NA,"n","FWC","5.5",NA,NA
+"24.90153","-80.52052","IS03","IS03",NA,"n","FWC","11.6",NA,"n"
+"24.90372","-80.51308","IS04","IS04",NA,"n","FWC","11.3",NA,"n"
+"24.89898","-80.50695","IS05","IS05",NA,"n","FWC",NA,NA,NA
+"25.18681667","-80.2342","KL01","KL01",NA,"n","FWC",NA,NA,NA
+"25.19108333","-80.22785","KL02","KL02",NA,"n","FWC",NA,NA,NA
+"25.18372","-80.22688","KL03","KL03",NA,"n","FWC","4",NA,"n"
+"25.18813333","-80.22055","KL04","KL04",NA,"n","FWC",NA,NA,NA
+"25.18092","-80.2197","KL05","KL05",NA,"n","FWC","8.2",NA,"n"
+"25.18513","-80.21338","KL06","KL06",NA,"n","FWC","9.7",NA,"n"
+"24.51306","-81.915366","KW02","KW02",NA,"n","FWC",NA,NA,NA
+"24.50828","-81.9214","KW03","KW03",NA,"n","FWC",NA,NA,NA
+"24.506","-81.91401","KW04","KW04",NA,"n","FWC",NA,NA,NA
+"24.50115","-81.91993","KW05","KW05",NA,"n","FWC",NA,NA,NA
+"24.49883","-81.91253","KW06","KW06",NA,"n","FWC",NA,NA,NA
+"24.49411","-81.91853","KW07","KW07",NA,"n","FWC",NA,NA,NA
+"24.48701667","-81.91708333","KW09","KW09",NA,"n","FWC",NA,NA,NA
+"24.48468333","-81.90966667","kw10","kw10",NA,"n","FWC",NA,NA,NA
+"24.47985","-81.91563","KW11","KW11",NA,"n","FWC",NA,NA,NA
+"24.4777","-81.90803333","KW12","KW12",NA,"n","FWC",NA,NA,NA
+"24.4728","-81.9142","KW13","KW13",NA,"n","FWC",NA,NA,NA
+"24.4704","-81.90671667","KW14","KW14",NA,"n","FWC",NA,NA,NA
+"24.46553333","-81.91236667","KW15","KW15",NA,"n","FWC",NA,NA,NA
+"24.46298","-81.905133","KW16","KW16",NA,"n","FWC",NA,NA,NA
+"24.45843","-81.91097","KW17","KW17",NA,"n","FWC",NA,NA,NA
+"24.45616667","-81.90353333","KW18","KW18",NA,"n","FWC",NA,NA,NA
+"24.45136667","-81.9095","KW19","KW19",NA,"n","FWC",NA,NA,NA
+"24.4491","-81.90192","KW20","KW20",NA,"n","FWC",NA,NA,"n"
+"24.44427","-81.90797","KW21","KW21",NA,"n","FWC",NA,NA,"n"
+"24.44198","-81.90042","KW22","KW22",NA,"n","FWC",NA,NA,NA
+"24.43697","-81.90628","KW23","KW23",NA,"n","FWC",NA,NA,NA
+"24.43517","-81.8985","KW24","KW24",NA,"n","FWC",NA,NA,NA
+"24.4337","-81.94855","LKA01","LKA01",NA,"n","FWC",NA,NA,NA
+"24.4317","-81.9656","LKA02","LKA02",NA,"n","FWC",NA,NA,NA
+"24.4334","-81.945","LKA03","LKA03",NA,"n","FWC",NA,NA,NA
+"24.4303","-81.9456","LKA04","LKA04",NA,"n","FWC",NA,NA,NA
+"24.4298","-81.9422","LKA05","LKA05",NA,"n","FWC",NA,NA,NA
+"24.4304","-81.9388","LKA06","LKA06",NA,"n","FWC",NA,NA,NA
+"24.4305","-81.9353","LKA07","LKA07",NA,"n","FWC",NA,NA,NA
+"24.4307","-81.9318","LKA08","LKA08",NA,"n","FWC",NA,NA,NA
+"24.4309","-81.9284","LKA09","LKA09",NA,"n","FWC",NA,NA,NA
+"24.4313","-81.9251","LKA10","LKA10",NA,"n","FWC",NA,NA,NA
+"24.43447","-81.92423","LKA11","LKA11",NA,"n","FWC",NA,NA,NA
+"24.4379","-81.92427","LKA12","LKA12",NA,"n","FWC",NA,NA,NA
+"24.43822","-81.92772","LKA13","LKA13",NA,"n","FWC",NA,NA,NA
+"24.43785","-81.93123","LKA14","LKA14",NA,"n","FWC",NA,NA,NA
+"24.43828","-81.93463","LKA15","LKA15",NA,"n","FWC",NA,NA,NA
+"24.43828","-81.93813","LKA16","LKA16",NA,"n","FWC",NA,NA,NA
+"24.43767","-81.9416","LKA17","LKA17",NA,"n","FWC",NA,NA,NA
+"24.43762","-81.94508","LKA18","LKA18",NA,"n","FWC",NA,NA,NA
+"24.4475","-81.8975","LKA19","LKA19",NA,"n","FWC",NA,NA,NA
+"24.4429","-81.9456","LKA19A","LKA19A",NA,"n","FWC",NA,NA,NA
+"24.4463","-81.8971","LKA20","LKA20",NA,"n","FWC",NA,NA,NA
+"24.57361111","-82.06138889","LKA20A","LKA20A",NA,"n","FWC",NA,NA,NA
+"24.4672","-81.7969","LKA21","LKA21",NA,"n","FWC",NA,NA,NA
+"24.4654","-81.7967","LKA22","LKA22",NA,"n","FWC",NA,NA,NA
+"24.467","-81.7778","LKA23","LKA23",NA,"n","FWC",NA,NA,NA
+"24.4635","-81.778","LKA24","LKA24",NA,"n","FWC",NA,NA,NA
+"24.4581","-81.7776","LKA25","LKA25",NA,"n","FWC",NA,NA,NA
+"24.4582","-81.7742","LKA26","LKA26",NA,"n","FWC",NA,NA,NA
+"24.4583","-81.7707","LKA27","LKA27",NA,"n","FWC",NA,NA,NA
+"24.4644","-81.7706","LKA28","LKA28",NA,"n","FWC",NA,NA,NA
+"24.4679","-81.7709","LKA29","LKA29",NA,"n","FWC",NA,NA,NA
+"24.4674","-81.7746","LKA30","LKA30",NA,"n","FWC",NA,NA,NA
+"24.467","-81.7329","LKA31","LKA31",NA,"n","FWC",NA,NA,NA
+"24.4644","-81.733","LKA32","LKA32",NA,"n","FWC",NA,NA,NA
+"24.5066","-81.5747","LKA33","LKA33",NA,"n","FWC",NA,NA,NA
+"24.5058","-81.5747","LKA34","LKA34",NA,"n","FWC",NA,NA,NA
+"24.46845","-82.217","Marquesas Line 1","MQ-1",NA,"n","FWC",NA,NA,NA
+"24.46478","-82.22385","Marquesas Line 2","MQ-2",NA,"n","FWC",NA,NA,NA
+"24.4615","-82.21661","Marquesas Line 3","MQ-3",NA,"n","FWC",NA,NA,NA
+"24.45755","-82.2235","Marquesas Line 4","MQ-4",NA,"n","FWC",NA,NA,NA
+"24.4542","-82.21655","Marquesas Line 5","MQ-5",NA,"n","FWC",NA,NA,NA
+"24.45213","-82.2239","Marquesas Line 6","MQ-6",NA,"n","FWC",NA,NA,"n"
+"24.6617","-81.06501","MT01","MT01",NA,"n","FWC",NA,NA,NA
+"24.66123","-81.05708","MT02","MT02",NA,"n","FWC",NA,NA,NA
+"24.65516","-81.06141","MT03","MT03",NA,"n","FWC",NA,NA,NA
+"24.6547","-81.0535","MT04","MT04",NA,"n","FWC",NA,NA,NA
+"24.64853","-81.05795","MT05","MT05",NA,"n","FWC",NA,NA,NA
+"24.64811","-81.05005","MT06","MT06",NA,"n","FWC",NA,NA,NA
+"24.64193","-81.05446","MT07","MT07",NA,"n","FWC",NA,NA,NA
+"24.64156","-81.04663","MT08","MT08",NA,"n","FWC",NA,NA,NA
+"24.63538","-81.05088","MT09","MT09",NA,"n","FWC",NA,NA,NA
+"24.6352","-81.04296","MT10","MT10",NA,"n","FWC","10.7",NA,"n"
+"24.84605","-80.72339","R011","R011",NA,"n","FWC","2-3m","generally hard bottom with patches of sea grass in the area.  There are macro alga, some sponges, and octocorals",NA
+"24.84746","-80.72738","R012","R012",NA,"n","FWC","2-3m","generally hard bottom with patches of sea grass in the area.  There are macro alga, some sponges, and octocorals",NA
+"25.06656","-80.31081","Spiegel Grove Wreck","S.Grove",NA,"n","FWC",NA,NA,NA
+"24.88473","-80.66448","SW1","SW1",NA,"n","FWC",NA,NA,NA
+"24.87383","-80.66133","SW2","SW2",NA,"n","FWC",NA,NA,NA
+"24.86608","-80.65567","SW4","SW4",NA,"n","FWC",NA,NA,NA
+"24.85643","-80.64843","SW5","SW5",NA,"n","FWC",NA,NA,NA
+"24.84867","-80.64215","SW6","SW6",NA,"n","FWC",NA,NA,NA
+"24.84057","-80.63573","SW7","SW7",NA,"n","FWC",NA,NA,NA
+"24.83175","-80.62877","SW8","SW8",NA,"n","FWC",NA,NA,NA
+"24.53085","-81.46188","WRadolp","WRadolp",NA,"n","FWC","9.4",NA,"n"
+"24.9958","-80.379","WRbibb","WRbibb",NA,"n","FWC",NA,NA,NA
+"24.9904","-80.38066","WRduane","WRduane",NA,"n","FWC",NA,NA,NA
+"24.46005","-81.73608","WRrvande","WRrvande",NA,"n","FWC","13.4",NA,"n"
+"25.06656","-80.31081","WRspeig","WRspeig",NA,"n","FWC","12.2",NA,"n"
+"24.66063","-80.96301","WRthund","WRthund",NA,"n","FWC","11",NA,"n"
+"30.28853333","-87.22026667","3 Barges","3 Barges",NA,"n","FWC","17",NA,NA
+"29.85238","-84.46507","DIR_inner, east","DIR_inner, east",NA,"n","FSU",NA,NA,NA
+"29.75377","-84.896728","East Bay, east shore","East Bay, east shore",NA,"n","FSU",NA,NA,NA
+"29.87009","-84.44495","Green Marker, DIR","Green Marker, DIR",NA,"n","FSU",NA,NA,NA
+"30.27208333","-87.28738333","Marker # 2","Marker # 2",NA,"n","FWC","14",NA,NA
+"29.20181667","-85.66781667","MS20","MS20",NA,"n","FWC",NA,NA,NA
+"29.19728333","-85.67083","MS21","MS21",NA,"n","FWC",NA,NA,NA
+"29.19246667","-85.67478333","MS22","MS22",NA,"n","FWC",NA,NA,NA
+"29.18775","-85.677","MS23","MS23",NA,"n","FWC",NA,NA,NA
+"29.1888","-85.683","MS24","MS24",NA,"n","FWC",NA,NA,NA
+"29.18288333","-85.68063333","MS25","MS25",NA,"n","FWC",NA,NA,NA
+"29.17903333","-85.68513333","MS26","MS26",NA,"n","FWC",NA,NA,NA
+"29.18433333","-85.68671667","MS27","MS27",NA,"n","FWC",NA,NA,NA
+"29.18916667","-85.68918333","MS28","MS28",NA,"n","FWC",NA,NA,NA
+"29.1401","-85.77297","MS43","MS43",NA,"n","FWC",NA,NA,"n"
+"29.14178","-85.78157","MS46","MS46",NA,"n","FWC",NA,NA,"n"
+"29.13862","-85.77747","MS56","MS56",NA,"n","FWC",NA,NA,"n"
+"31.08409","-81.17211","BN 03","BN 03",NA,"n","GADNR",NA,NA,"n"
+"31.0912","-81.18997","BN 04","BN 04",NA,"n","GADNR",NA,NA,NA
+"31.09681","-81.20782","BN 05","BN 05",NA,"n","GADNR",NA,NA,NA
+"31.09947","-81.22613","BN 06","BN 06",NA,"n","GADNR",NA,NA,NA
+"31.10537","-81.24387","BN 07","BN 07",NA,"n","GADNR",NA,NA,NA
+"30.93319","-81.15422","BS 01","BS 01",NA,"n","GADNR",NA,NA,"n"
+"30.93326","-81.17183","BS 02","BS 02",NA,"n","GADNR",NA,NA,"n"
+"30.93313","-81.19009","BS 03","BS 03",NA,"n","GADNR",NA,NA,"n"
+"30.93312","-81.20824","BS 04","BS 04",NA,"n","GADNR",NA,NA,"n"
+"30.93302","-81.22632","BS 05","BS 05",NA,"n","GADNR",NA,NA,"n"
+"30.93312","-81.2441","BS 06","BS 06",NA,"n","GADNR",NA,NA,"n"
+"29.68336","-81.20428","GAICFS_1","GAICFS_1",NA,"n","GAICFS",NA,NA,NA
+"29.66358","-81.1959","GAICFS_2","GAICFS_2",NA,"n","GAICFS",NA,NA,NA
+"29.6439","-81.1875","GAICFS_3","GAICFS_3",NA,"n","GAICFS",NA,NA,NA
+"29.62405","-81.179","GAICFS_4","GAICFS_4",NA,"n","GAICFS",NA,NA,NA
+"29.60493","-81.17095","GAICFS_5","GAICFS_5",NA,"n","GAICFS",NA,NA,NA
+"26.32559","-80.07108","Boca1","Boca1",NA,"n","Inwater Research Group",NA,NA,NA
+"26.32114","-80.07129","Boca2","Boca2",NA,"n","Inwater Research Group",NA,NA,NA
+"26.31649","-80.07191","Boca3","Boca3",NA,"n","Inwater Research Group",NA,NA,NA
+"26.31203","-80.07211","Boca4","Boca4",NA,"n","Inwater Research Group",NA,NA,NA
+"26.30746","-80.07288","Boca5","Boca5",NA,"n","Inwater Research Group",NA,NA,NA
+"27.34722","-80.23212","Intake","Intake",NA,"n","Inwater Research Group",NA,NA,NA
+"27.33957","-80.22894","Walton","Walton",NA,"n","Inwater Research Group",NA,NA,NA
+"28.7869","-80.55965","BOEM WG SV3","BOEM WG SV3",NA,"n","KSC",NA,NA,NA
+"28.553354","-80.510059","BOEM1","BOEM1",NA,"n","KSC",NA,NA,NA
+"28.42528","-80.30194","BOEM10","BOEM10",NA,"n","KSC",NA,NA,NA
+"28.3101","-80.4569","BOEM11","BOEM11",NA,"n","KSC",NA,NA,NA
+"28.531145","-80.466545","BOEM2","BOEM2",NA,"n","KSC",NA,NA,NA
+"28.510353","-80.424712","BOEM3","BOEM3",NA,"n","KSC",NA,NA,NA
+"28.458005","-80.478153","BOEM4","BOEM4",NA,"n","KSC",NA,NA,NA
+"28.437111","-80.429518","BOEM5","BOEM5",NA,"n","KSC",NA,NA,NA
+"28.39965","-80.53358","BOEM6","BOEM6",NA,"n","KSC",NA,NA,NA
+"28.70321","-80.54107","BOEM7","BOEM7",NA,"n","KSC",NA,NA,NA
+"28.68201","-80.4271","BOEM8","BOEM8",NA,"n","KSC",NA,NA,NA
+"28.52843","-80.35162","BOEM9","BOEM9",NA,"n","KSC",NA,NA,NA
+"28.41132","-80.58135","CC1","CC1",NA,"n","KSC",NA,NA,NA
+"28.440036","-80.521241","CC10","CC10",NA,"n","KSC",NA,NA,NA
+"28.479511","-80.533495","CC11","CC11",NA,"n","KSC",NA,NA,NA
+"28.509053","-80.549075","CC12","CC12",NA,"n","KSC",NA,NA,NA
+"28.539112","-80.561056","CC13","CC13",NA,"n","KSC",NA,NA,NA
+"28.571293","-80.567327","CC14","CC14",NA,"n","KSC",NA,NA,NA
+"28.600678","-80.584132","CC15","CC15",NA,"n","KSC",NA,NA,NA
+"28.626155","-80.606753","CC16","CC16",NA,"n","KSC",NA,NA,NA
+"28.483306","-80.524195","CC17","CC17",NA,"n","KSC",NA,NA,NA
+"28.513066","-80.539916","CC18","CC18",NA,"n","KSC",NA,NA,NA
+"28.541026","-80.551062","CC19","CC19",NA,"n","KSC",NA,NA,NA
+"28.573599","-80.557417","CC20","CC20",NA,"n","KSC",NA,NA,NA
+"28.606557","-80.576373","CC21","CC21",NA,"n","KSC",NA,NA,NA
+"28.631485","-80.598481","CC22","CC22",NA,"n","KSC",NA,NA,NA
+"28.435175","-80.560133","CC3","CC3",NA,"n","KSC",NA,NA,NA
+"28.447043","-80.527671","CC5","CC5",NA,"n","KSC",NA,NA,NA
+"28.4119","-80.57003","CC6","CC6",NA,"n","KSC",NA,NA,NA
+"28.42846","-80.5535","CC8","CC8",NA,"n","KSC",NA,NA,NA
+"28.55781677","-80.45565022","CON1","CON1",NA,"n","KSC",NA,NA,NA
+"28.56143834","-80.46931818","CON10","CON10",NA,"n","KSC",NA,NA,NA
+"28.5651074","-80.46671472","CON11","CON11",NA,"n","KSC",NA,NA,NA
+"28.55273689","-80.45367672","CON2","CON2",NA,"n","KSC",NA,NA,NA
+"28.5477174","-80.45573708","CON3","CON3",NA,"n","KSC",NA,NA,NA
+"28.54537","-80.4622","CON4","CON4",NA,"n","KSC",NA,NA,NA
+"28.5470024","-80.46783658","CON5","CON5",NA,"n","KSC",NA,NA,NA
+"28.54969834","-80.47322972","CON6","CON6",NA,"n","KSC",NA,NA,NA
+"28.55399913","-80.47658931","CON7","CON7",NA,"n","KSC",NA,NA,NA
+"28.55931208","-80.47736","CON8","CON8",NA,"n","KSC",NA,NA,NA
+"28.56368756","-80.47273913","CON9","CON9",NA,"n","KSC",NA,NA,NA
+"28.393","-80.48936","CS1","CS1",NA,"n","KSC",NA,NA,NA
+"28.54435","-80.41487","CS10","CS10",NA,"n","KSC",NA,NA,NA
+"28.41718","-80.47164","CS2","CS2",NA,"n","KSC",NA,NA,NA
+"28.39787","-80.42409","CS3","CS3",NA,"n","KSC",NA,NA,NA
+"28.52048","-80.51404","CS4","CS4",NA,"n","KSC",NA,NA,NA
+"28.49841","-80.47406","CS5","CS5",NA,"n","KSC",NA,NA,NA
+"28.47628","-80.4349","CS6","CS6",NA,"n","KSC",NA,NA,NA
+"28.60944","-80.55479","CS7","CS7",NA,"n","KSC",NA,NA,NA
+"28.58601","-80.50583","CS8","CS8",NA,"n","KSC",NA,NA,NA
+"28.56384","-80.45915","CS9","CS9",NA,"n","KSC",NA,NA,NA
+"28.40138","-80.45773","CSII Dredge Site","DRE8",NA,"n","KSC",NA,NA,"n"
+"28.41118","-80.44027","DRE1","DRE1",NA,"n","KSC",NA,NA,NA
+"28.40880406","-80.45045907","DRE11","DRE11",NA,"n","KSC",NA,NA,NA
+"28.4088","-80.45046","DRE11","DRE11",NA,"n","KSC",NA,NA,"n"
+"28.41254068","-80.44788133","DRE12","DRE12",NA,"n","KSC",NA,NA,NA
+"28.40522","-80.43681","DRE2","DRE2",NA,"n","KSC",NA,NA,NA
+"28.40011","-80.43485","DRE3","DRE3",NA,"n","KSC",NA,NA,NA
+"28.39512338","-80.43693308","DRE4","DRE4",NA,"n","KSC",NA,NA,NA
+"28.39274276","-80.44329609","DRE5","DRE5",NA,"n","KSC",NA,NA,NA
+"28.39447512","-80.44898066","DRE6","DRE6",NA,"n","KSC",NA,NA,NA
+"28.39713321","-80.4543518","DRE7","DRE7",NA,"n","KSC",NA,NA,NA
+"28.40138","-80.45774","DRE8","DRE8",NA,"n","KSC",NA,NA,"n"
+"28.40663","-80.45882","DRE9","DRE9",NA,"n","KSC",NA,NA,NA
+"28.040444","-80.574492","IR13","IR13",NA,"n","KSC",NA,NA,NA
+"27.93798","-80.51946","IR15","IR15",NA,"n","KSC",NA,NA,"n"
+"27.85593","-80.48608","IR16","IR16",NA,"n","KSC",NA,NA,"n"
+"28.2093","-80.59384","Mid-Reach North","MR1A",NA,"n","KSC","3-4m","open ocean receivers. They are just outside the surf zone on a calm day but in the surf during periods of high seas. The surrounding sediment is sand and there are scattered low-relief ledges of coquina and worm rock within acoustic range",NA
+"28.18464","-80.58927","Mid-Reach North-Central","MR2A",NA,"n","KSC","3-4m","open ocean receivers. They are just outside the surf zone on a calm day but in the surf during periods of high seas. The surrounding sediment is sand and there are scattered low-relief ledges of coquina and worm rock within acoustic range",NA
+"28.12785","-80.57413","Mid-Reach South","MR4A",NA,"n","KSC","3-4m","open ocean receivers. They are just outside the surf zone on a calm day but in the surf during periods of high seas. The surrounding sediment is sand and there are scattered low-relief ledges of coquina and worm rock within acoustic range",NA
+"28.15866","-80.58229","Mid-Reach South-Central","MR3A",NA,"n","KSC","3-4m","open ocean receivers. They are just outside the surf zone on a calm day but in the surf during periods of high seas. The surrounding sediment is sand and there are scattered low-relief ledges of coquina and worm rock within acoustic range",NA
+"29.07856","-80.90691","ML1","ML1",NA,"n","KSC",NA,NA,NA
+"29.08319","-80.89799","ML1A","ML1A",NA,"n","KSC",NA,NA,NA
+"28.84965","-80.81577","ML5","ML5",NA,"n","KSC",NA,NA,NA
+"28.805687","-80.789365","ML6","ML6",NA,"n","KSC",NA,NA,NA
+"28.41139","-80.59319","TB5","TB5",NA,"n","KSC",NA,NA,"n"
+"28.57038","-80.44475","UF03","UF03",NA,"n","KSC",NA,NA,NA
+"28.5221","-80.41557","UF06","UF06",NA,"n","KSC",NA,NA,NA
+"28.53307","-80.40515","UF07","UF07",NA,"n","KSC",NA,NA,NA
+"28.49794","-80.41677","UF08","UF08",NA,"n","KSC",NA,NA,NA
+"28.48478","-80.42177","UF09","UF09",NA,"n","KSC",NA,NA,NA
+"28.41987","-80.42832","UF10","UF10",NA,"n","KSC",NA,NA,NA
+"28.59295","-80.5345","UF12","UF12",NA,"n","KSC",NA,NA,NA
+"28.38878","-80.46715","UF16","UF16",NA,"n","KSC",NA,NA,NA
+"28.39557","-80.5055","UF17","UF17",NA,"n","KSC",NA,NA,NA
+"28.46745","-80.4225","UF21","UF21",NA,"n","KSC",NA,NA,NA
+"28.45542","-80.43077","UF22","UF22",NA,"n","KSC",NA,NA,NA
+"27.27104","-82.80022","M7_1","M7_1",NA,"n","Mote Marine Lab",NA,NA,NA
+"26.744385","-82.173242","Red 4","Red 4",NA,"n","Mote Marine Lab",NA,NA,NA
+"26.67463","-78.97445","Ginn Cut OTN","Ginn Cut OTN",NA,"n","Murchie OTN",NA,NA,NA
+"26.63537","-78.92339","Karen's Beach OTN","KBOTN",NA,"n","Murchie OTN","1.5","sand",NA
+"26.59399","-78.4353","NRPC OTN","NRPC OTN",NA,"n","Murchie OTN",NA,NA,NA
+"26.64173","-79.11441","Pelican Pt","PPt",NA,"n","Murchie OTN",NA,NA,NA
+"31.38351","-80.883416","09MS","09MS",NA,"n","NOAA GRNMS",NA,NA,NA
+"31.383394","-80.866788","09T","09T",NA,"n","NOAA GRNMS",NA,NA,NA
+"31.383595","-80.900035","FS17","FS17",NA,"n","NOAA GRNMS",NA,NA,NA
+"33.42823","-78.55335","Bill Perry","BP",NA,"n","SCDNR",NA,NA,NA
+"33.35433","-78.42465","BP 25","BP 25",NA,"n","SCDNR",NA,NA,NA
+"32.0541","-80.41134","BR NE","BR NE",NA,"n","SCDNR","27.7","near structure","n"
+"32.05363","-80.42005","BR SW","BR SW",NA,"n","SCDNR","28","near structure","n"
+"32.63034","-79.4538","CHS Green 01","CHS Green 01",NA,"n","SCDNR","15.2","sand,off the side of USCG Aids to Navigation (ATONs) in the Charleston shipping channel",NA
+"32.64174","-79.6444","CHS Green 03","CHS Green 03",NA,"n","SCDNR","15.2",NA,"n"
+"32.66522","-79.69393","CHS Green 07","CHS Green 07",NA,"n","SCDNR","15.2",NA,"n"
+"32.67673","-79.71833","CHS Green 09","CHS Green 09",NA,"n","SCDNR",NA,NA,NA
+"32.69959","-79.76569","CHS GREEN 13","CHS GREEN 13",NA,"n","SCDNR",NA,NA,NA
+"32.71293","-79.79347","CHS Green 15","CHS Green 15",NA,"n","SCDNR","15.2","sand,off the side of USCG Aids to Navigation (ATONs) in the Charleston shipping channel",NA
+"32.5748","-79.46332","CHS MidShelf_1","CHS MS 1",NA,"n","SCDNR",NA,NA,"n"
+"32.58917","-79.47875","CHS MidShelf_2","CHS MidShelf_2",NA,"n","SCDNR",NA,NA,NA
+"32.58917","-79.44791","CHS MidShelf_3","CHS MidShelf_3",NA,"n","SCDNR","21","near structure","n"
+"32.56083","-79.44791","CHS MidShelf_4","CHS MidShelf_4",NA,"n","SCDNR",NA,NA,NA
+"32.56083","-79.47875","CHS MidShelf_5","CHS MidShelf_5",NA,"n","SCDNR",NA,NA,NA
+"32.58127","-79.46989","CHS MidShelf_6","CHS MidShelf_6",NA,"n","SCDNR","20.4",NA,"n"
+"32.58138","-79.45662","CHS MidShelf_7","CHS MidShelf_7",NA,"n","SCDNR","21.6",NA,"n"
+"32.56878","-79.45654","CHS MidShelf_8","CHS MidShelf_8",NA,"n","SCDNR","21.9",NA,"n"
+"32.56877","-79.46976","CHS MidShelf_9","CHS MidShelf_9",NA,"n","SCDNR","20.7",NA,"n"
+"32.78082","-79.59935","CHS N1","CHS N1",NA,"n","SCDNR","12.8-16.5","sand",NA
+"32.76843","-79.58897","CHS N2","CHS N2",NA,"n","SCDNR","12.8-16.5","sand",NA
+"32.7562","-79.5786","CHS N3","CHS N3",NA,"n","SCDNR","12.8-16.5","sand",NA
+"32.74317","-79.56783","CHS N4","CHS N4",NA,"n","SCDNR","12.8-16.5","sand,close to artificial reef",NA
+"32.73122","-79.5577","CHS N5","CHS N5",NA,"n","SCDNR","15.2",NA,"n"
+"32.7188","-79.54732","CHS N6","CHS N6",NA,"n","SCDNR","12.8-16.5","sand",NA
+"32.70633","-79.53703","CHS N7","CHS N7",NA,"n","SCDNR","15.5",NA,"n"
+"32.69403","-79.52641","CHS N8","CHS N8",NA,"n","SCDNR","16.4",NA,"n"
+"32.6563","-79.66708","CHS Red 06","CHS Red 06",NA,"n","SCDNR","15.2",NA,"n"
+"32.57155","-79.91901","CHS S1","CHS S1",NA,"n","SCDNR","13.4-17.4","sand, deployed amongst amongst reef material",NA
+"32.54962","-79.92702","CHS S2","CHS S2",NA,"n","SCDNR","13.4-17.4","sand",NA
+"32.54288","-79.90762","CHS S3","CHS S3",NA,"n","SCDNR","13.4-17.4","sand",NA
+"32.53598","-79.88731","CHS S4","CHS S4",NA,"n","SCDNR","13.4-17.4","sand",NA
+"32.52605","-79.87407","CHS S5","CHS S5",NA,"n","SCDNR","13.4-17.4","sand",NA
+"32.52172","-79.84734","CHS S6","CHS S6",NA,"n","SCDNR","13.4-17.4","sand",NA
+"32.51708","-79.82767","CHS S7","CHS S7",NA,"n","SCDNR","15.2",NA,"n"
+"32.51048","-79.8087","CHS S8","CHS S8",NA,"n","SCDNR","13.4-17.4","sand",NA
+"32.00176","-80.59824","HH NW","HH NW",NA,"n","SCDNR",NA,NA,NA
+"33.69867","-78.44517","Little River Reef","Little River Reef",NA,"n","SCDNR",NA,NA,NA
+"32.6304","-79.792","OD_HB2","OD_HB2",NA,"n","SCDNR",NA,NA,NA
+"32.60475","-79.7403","OD_I5","OD_I5",NA,"n","SCDNR",NA,NA,NA
+"32.1688","-80.5944","PRS G15","PRS G15",NA,"n","SCDNR",NA,NA,NA
+"32.18341","-80.6042","PRS G19","PRS G19",NA,"n","SCDNR",NA,NA,NA
+"33.20732","-79.1644","RDLL-WB-32","RDLL-WB-32",NA,"n","SCDNR",NA,NA,NA
+"32.44685","-80.40548","SHS 11","SHS 11",NA,"n","SCDNR",NA,NA,NA
+"32.36363","-80.33314","SHS 4","SHS 4",NA,"n","SCDNR",NA,NA,NA
+"32.396","-80.35459","SHS 4B","SHS 4B",NA,"n","SCDNR",NA,NA,NA
+"32.40921","-80.35817","SHS 5","SHS 5",NA,"n","SCDNR",NA,NA,NA
+"32.42019","-80.36181","SHS 7","SHS 7",NA,"n","SCDNR",NA,NA,NA
+"32.42013","-80.3615","SHS G7","SHS G7",NA,"n","SCDNR","<10m","sand/silt","n"
+"33.19191","-79.15214","WINYAH BAY LB 7","WINYAH BAY LB 7",NA,"n","SCDNR",NA,NA,NA
+"34.2073","-76.9488","LEJ3 Buoy","LEJ3 Buoy",NA,"n","SERC MD - NC Array",NA,NA,NA
+"24.50288","-77.6973","Cargill Creek","Cargill Creek",NA,"n","Shedd Aquarium","26.8","Sandy flat; extremely dramatic drop-off approx 30 ft east",NA
+"24.18025","-77.5513","Congo Town","Congo Town",NA,"n","Shedd Aquarium","30.2","Gentle slope; very patchy, with low relief coral heads in vicinity (max 3ft tall); sand patch monitor is in ~5ft diameter; sea whips (rare); fairly strong S current, even at depth",NA
+"24.73948","-77.7651","Fresh Creek","Fresh Creek",NA,"n","Shedd Aquarium","29.9","Not very rugose reef site; slight ridge just shoreward; patchy sand/coral sloping downward",NA
+"25.17962","-78.00633","Morgan's Bluff","MOBL",NA,"n","Shedd Aquarium",NA,NA,NA
+"25.38912","-78.12613","North Joulters","North Joulters",NA,"n","Shedd Aquarium","24.4","Sandy area among scattered coral heads; approx. 30 ft from dramatic drop-off",NA
+"25.39795","-77.7749","Whale Cay","WHCA",NA,"n","Shedd Aquarium",NA,NA,NA
+"24.3756","-76.59386","BIO","BIO",NA,"n","Shedd Aquarium",NA,NA,NA
+"24.22207","-76.48875","SamCI","SamCI",NA,"n","Shedd Aquarium",NA,NA,NA
+"24.22769","-76.47154","SamCO","SamCO",NA,"n","Shedd Aquarium",NA,NA,NA
+"24.41633","-76.6421","WWO","WWO",NA,"n","Shedd Aquarium",NA,NA,NA
+"24.52007","-81.96363","BTT_57","BTT_57",NA,"n","Tarpon Trust",NA,NA,NA
+"24.69271","-81.6894","BTT12","BTT12",NA,"n","Tarpon Trust",NA,NA,NA
+"24.80891","-81.46849","BTT14","BTT14",NA,"n","Tarpon Trust",NA,NA,NA
+"24.5854","-82.08601667","BTT15","BTT15",NA,"n","Tarpon Trust",NA,NA,NA
+"24.80891","-81.46849","BTT22","BTT22",NA,"n","Tarpon Trust",NA,NA,NA
+"24.66564","-81.75321","BTT30","BTT30",NA,"n","Tarpon Trust",NA,NA,NA
+"24.66564","-81.75321","BTT31","BTT31",NA,"n","Tarpon Trust",NA,NA,NA
+"24.55152","-81.84632","BTT37","BTT37",NA,"n","Tarpon Trust",NA,NA,NA
+"24.55662098","-81.84281901","BTT48","BTT48",NA,"n","Tarpon Trust",NA,NA,NA
+"24.52442","-81.99171","BTT52","BTT52",NA,"n","Tarpon Trust",NA,NA,NA
+"24.57395","-81.62611","BTT63","BTT63",NA,"n","Tarpon Trust",NA,NA,NA
+"24.653583","-81.291","BTT67","BTT67",NA,"n","Tarpon Trust",NA,NA,NA
+"24.65411","-81.28597","BTT68","BTT68",NA,"n","Tarpon Trust",NA,NA,NA
+"25.049517","-80.440867","BTT74","BTT74",NA,"n","Tarpon Trust",NA,NA,NA
+"24.996683","-80.492083","BTT75","BTT75",NA,"n","Tarpon Trust",NA,NA,NA
+"24.81912","-80.7786","BTT76","BTT76",NA,"n","Tarpon Trust",NA,NA,NA
+"24.84034","-80.74824","BTT77","BTT77",NA,"n","Tarpon Trust",NA,NA,NA
+"24.877383","-80.669117","BTT79","BTT79",NA,"n","Tarpon Trust",NA,NA,NA
+"24.68626","-81.07353","BTT83","BTT83",NA,"n","Tarpon Trust",NA,NA,NA
+"24.9524","-81.8992","LUCRX","LUCRX",NA,"n","Tarpon Trust",NA,NA,NA
+"24.5854","-82.08602","P15","P15",NA,"n","Tarpon Trust",NA,NA,NA
+"24.64123336","-81.89193335","P29","P29",NA,"n","Tarpon Trust",NA,NA,NA
+"24.57692","-81.84724","P35","P35",NA,"n","Tarpon Trust",NA,NA,NA
+"24.58402","-81.8534","P36","P36",NA,"n","Tarpon Trust",NA,NA,NA
+"24.551518","-81.846315","P37","P37",NA,"n","Tarpon Trust",NA,NA,NA
+"24.6028","-81.88066","P45","P45",NA,"n","Tarpon Trust",NA,NA,NA
+"24.57677","-81.83136","P47","P47",NA,"n","Tarpon Trust",NA,NA,NA
+"24.55662","-81.84282","P48","P48",NA,"n","Tarpon Trust",NA,NA,NA
+"24.52905","-81.9032","P49","P49",NA,"n","Tarpon Trust",NA,NA,NA
+"24.595267","-81.956254","P56","P56",NA,"n","Tarpon Trust",NA,NA,NA
+"24.52007","-81.96363","P57","P57",NA,"n","Tarpon Trust",NA,NA,NA
+"24.678283","-81.19805","T10","T10",NA,"n","Tarpon Trust",NA,NA,NA
+"24.8402","-80.74805","T17","T17",NA,"n","Tarpon Trust",NA,NA,NA
+"24.57391667","-81.6257","T3","T3",NA,"n","Tarpon Trust",NA,NA,NA
+"24.77883333","-81.40793333","T5","T5",NA,"n","Tarpon Trust",NA,NA,NA
+"24.65358333","-81.291","T7","T7",NA,"n","Tarpon Trust",NA,NA,NA
+"24.65388333","-81.28595","T8","T8",NA,"n","Tarpon Trust",NA,NA,NA
+"24.66503333","-81.23863333","T9","T9",NA,"n","Tarpon Trust",NA,NA,NA
+"24.55978","-82.32777","TUGRX","TUGRX",NA,"n","Tarpon Trust",NA,NA,NA
+"27.90902","-93.59755","East Flower Garden Bank","East Flower Garden Bank",NA,"n","Texas A&M","18","on the crest of a large coral reef cap",NA
+"30.25362","-88.05627","MB3","MB3",NA,"n","U Alab",NA,NA,NA
+"30.25722","-88.04121","MB4","MB4",NA,"n","U Alab",NA,NA,NA
+"29.46752","-88.02419","VR100","VR100",NA,"n","U Alab",NA,NA,NA
+"30.23301","-88.02103","WRECK","WRECK",NA,"n","U Alab",NA,NA,NA
+"27.48785","-82.98453333","AcjL","AcjL",NA,"n","UF",NA,NA,NA
+"27.46865","-83.22108333","Cog1","Cog1",NA,"n","UF",NA,"Artificial reef",NA
+"27.50733","-82.98543","Doc1","Doc1",NA,"n","UF",NA,NA,NA
+"27.50733333","-82.98543333","Doc2","Doc2",NA,"n","UF",NA,NA,NA
+"28.1565","-83.2116","EW2","EW2",NA,"n","UF",NA,NA,NA
+"28.18941667","-83.45778333","EW3","EW3",NA,"n","UF",NA,NA,NA
+"28.20428333","-83.46676667","EW4","EW4",NA,"n","UF",NA,NA,NA
+"27.49448","-83.09492","FIN","FIN",NA,"n","UF",NA,NA,NA
+"27.4959","-83.0953","FIN_N","FIN_N",NA,"n","UF",NA,NA,"n"
+"27.4959","-83.0953","FIN_S","FIN_S",NA,"n","UF",NA,NA,"n"
+"27.4876","-83.0837","FinL","FinL",NA,"n","UF",NA,NA,"n"
+"27.69603","-83.29322","GAR","GAR",NA,"n","UF",NA,NA,NA
+"27.68445","-83.05245","HRSL","HRSL",NA,"n","UF",NA,NA,NA
+"27.542","-82.8784","Hul2","Hul2",NA,"n","UF",NA,"Artificial reef","n"
+"27.9016","-83.32592","IL2","IL2",NA,"n","UF",NA,NA,NA
+"27.7853","-83.1959","IL3","IL3",NA,"n","UF",NA,NA,NA
+"27.7614","-83.2075","IL4","IL4",NA,"n","UF",NA,NA,NA
+"27.7912","-83.20745","IL5","IL5",NA,"n","UF",NA,NA,NA
+"27.6444","-83.3419","IL6","IL6",NA,"n","UF",NA,"Artificial reef","n"
+"27.6608","-83.3213","IL7","IL7",NA,"n","UF",NA,NA,"n"
+"27.5224","-83.40468","MEX1","MEX1",NA,"n","UF",NA,NA,NA
+"27.45046667","-83.26826667","Pil1","Pil1",NA,"n","UF",NA,NA,NA
+"27.67797","-82.86235","St Pete Barge","St Pete Barge",NA,"n","UF",NA,NA,NA
+"27.5698","-83.1335","Sulph","Sulph",NA,"n","UF",NA,NA,"n"
+"27.65033","-83.05667","TEN","TEN",NA,"n","UF",NA,NA,NA
+"27.64911667","-83.05675","Ten2","Ten2",NA,"n","UF",NA,NA,NA
+"30.14593","-86.60186","VPS.array","VPS.array",NA,"n","UF",NA,NA,NA
+"29.63683","-84.89535","GAG","GAG",NA,"n","UGA",NA,NA,NA
+"27.02918","-79.16235","NH-BP","NH-BP",NA,"n","UM - GB","12.2","top of small coral head",NA
+"27.01355","-79.13337","NH-CH","NH-CH",NA,"n","UM - GB","4.9","hard pan",NA
+"27.00037","-79.13943","NH-CT","NH-CT",NA,"n","UM - GB","6.1","rock outcrop by sand",NA
+"27.02362","-79.16153","NH-HT","NH-HT",NA,"n","UM - GB","14.9","near eastern edge of high reef",NA
+"26.9065","-79.09427","NH1","NH1",NA,"n","UM - GB","9.1","hard",NA
+"27.01295","-79.15143","NH10","NH10",NA,"n","UM - GB","5.5","sand",NA
+"27.02638","-79.15715","NH11","NH11",NA,"n","UM - GB","6.1","hard pan with sargassum",NA
+"27.04022","-79.16178","NH12","NH12",NA,"n","UM - GB","7","hard pan",NA
+"27.04092","-79.14562","NH13","NH13",NA,"n","UM - GB","4.8","sand and rubble",NA
+"27.04403","-79.1299","NH14","NH14",NA,"n","UM - GB","4.6","deep sand",NA
+"27.03152","-79.12273","NH15","NH15",NA,"n","UM - GB","4.3","deep sand",NA
+"27.0189","-79.11593","NH16","NH16",NA,"n","UM - GB","5.2","grass with substrate",NA
+"27.00648","-79.10932","NH17","NH17",NA,"n","UM - GB","3","sand hole in grass",NA
+"26.99667","-79.10158","NH18","NH18",NA,"n","UM - GB","4.9","sand hole in grass",NA
+"26.98708","-79.0915","NH19","NH19",NA,"n","UM - GB","5.2","sand hole in grass",NA
+"26.92098","-79.09588","NH2","NH2",NA,"n","UM - GB","6.1","hard",NA
+"26.97297","-79.09185","NH20","NH20",NA,"n","UM - GB","6.1","sand and rock",NA
+"26.96788","-79.0772","NH21","NH21",NA,"n","UM - GB","3.4","deep sand",NA
+"26.95495","-79.07685","NH22","NH22",NA,"n","UM - GB","3.4","deep sand",NA
+"26.94152","-79.07515","NH23","NH23",NA,"n","UM - GB","5.2","grass and hard pan",NA
+"26.92978","-79.06937","NH24","NH24",NA,"n","UM - GB","4.9","hard pan",NA
+"26.9173","-79.06627","NH25","NH25",NA,"n","UM - GB","4.9","grass, hard pan, gorgo",NA
+"26.90648","-79.05968","NH26","NH26",NA,"n","UM - GB","2.7","sand",NA
+"26.906833","-79.079048","NH27","NH27",NA,"n","UM - GB","4.9","deep sand",NA
+"26.90637","-79.08588","NH28","NH28",NA,"n","UM - GB","7","deep sand",NA
+"26.9344","-79.10221","NH3","NH3",NA,"n","UM - GB","6.1",NA,NA
+"26.94847","-79.10622","NH4","NH4",NA,"n","UM - GB","6.1",NA,NA
+"26.96292","-79.10798","NH5","NH5",NA,"n","UM - GB","7",NA,NA
+"26.969","-79.12278","NH6","NH6",NA,"n","UM - GB","7.3",NA,NA
+"26.98302","-79.11922","NH7","NH7",NA,"n","UM - GB","6.1",NA,NA
+"26.98835","-79.13438","NH8","NH8",NA,"n","UM - GB","6.4","on reef ridge",NA
+"27.00072","-79.1428","NH9","NH9",NA,"n","UM - GB","5.8","hard pan",NA
+"25.41083","-80.13599","Ajax Reef","Ajax Reef",NA,"n","UM - Miami",NA,NA,NA
+"25.3533","-80.26105","BCG1","BCG1",NA,"n","UM - Miami",NA,NA,NA
+"25.34363","-80.25147","BCG2","BCG2",NA,"n","UM - Miami",NA,NA,NA
+"25.59123","-80.16311","SK","SK",NA,"n","UM - Miami",NA,NA,NA
+"25.591225","-80.163113","Soldier Key","Soldier Key",NA,"n","UM - Miami",NA,NA,NA
+"25.772334","-80.124341","South Beach","South Beach",NA,"n","UM - Miami",NA,NA,NA
+"25.51019","-80.11313","Star Reef","Star Reef",NA,"n","UM - Miami",NA,NA,NA
+"34.56212","-77.36517","25","25",NA,"n","UNC Institute of Marine Science",NA,NA,NA
+"34.56629","-77.35729","26","26",NA,"n","UNC Institute of Marine Science",NA,NA,NA
+"34.55132","-77.34859","34","34",NA,"n","UNC Institute of Marine Science",NA,NA,NA
+"34.54678","-77.31476","36","36",NA,"n","UNC Institute of Marine Science",NA,NA,NA
+"34.55113","-77.30991","37","37",NA,"n","UNC Institute of Marine Science",NA,NA,NA
+"34.5367","-77.33409","38","38",NA,"n","UNC Institute of Marine Science",NA,NA,NA
+"26.7789","-77.91592","V2LGBI_2","V2LGBI_2",NA,"n","V2LGBI",NA,NA,NA
+"26.92295","-78.61763","V2LGBI_25","V2LGBI_25",NA,"n","V2LGBI",NA,NA,NA
+"26.58863","-77.80334","V2LGBI_26","V2LGBI_26",NA,"n","V2LGBI",NA,NA,NA
+"26.55499","-77.86391","V2LGBI_33","V2LGBI_33",NA,"n","V2LGBI",NA,NA,NA
+"26.60125","-78.38767","V2LGBI_35","V2LGBI_35",NA,"n","V2LGBI",NA,NA,NA
+"26.49353","-78.72446","V2LGBI_46","V2LGBI_46",NA,"n","V2LGBI",NA,NA,NA
+"26.88764","-77.44898","V2LGBI_13","V2LGBI_13",NA,"n","V2LGBI",NA,NA,NA
+"26.95831","-77.55759","V2LGBI_14","V2LGBI_14",NA,"n","V2LGBI",NA,NA,NA
+"26.91964","-77.58745","V2LGBI_15","V2LGBI_15",NA,"n","V2LGBI",NA,NA,NA
+"26.89665","-77.80117","V2LGBI_17","V2LGBI_17",NA,"n","V2LGBI",NA,NA,NA
+"26.85962","-77.62237","V2LGBI_19","V2LGBI_19",NA,"n","V2LGBI",NA,NA,NA
+"27.07502","-77.98358","V2LGBI_21","V2LGBI_21",NA,"n","V2LGBI",NA,NA,NA
+"27.12985","-78.10647","V2LGBI_23","V2LGBI_23",NA,"n","V2LGBI",NA,NA,NA
+"26.89715","-77.95527","V2LGBI_5","V2LGBI_5",NA,"n","V2LGBI",NA,NA,NA
+"26.91518","-77.82643","V2LGBI_7","V2LGBI_7",NA,"n","V2LGBI",NA,NA,NA
+"27.28531","-82.60021","SILVERTOOTH_REEF","SILVERTOOTH_REEF",NA,"n","Mote Marine Lab",NA,NA,NA
+"29.66188","-84.3731","KTW","KTW",NA,"n","UGA",NA,NA,NA
+"29.72865","-84.30202","OAR","OAR",NA,"n","UGA",NA,NA,NA
+"29.78514","-84.46677","PCP","PCP",NA,"n","UGA",NA,NA,NA
+"29.66022","-84.50027","RRR","RRR",NA,"n","UGA",NA,NA,NA
+"29.76637","-84.52853","TDC","TDC",NA,"n","UGA",NA,NA,NA

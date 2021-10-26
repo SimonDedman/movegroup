@@ -1,0 +1,27 @@
+Package: dBBMM_HomeRange
+Title: Home Range for (marine) animals using dynamic brownian bridge movement models
+Version: 0.0.1
+Authors@R: c(
+    person("Simon", "Dedman", email = "simondedman@gmail.com", role = c("aut", "cre")),
+    person("Maurits", " Zinnicq Bergmann", role = c("aut", "cre"))
+Description: TO BE FILLED.
+Depends:
+    R (>= 4.1.1)
+License: MIT + file LICENSE
+Encoding: UTF-8
+Language: en-GB
+LazyData: true
+Imports:
+    gbm (>= 2.1.1),
+    dismo (>= 1.0-15),
+    beepr (>= 1.2),
+    mapplots (>= 1.5),
+    maptools (>= 0.9-1),
+    rgdal (>= 1.1-10),
+    rgeos (>= 0.3-19),
+    raster (>= 2.5-8),
+    sf (>= 0.9-7),
+    shapefiles (>= 0.7),
+    stats (>= 3.3.1),
+    stringi(>= 1.6.1)
+RoxygenNote: 7.1.2
