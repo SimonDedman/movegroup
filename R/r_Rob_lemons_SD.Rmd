@@ -20,6 +20,7 @@ print(Sys.info()["nodename"])
 if (grepl("aurits", Sys.info()["nodename"])) {
   data.dir <- "~/Documents/Science/Projects/Rob Bullock - Bimini/dBBMM_HomeRange/data/"
 }
+
 if (grepl("nautilus", Sys.info()["nodename"]) | grepl("Poseidon", Sys.info()["nodename"]) | grepl("aquarius", Sys.info()["nodename"])) {
   data.dir <- "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/"
 }
@@ -43,6 +44,11 @@ library(tidyr) # drop_na
 library(tidylog) # verbose functions
 library(raster)
 library(sf)
+library(knitr)
+library(kableExtra)
+library(devtools)
+#install_github("SimonDedman/gbm.auto")
+library(gbm.auto)
 ```
 
 Load data set
@@ -78,9 +84,20 @@ names(DET)
 str(DET)
 dim(DET)
 head(DET)
-table(DET$Tidal.Phase)
+
+table(DET$Tidal.Phase) %>%
+  kbl(caption = "Detection frequency per tidal phase") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+table(DET$Shark) %>%
+  kbl(caption = "Detection frequency per shark") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+table(DET$Shark, DET$Tidal.Phase) %>%
+  kbl(caption = "Detection frequency per shark and tidal phase") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
 table(DET$Shark, DET$Tidal.Phase)
-table(DET$Shark)
 ```
 
 Housekeeping and tidy up
@@ -362,7 +379,7 @@ write.csv(md,
 # Scale and sum individual rasters, followed by a rescaling to obtain an aggregated UD (.asc)
 print(Sys.info()["nodename"])
 if (grepl("aurits", Sys.info()["nodename"])) {
-  work.dir <- "~/Documents/Science/Projects/Rob Bullock - Bimini/"
+  work.dir <- "~/Documents/Science/Projects/Rob Bullock - Bimini/dBBMM_HomeRange/"
 }
 if (grepl("nautilus", Sys.info()["nodename"]) | grepl("Poseidon", Sys.info()["nodename"]) | grepl("aquarius", Sys.info()["nodename"])) {
   work.dir <- "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/"
@@ -418,9 +435,6 @@ lemons.ras <- read_stars(paste0(work.dir, "/dBBMM ASCII/Scaled/All_Rasters_Scale
 # # Plot in projected CRS
 # ggplot() +
 #   geom_raster(data = lemon.poly.df.sf, aes(x = x, y = y, fill = layer))
-library(devtools)
-install_github("SimonDedman/gbm.auto")
-library(gbm.auto)
 dir.create(paste0(out.dir, "basemap"))
 bounds <- st_bbox(lemons.ras) %>% as.vector() # xmin      ymin      xmax      ymax 
 bounds <- bounds[c(1, 3, 2, 4)] # c(xmin,xmax,ymin,ymax)
