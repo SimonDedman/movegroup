@@ -18,7 +18,7 @@ Set the working directory depending on the user
 ```{r setup}
 print(Sys.info()["nodename"])
 if (grepl("aurits", Sys.info()["nodename"])) {
-  data.dir <- "~/Documents/Science/Projects/Rob Bullock - Bimini/data/"
+  data.dir <- "~/Documents/Science/Projects/Rob Bullock - Bimini/dBBMM_HomeRange/data/"
 }
 if (grepl("nautilus", Sys.info()["nodename"]) | grepl("Poseidon", Sys.info()["nodename"]) | grepl("aquarius", Sys.info()["nodename"])) {
   data.dir <- "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/"
