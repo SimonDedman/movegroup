@@ -47,6 +47,7 @@ library(sf)
 library(knitr)
 library(kableExtra) # LaTeX format tables via pipe structure
 library(lubridate) # today(). And other datetime operations as needed.
+library(stars) # ggplot rasters in plot sections.
 library(devtools)
 #install_github("SimonDedman/gbm.auto")
 library(gbm.auto)
@@ -400,7 +401,6 @@ Now we're ready for the final step: plotting!
 # plot(sqrt(lemons.ras)) # sqrt inflates the values to make it easier to view
 # plot(lemons.ras) # fix this nor plotting why?? SD
 
-library(stars)
 lemons.ras <- read_stars(paste0(work.dir, "/dBBMM ASCII/Scaled/All_Rasters_Scaled.asc")) %>% # si directory
   st_set_crs(2958) %>%
   st_transform(4326)
@@ -478,23 +478,41 @@ myMap <- get_map(location = myLocation,
 # attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]] # latitude, y, height
 autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]]) * 1.2
 
-# For polygonizing rasters following grid boundaries, see st_as_sf with arguments as_points=FALSE and merge=TRUE; contour plots contour lines using R's native algorithm (which also plots contour levels)
-lemons.sf <- st_as_sf(lemons.ras, as_points = FALSE, merge = TRUE)
-# Error in st_as_sf.stars(lemons.ras, as_points = FALSE, merge = TRUE) : 
-# merge=TRUE and as_points=TRUE unsupported; consider using st_contour for generating contour lines
-lemons.sf <- st_as_sf(lemons.ras, as_points = FALSE, merge = FALSE)
+# # For polygonizing rasters following grid boundaries, see st_as_sf with arguments as_points=FALSE and merge=TRUE; contour plots contour lines using R's native algorithm (which also plots contour levels)
+# lemons.sf <- st_as_sf(lemons.ras, as_points = FALSE, merge = TRUE)
+# # Error in st_as_sf.stars(lemons.ras, as_points = FALSE, merge = TRUE) : 
+# # merge=TRUE and as_points=TRUE unsupported; consider using st_contour for generating contour lines
+# lemons.sf <- st_as_sf(lemons.ras, as_points = FALSE, merge = FALSE)
+
+mycontour <- st_contour(x = lemons.ras,
+                        contour_lines = FALSE, #false = polygons, true = lines
+                        # breaks = classInt::classIntervals(na.omit(as.vector(lemons.ras[[1]])))$brks
+                        # numerical; values at which to "draw" contour levels
+                        breaks = c(0.5, 0.95))
+class(mycontour) # "sf"         "data.frame"
+mycontour$geometry[1]
+st_geometry(mycontour)
+st_geometry(crop_map)
+st_bbox(mycontour)
+# xmin ymin xmax ymax 
+#   NA   NA   NA   NA
+st_bbox(lemons.ras)
+# xmin      ymin      xmax      ymax 
+# -79.28970  25.68331 -79.21143  25.78939
+st_set_bbox(mycontour, st_bbox(lemons.ras))
+# Error in UseMethod("st_set_bbox") : no applicable method for 'st_set_bbox' applied to an object of class "c('sf', 'data.frame')"
 
 # ggplot() +
 ggmap(myMap) +
-  geom_stars(data = sqrt(lemons.ras), inherit.aes = FALSE) + # geom_stars only works for objects with raster or vector geometries
+  # geom_stars(data = sqrt(lemons.ras), inherit.aes = FALSE) + # geom_stars only works for objects with raster or vector geometries
   # inherit.aes=FALSE from https://github.com/r-spatial/sf/issues/336
-  # st_contour(x = lemons.ras)
-  #            contour_lines = FALSE #false = polygons, true = lines
-  #            # breaks = classInt::classIntervals(na.omit(as.vector(lemons.ras[[1]])))$brks
-  #            ) + # numerical; values at which to "draw" contour levels
-  # breaks = c(0.5, 0.95)
-  # Warning: Incompatible methods ("+.gg", "Ops.data.frame") for "+" Error in ggmap(myMap) + st_contour(lemons.ras) : non-numeric argument to binary operator. Same for ggmap, with default contour_lines & breaks
-  # geom_sf(data = crop_map, colour = "black", fill = "grey") + # coastline basemap # REMOVE if using GGMAP
+  geom_sf(st_contour(x = lemons.ras,
+                     contour_lines = FALSE, #false = polygons, true = lines
+                     # breaks = classInt::classIntervals(na.omit(as.vector(lemons.ras[[1]])))$brks
+                     # numerical; values at which to "draw" contour levels
+                     breaks = c(0.5, 0.95))) +
+  # https://github.com/r-spatial/stars/issues/465 st_contour returns an sf object with the contours; you'd have to pass that to geom_sf()
+  # Error: `mapping` must be created by `aes()`
   coord_sf(xlim = bounds[1:2], ylim = bounds[3:4], expand = FALSE) +
   scale_fill_viridis_c() +
   ggtitle("dBBMM title, ideally dynamic based on data",
