@@ -482,38 +482,38 @@ autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(my
 lemons.sf <- st_as_sf(lemons.ras, as_points = FALSE, merge = TRUE)
 # Error in st_as_sf.stars(lemons.ras, as_points = FALSE, merge = TRUE) : 
 # merge=TRUE and as_points=TRUE unsupported; consider using st_contour for generating contour lines
+lemons.sf <- st_as_sf(lemons.ras, as_points = FALSE, merge = FALSE)
 
-ggplot() +
-# ggmap(myMap) +
+# ggplot() +
+ggmap(myMap) +
   geom_stars(data = sqrt(lemons.ras), inherit.aes = FALSE) + # geom_stars only works for objects with raster or vector geometries
   # inherit.aes=FALSE from https://github.com/r-spatial/sf/issues/336
-  st_contour(x = lemons.ras) +
+  # st_contour(x = lemons.ras)
   #            contour_lines = FALSE #false = polygons, true = lines
   #            # breaks = classInt::classIntervals(na.omit(as.vector(lemons.ras[[1]])))$brks
   #            ) + # numerical; values at which to "draw" contour levels
   # breaks = c(0.5, 0.95)
-# Warning: Incompatible methods ("+.gg", "Ops.data.frame") for "+" Error in ggmap(myMap) + st_contour(lemons.ras) : non-numeric argument to binary operator. Same for ggmap, with default contour_lines & breaks
-  
+  # Warning: Incompatible methods ("+.gg", "Ops.data.frame") for "+" Error in ggmap(myMap) + st_contour(lemons.ras) : non-numeric argument to binary operator. Same for ggmap, with default contour_lines & breaks
   # geom_sf(data = crop_map, colour = "black", fill = "grey") + # coastline basemap # REMOVE if using GGMAP
   coord_sf(xlim = bounds[1:2], ylim = bounds[3:4], expand = FALSE) +
   scale_fill_viridis_c() +
   ggtitle("dBBMM title, ideally dynamic based on data",
           subtitle = "inc subtitle if worthwhile") +
   labs(x = "Longitude", y = "Latitude", caption = paste0("dBBMM_HomeRange, ", today())) +
-  theme_minimal() # + 
-  # theme(legend.position = c(0.1, 0.16), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
-  #       legend.spacing.x = unit(0, 'cm'), #compress spacing between legend items, this is min
-  #       legend.spacing.y = unit(0.1, 'cm'), #compress spacing between legend items, this is min
-  #       legend.background = element_rect(fill = "white", colour = NA), # element_blank(),
-  #       panel.background = element_rect(fill = "white", colour = "grey50"), # white background
-  #       legend.key = element_blank()) # removed whitespace buffer around legend boxes which is nice
-  
-  ggsave(paste0(today(), "_Hammertrack_", hammerdirs, ".png"),
-         plot = last_plot(), device = "png", path = "../../Maps & Surveys/R_Plot_Outputs", scale = 1.75,
-         #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
-         width = 6, # 8 for Med # 7 normal # 3.8 miwingWhotspot, 7 wholearea 6 gsl 5 gom 5.5 centralAtl
-         height = autoheight, #NA default; Then ggsave with defaults, changes from 7x7" to e.g.
-         units = "in", dpi = 600, limitsize = TRUE)
+  theme_minimal() +
+  theme(legend.position = c(0.1, 0.16), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
+        legend.spacing.x = unit(0, 'cm'), #compress spacing between legend items, this is min
+        legend.spacing.y = unit(0.1, 'cm'), #compress spacing between legend items, this is min
+        legend.background = element_rect(fill = "white", colour = NA), # element_blank(),
+        panel.background = element_rect(fill = "white", colour = "grey50"), # white background
+        legend.key = element_blank()) # removed whitespace buffer around legend boxes which is nice
+
+# ggsave(paste0(today(), "_Hammertrack_", hammerdirs, ".png"),
+#        plot = last_plot(), device = "png", path = "../../Maps & Surveys/R_Plot_Outputs", scale = 1.75,
+#        #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
+#        width = 6, # 8 for Med # 7 normal # 3.8 miwingWhotspot, 7 wholearea 6 gsl 5 gom 5.5 centralAtl
+#        height = autoheight, #NA default; Then ggsave with defaults, changes from 7x7" to e.g.
+#        units = "in", dpi = 600, limitsize = TRUE)
 
 
 
