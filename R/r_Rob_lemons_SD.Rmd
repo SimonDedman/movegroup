@@ -48,6 +48,7 @@ library(knitr)
 library(kableExtra) # LaTeX format tables via pipe structure
 library(lubridate) # today(). And other datetime operations as needed.
 library(stars) # ggplot rasters in plot sections.
+library(starsExtra) # ggplot rasters in plot sections; trim2
 library(devtools)
 #install_github("SimonDedman/gbm.auto")
 library(gbm.auto)
@@ -405,37 +406,10 @@ lemons.ras <- read_stars(paste0(work.dir, "/dBBMM ASCII/Scaled/All_Rasters_Scale
   st_set_crs(2958) %>%
   st_transform(4326)
 
-# lemons.ras2
-# plot(sqrt(lemons.ras2)) # sqrt inflates the values to make it easier to view
-# plot(lemons.ras2) # fix this nor plotting why?? SD
+is.na(lemons.ras$All_Rasters_Scaled.asc) <- lemons.ras$All_Rasters_Scaled.asc == 0 # replace char pattern (0) in whole df/tbl with NA
+lemons.ras %<>% trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
 
-# # Set projection
-# crs(lemons.ras) <- "+init=epsg:32617"
-# lemons.ras
-# 
-# lemons.poly <- rasterToPolygons(trim(lemons.ras, values = 0))
-# 
-# # Extract UD values column
-# layer <- lemons.poly@data
-# 
-# # Transform raster object to data frame
-# lemon.poly.df <- fortify(lemons.poly)
-# 
-# # Merge
-# lemon.poly.df <- cbind(lemon.poly.df, layer)
-# 
-# # Transform to simple features and change crs
-# lemon.poly.df.sf <- st_as_sf(lemon.poly.df, coords = c("long", "lat"), crs = 2958) %>%
-#   st_transform(4326)
 
-# # Get map function makes a call to online databases and retrieves a map which is defined by the bounding box
-# test <- get_map(bbox(extent(lemon.poly.df.sf)), zoom = 12)
-# test <- get_map(bbox(extent(lemon.poly.df.sf2)), zoom = 12)
-# 
-# 
-# # Plot in projected CRS
-# ggplot() +
-#   geom_raster(data = lemon.poly.df.sf, aes(x = x, y = y, fill = layer))
 dir.create(paste0(out.dir, "basemap"))
 bounds <- st_bbox(lemons.ras) %>% as.vector() # xmin      ymin      xmax      ymax 
 bounds <- bounds[c(1, 3, 2, 4)] # c(xmin,xmax,ymin,ymax)
@@ -449,7 +423,6 @@ crop_map <- gbm.basemap(bounds = bounds,
 crop_map <- st_read(dsn = paste0(work.dir, out.dir, "basemap/CroppedMap/Crop_Map.shp"),
                     layer = paste0("Crop_Map"),
                     quiet = TRUE) # read in worldmap
-
 
 myLocation <- st_bbox(lemons.ras) %>% as.vector() # # bounding box lowerleftlon, lowerleftlat, upperrightlon, upperrightlat
 
@@ -478,21 +451,29 @@ myMap <- get_map(location = myLocation,
 # attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]] # latitude, y, height
 autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]]) * 1.2
 
+
+# st_contour fail section ####
 # # For polygonizing rasters following grid boundaries, see st_as_sf with arguments as_points=FALSE and merge=TRUE; contour plots contour lines using R's native algorithm (which also plots contour levels)
 # lemons.sf <- st_as_sf(lemons.ras, as_points = FALSE, merge = TRUE)
 # # Error in st_as_sf.stars(lemons.ras, as_points = FALSE, merge = TRUE) : 
 # # merge=TRUE and as_points=TRUE unsupported; consider using st_contour for generating contour lines
 # lemons.sf <- st_as_sf(lemons.ras, as_points = FALSE, merge = FALSE)
 
-mycontour <- st_contour(x = lemons.ras,
-                        contour_lines = FALSE, #false = polygons, true = lines
+mycontour <- st_contour(lemons.ras,
+                        contour_lines = TRUE, #false = polygons, true = lines
                         # breaks = classInt::classIntervals(na.omit(as.vector(lemons.ras[[1]])))$brks
                         # numerical; values at which to "draw" contour levels
                         breaks = c(0.5, 0.95))
+
+mycontour <- st_contour(x = lemons.ras)
+mycontour2 <- st_contour(lemons.ras)
+mycontour == mycontour2
+
 class(mycontour) # "sf"         "data.frame"
 mycontour$geometry[1]
 st_geometry(mycontour)
 st_geometry(crop_map)
+range(lemons.ras$All_Rasters_Scaled.asc, na.rm = TRUE)
 st_bbox(mycontour)
 # xmin ymin xmax ymax 
 #   NA   NA   NA   NA
@@ -501,16 +482,89 @@ st_bbox(lemons.ras)
 # -79.28970  25.68331 -79.21143  25.78939
 st_set_bbox(mycontour, st_bbox(lemons.ras))
 # Error in UseMethod("st_set_bbox") : no applicable method for 'st_set_bbox' applied to an object of class "c('sf', 'data.frame')"
+summary(lemons.ras)
 
-# ggplot() +
-ggmap(myMap) +
+geom_sf(mycontour, mapping = aes())
+# Coordinate system already present. Adding new coordinate system, which will replace the existing one.
+# Error in FUN(X[[i]], ...) : object 'lon' not found  
+
+ggplot() + geom_stars(data = lemons.ras)
+
+tif = system.file("tif/L7_ETMs.tif", package = "stars") # just a character string location
+x = read_stars(tif)[, 1:50, 1:50, 1:2] # original, 2 bands
+x = read_stars(tif)[, 1:50, 1:50] # edit, 1 band
+x[[1]] = round(x[[1]]/5)
+l = st_contour(x,
+               contour_lines = TRUE,
+               breaks = 11:15)
+plot(l,
+     key.pos = 1,
+     pal = sf.colors,
+     lwd = 2,
+     key.length = 0.8)
+
+class(l)
+st_geometry(l)
+ggplot() + geom_sf(l)
+
+plot(mycontour,
+     key.pos = 1,
+     pal = sf.colors,
+     lwd = 2,
+     key.length = 0.8)
+
+range(lemons.ras$All_Rasters_Scaled.asc, na.rm = TRUE) # 0 1
+lemons.ras$All_Rasters_Scaled.asc <- round(lemons.ras$All_Rasters_Scaled.asc * 100)
+range(lemons.ras$All_Rasters_Scaled.asc, na.rm = TRUE) # 0 100
+tmp <- as.data.frame(lemons.ras$All_Rasters_Scaled.asc) # looks fine, values present
+dim(x)
+# x    y band 
+#   50   50    6 # 2 original, 6 if you remove 1:2
+dim(lemons.ras)
+ #  x   y 
+ # 69 111 
+
+dims_x <- st_dimensions(x)
+dims_lem <- st_dimensions(lemons.ras)
+length(dims_x) # 3
+length(dims_lem) # 2
+lemons.ras2 <- st_redimension(x = lemons.ras,
+               new_dims = 1:3)
+# Error in st_redimension.stars(x = lemons.ras, new_dims = 1:3) : 
+#   product of dim(new_dim) does not match that of x
+# Might not be possible to just add a band.
+
+x
+# stars object with 3 dimensions and 1 attribute
+# attribute(s):
+#              Min. 1st Qu. Median    Mean 3rd Qu. Max.
+# L7_ETMs.tif     7       9     11 11.2548      12   28
+# dimension(s):
+
+lemons.ras
+# stars object with 2 dimensions and 1 attribute
+# attribute(s):
+#                                 Min.      1st Qu.       Median        Mean      3rd Qu. Max. NA's
+# All_Rasters_Scaled.asc  1.214989e-12 8.115487e-08 5.516034e-06 0.002278308 0.0002800115    1 4226
+# dimension(s):
+# curvilinear grid
+
+lemons.spl = split(lemons.ras, "band")
+
+# st_contour fail section ends####
+
+ggplot() + 
+# ggmap(myMap) +
   # geom_stars(data = sqrt(lemons.ras), inherit.aes = FALSE) + # geom_stars only works for objects with raster or vector geometries
   # inherit.aes=FALSE from https://github.com/r-spatial/sf/issues/336
-  geom_sf(st_contour(x = lemons.ras,
-                     contour_lines = FALSE, #false = polygons, true = lines
-                     # breaks = classInt::classIntervals(na.omit(as.vector(lemons.ras[[1]])))$brks
-                     # numerical; values at which to "draw" contour levels
-                     breaks = c(0.5, 0.95))) +
+  # geom_sf(st_contour(x = lemons.ras,
+  #                    contour_lines = FALSE, #false = polygons, true = lines
+  #                    # breaks = classInt::classIntervals(na.omit(as.vector(lemons.ras[[1]])))$brks
+  #                    # numerical; values at which to "draw" contour levels
+  #                    breaks = c(0.5, 0.95))) +
+  geom_sf(mycontour) +
+  # geom_sf(mycontour, mapping = aes()) +
+  # geom_sf(mycontour, mapping = aes(geometry)) +
   # https://github.com/r-spatial/stars/issues/465 st_contour returns an sf object with the contours; you'd have to pass that to geom_sf()
   # Error: `mapping` must be created by `aes()`
   coord_sf(xlim = bounds[1:2], ylim = bounds[3:4], expand = FALSE) +
