@@ -411,6 +411,7 @@ lemons.ras <- read_stars(paste0(work.dir, "/dBBMM ASCII/Scaled/All_Rasters_Scale
   st_set_crs(2958)
 stars:::is_curvilinear(lemons.ras) # FALSE
 
+# maybe don't do this trimming bit? ####
 is.na(lemons.ras$All_Rasters_Scaled.asc) <- lemons.ras$All_Rasters_Scaled.asc == 0 # replace char pattern (0) in whole df/tbl with NA
 lemons.ras %<>% trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
 
@@ -428,8 +429,6 @@ crop_map <- st_read(dsn = paste0(work.dir, out.dir, "basemap/CroppedMap/Crop_Map
                     layer = paste0("Crop_Map"),
                     quiet = TRUE) # read in worldmap
 
-
-
 googlemap = TRUE
 if (googlemap) { # grow bounds extents if requested
   expandfactor <- 1.6 # 1.3 - 1.5 same zoom as 1. 1.6 is a big leap up in zoom (out). 1.9 (& maybe 1.7 or 1.8 is another step out, done manually for #2, 200368, because some points were out of bounds.)
@@ -446,7 +445,7 @@ if (googlemap) { # grow bounds extents if requested
 myMap <- get_map(location = myLocation,
                  source = "google", # using stamen as fallback
                  maptype = "satellite",
-                 crop = FALSE)
+                 crop = FALSE) # google maps crs = 4326
 
 # Automate width * height adjustments for different map extent / ratio
 # 6 (manually chosen width, below), divided by width range times by height range
@@ -455,10 +454,10 @@ myMap <- get_map(location = myLocation,
 # attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]] # latitude, y, height
 autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]]) * 1.2
 
-
 mycontour <- st_contour(lemons.ras,
-                        contour_lines = TRUE,
-                        breaks = c(0.5, 0.95))
+                        contour_lines = TRUE
+                        # breaks = c(0.5, 0.95)
+                        )
 # %>%
 #   st_transform(4326)
 
@@ -468,6 +467,18 @@ st_crs(myMap) <- st_crs(mycontour) # Coordinate Reference System: NA
 #   no applicable method for 'st_crs<-' applied to an object of class "c('ggmap', 'raster')"
 mycontour_bbox <- st_bbox(mycontour)
 
+bbox(myMap)
+#  min       max      
+# x "#99B3CC" "#99B3CC"
+# y "#99B3CC" "#99B3CC"
+crs(bbox(myMap))
+# NA
+attr(myMap, "bb")
+# ll.lat  ll.lon  ur.lat  ur.lon
+# 25.64153 -79.32129 25.83945 -79.14551
+crs(lemons.ras) # NA
+st_crs(lemons.ras) # EPSG:2958 
+st_crs(mycontour) # EPSG:2958 
 
 
 # Extract the bounding box (in lat/lon) from the ggmap to a numeric vector, 
@@ -483,23 +494,30 @@ attr(myMap, "bb")$ll.lon <- bbox_3857["xmin"]
 attr(myMap, "bb")$ur.lat <- bbox_3857["ymax"]
 attr(myMap, "bb")$ur.lon <- bbox_3857["xmax"]
 
-
 plot(st_transform(mycontour, crs = 4326)[1], bgMap = myMap)
 
 
 # ggplot() +
 ggmap(myMap) +
-  geom_stars(data = lemons.ras %>% st_transform(4326), inherit.aes = FALSE) + # geom_stars only works for objects with raster or vector geometries
+  # geom_stars(data = lemons.ras %>% st_transform(4326), inherit.aes = FALSE) +
+  # geom_stars(data = lemons.ras, inherit.aes = FALSE) +
+  # geom_stars only works for objects with raster or vector geometries
   # inherit.aes=FALSE from https://github.com/r-spatial/sf/issues/336
+  # Coordinate system already present. Adding new coordinate system, which will replace the existing one.
+  # Get this error when using st_transform but not if not, so myMap presumably has same crs as lemons.ras i.e.
+  # 2958. st_transform(2958) plots but no data.
+  
+  # geom_sf(data = mycontour %>% st_transform(4326),
   geom_sf(data = mycontour,
           fill = NA,
           color = "orange") +
   # Coordinate system already present. Adding new coordinate system, which will replace the existing one.
   # Error in FUN(X[[i]], ...) : object 'lon' not found
-  # https://github.com/dkahle/ggmap/issues/160
+  # https://github.com/dkahle/ggmap/issues/160 # main bug, posted there.
   # https://github.com/dkahle/ggmap/pull/162 # tried below, no success
+  # https://github.com/r-spatial/stars/issues/465
   
-  # coord_sf(crs = st_crs(3857)) +
+  # coord_sf(crs = st_crs(2958)) + # 3857 4326
   # coord_sf(xlim = c(mycontour_bbox["xmin"] - .1 * (mycontour_bbox["xmax"] - mycontour_bbox["xmin"]),
   #                 mycontour_bbox["xmax"] + .1 * (mycontour_bbox["xmax"] - mycontour_bbox["xmin"])),
   #        ylim = c(mycontour_bbox["ymin"] - .1 * (mycontour_bbox["ymax"] - mycontour_bbox["ymin"]),
