@@ -57,7 +57,9 @@ library(gbm.auto)
 Load data set
 
 ```{r read_files}
-DET <- read.csv(file.path(data.dir, "/TRACKS1.csv")) # 1308 x 7
+DET <- read.csv("./data/TRACKS1.csv")
+# Error in file(file, "rt") : cannot open the connection
+# works if you paste it into the console. The command is correct. What's going on? Something with markdown?
 ```
 
 Check data directory and create it if not present
@@ -388,7 +390,10 @@ if (grepl("nautilus", Sys.info()["nodename"]) | grepl("Poseidon", Sys.info()["no
   work.dir <- "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/"
 }
 
-source(paste0(work.dir, "scaleraster.R"))
+source("./R/scaleraster.R")
+# Warning in file(filename, "r", encoding = encoding) :  cannot open file './R/scaleraster.R': No such file or directory
+# Error in file(filename, "r", encoding = encoding) : cannot open the connection
+# Again, works fine in console
 scaleraster(path = paste0(data.dir, out.dir))
 ```
 
@@ -409,27 +414,32 @@ Now we're ready for the final step: plotting!
 
 lemons.ras <- read_stars(paste0(work.dir, "/dBBMM ASCII/Scaled/All_Rasters_Scaled.asc")) %>% # si directory
   st_set_crs(2958)
-stars:::is_curvilinear(lemons.ras) # FALSE
+# stars:::is_curvilinear(lemons.ras) # FALSE
 
 # maybe don't do this trimming bit? ####
-is.na(lemons.ras$All_Rasters_Scaled.asc) <- lemons.ras$All_Rasters_Scaled.asc == 0 # replace char pattern (0) in whole df/tbl with NA
-lemons.ras %<>% trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
+# is.na(lemons.ras$All_Rasters_Scaled.asc) <- lemons.ras$All_Rasters_Scaled.asc == 0 # replace char pattern (0) in whole df/tbl with NA
+# lemons.ras %<>% trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
 
-dir.create(paste0(out.dir, "basemap"))
-myLocation <- st_bbox(lemons.ras %>% st_transform(4326)) %>% as.vector() # xmin      ymin      xmax      ymax 
-bounds <- myLocation[c(1, 3, 2, 4)] # c(xmin,xmax,ymin,ymax)
-# run to generate basemap:
-crop_map <- gbm.basemap(bounds = bounds,
-                        res = "f",
-                        # getzip = paste0(work.dir, out.dir, "basemap/GSHHS_shp"), # comment out first time, uncomment subsequent
-                        savedir = paste0(work.dir, out.dir, "basemap"),
-                        returnsf = TRUE)
-# run to use generated basemap later:
-crop_map <- st_read(dsn = paste0(work.dir, out.dir, "basemap/CroppedMap/Crop_Map.shp"),
-                    layer = paste0("Crop_Map"),
-                    quiet = TRUE) # read in worldmap
+# myLocation to be function param, NULL by default so extents autocreated from data, but gives user the option to set extents
+if (is.null(myLocation)) myLocation <- st_bbox(lemons.ras %>% st_transform(4326)) %>% as.vector() # xmin      ymin      xmax      ymax 
+myLocation <- c(-79.3, 25.68331, -79.24, 25.78)
 
-googlemap = TRUE
+# Create basemap with gbm.auto####
+# # Remove gbm.auto from dependency at top if not using
+# dir.create(paste0(out.dir, "basemap"))
+# bounds <- myLocation[c(1, 3, 2, 4)] # c(xmin,xmax,ymin,ymax)
+# # run to generate basemap:
+# crop_map <- gbm.basemap(bounds = bounds,
+#                         res = "f",
+#                         # getzip = paste0(work.dir, out.dir, "basemap/GSHHS_shp"), # comment out first time, uncomment subsequent
+#                         savedir = paste0(work.dir, out.dir, "basemap"),
+#                         returnsf = TRUE)
+# # run to use generated basemap later:
+# crop_map <- st_read(dsn = paste0(work.dir, out.dir, "basemap/CroppedMap/Crop_Map.shp"),
+#                     layer = paste0("Crop_Map"),
+#                     quiet = TRUE) # read in worldmap
+
+# googlemap = TRUE # set as top parameter when this is a function
 if (googlemap) { # grow bounds extents if requested
   expandfactor <- 1.6 # 1.3 - 1.5 same zoom as 1. 1.6 is a big leap up in zoom (out). 1.9 (& maybe 1.7 or 1.8 is another step out, done manually for #2, 200368, because some points were out of bounds.)
   # Still need to improve this part
@@ -447,6 +457,27 @@ myMap <- get_map(location = myLocation,
                  maptype = "satellite",
                  crop = FALSE) # google maps crs = 4326
 
+# Define a function to fix the bbox to be in EPSG:3857
+# https://stackoverflow.com/a/50844502/1736291
+# Fixes "error no lon value" in ggmap below
+# Move this to separate script & source it####
+ggmap_bbox <- function(map) {
+  if (!inherits(map, "ggmap")) stop("map must be a ggmap object")
+  # Extract the bounding box (in lat/lon) from the ggmap to a numeric vector, 
+  # and set the names to what sf::st_bbox expects:
+  map_bbox <- setNames(unlist(attr(map, "bb")), c("ymin", "xmin", "ymax", "xmax"))
+  # Coonvert the bbox to an sf polygon, transform it to 3857, 
+  # and convert back to a bbox (convoluted, but it works)
+  bbox_3857 <- st_bbox(st_transform(st_as_sfc(st_bbox(map_bbox, crs = 4326)), 3857))
+  # Overwrite the bbox of the ggmap object with the transformed coordinates 
+  attr(map, "bb")$ll.lat <- bbox_3857["ymin"]
+  attr(map, "bb")$ll.lon <- bbox_3857["xmin"]
+  attr(map, "bb")$ur.lat <- bbox_3857["ymax"]
+  attr(map, "bb")$ur.lon <- bbox_3857["xmax"]
+  map
+}
+myMap <- ggmap_bbox(myMap) # Use the function
+
 # Automate width * height adjustments for different map extent / ratio
 # 6 (manually chosen width, below), divided by width range times by height range
 # Maintains ratio by scales height to width(6). Then *1.2 because it still wasn't perfect.
@@ -454,101 +485,41 @@ myMap <- get_map(location = myLocation,
 # attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]] # latitude, y, height
 autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]]) * 1.2
 
-mycontour <- st_contour(lemons.ras,
-                        contour_lines = TRUE
-                        # breaks = c(0.5, 0.95)
-                        )
-# %>%
-#   st_transform(4326)
-
-st_crs(mycontour)
-st_crs(myMap) <- st_crs(mycontour) # Coordinate Reference System: NA
-# Error in UseMethod("st_crs<-") : 
-#   no applicable method for 'st_crs<-' applied to an object of class "c('ggmap', 'raster')"
-mycontour_bbox <- st_bbox(mycontour)
-
-bbox(myMap)
-#  min       max      
-# x "#99B3CC" "#99B3CC"
-# y "#99B3CC" "#99B3CC"
-crs(bbox(myMap))
-# NA
-attr(myMap, "bb")
-# ll.lat  ll.lon  ur.lat  ur.lon
-# 25.64153 -79.32129 25.83945 -79.14551
-crs(lemons.ras) # NA
-st_crs(lemons.ras) # EPSG:2958 
-st_crs(mycontour) # EPSG:2958 
-
-
-# Extract the bounding box (in lat/lon) from the ggmap to a numeric vector, 
-# and set the names to what sf::st_bbox expects:
-map_bbox <- setNames(unlist(attr(myMap, "bb")), 
-                     c("ymin", "xmin", "ymax", "xmax"))
-# Coonvert the bbox to an sf polygon, transform it to 3857, 
-# and convert back to a bbox (convoluted, but it works)
-bbox_3857 <- st_bbox(st_transform(st_as_sfc(st_bbox(map_bbox, crs = 4326)), 3857))
-# Overwrite the bbox of the ggmap object with the transformed coordinates 
-attr(myMap, "bb")$ll.lat <- bbox_3857["ymin"]
-attr(myMap, "bb")$ll.lon <- bbox_3857["xmin"]
-attr(myMap, "bb")$ur.lat <- bbox_3857["ymax"]
-attr(myMap, "bb")$ur.lon <- bbox_3857["xmax"]
-
-plot(st_transform(mycontour, crs = 4326)[1], bgMap = myMap)
-
 
 # ggplot() +
 ggmap(myMap) +
-  # geom_stars(data = lemons.ras %>% st_transform(4326), inherit.aes = FALSE) +
-  # geom_stars(data = lemons.ras, inherit.aes = FALSE) +
-  # geom_stars only works for objects with raster or vector geometries
-  # inherit.aes=FALSE from https://github.com/r-spatial/sf/issues/336
-  # Coordinate system already present. Adding new coordinate system, which will replace the existing one.
-  # Get this error when using st_transform but not if not, so myMap presumably has same crs as lemons.ras i.e.
-  # 2958. st_transform(2958) plots but no data.
-  
-  # geom_sf(data = mycontour %>% st_transform(4326),
-  geom_sf(data = mycontour,
-          fill = NA,
-          color = "orange") +
-  # Coordinate system already present. Adding new coordinate system, which will replace the existing one.
-  # Error in FUN(X[[i]], ...) : object 'lon' not found
-  # https://github.com/dkahle/ggmap/issues/160 # main bug, posted there.
-  # https://github.com/dkahle/ggmap/pull/162 # tried below, no success
-  # https://github.com/r-spatial/stars/issues/465
-  
-  # coord_sf(crs = st_crs(2958)) + # 3857 4326
-  # coord_sf(xlim = c(mycontour_bbox["xmin"] - .1 * (mycontour_bbox["xmax"] - mycontour_bbox["xmin"]),
-  #                 mycontour_bbox["xmax"] + .1 * (mycontour_bbox["xmax"] - mycontour_bbox["xmin"])),
-  #        ylim = c(mycontour_bbox["ymin"] - .1 * (mycontour_bbox["ymax"] - mycontour_bbox["ymin"]),
-  #                 mycontour_bbox["ymax"] + .1 * (mycontour_bbox["ymax"] - mycontour_bbox["ymin"]))) +
-  # coord_sf(xlim = bounds[1:2], ylim = bounds[3:4], expand = FALSE) +
-  scale_fill_viridis_c() +
-  ggtitle("dBBMM title, ideally dynamic based on data",
-          subtitle = "inc subtitle if worthwhile") +
+  # geom_stars(data = lemons.ras %>% st_transform(3857), inherit.aes = FALSE) + # 4326
+  # scale_fill_viridis_c() + # for stars
+  geom_sf(data = st_contour(x = lemons.ras,
+                            contour_lines = TRUE, # makes lines not polys regardless of T or F
+                            breaks = c(0.95)) %>%
+            st_transform(3857), # Vector transform after st_contour()  4326
+          fill = NA, inherit.aes = FALSE,
+          aes(colour = "KUD_95_pct")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
+  geom_sf(data = st_contour(x = lemons.ras, contour_lines = TRUE, breaks = c(0.5)) %>%
+            st_transform(3857), fill = NA, inherit.aes = FALSE, aes(colour = "KUD_50_pct")) +
+  scale_colour_manual(name = "Percent KUD Contours", values = c(KUD_95_pct = "red", KUD_50_pct = "orange")) +
+  ggtitle("95 and 50% dBBMM home range, lemon sharks, Bimini",
+          subtitle = "home ranges all scaled. n = 13") +
+  # make title & subtitle function params ####
+  # DET %>% distinct(Shark) %>% nrow() # 13
   labs(x = "Longitude", y = "Latitude", caption = paste0("dBBMM_HomeRange, ", today())) +
   theme_minimal() +
-  theme(legend.position = c(0.1, 0.16), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
+  theme(legend.position = c(0.16, 0.92), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
+        # Make legend.position as function param ####
         legend.spacing.x = unit(0, 'cm'), #compress spacing between legend items, this is min
-        legend.spacing.y = unit(0.1, 'cm'), #compress spacing between legend items, this is min
+        legend.spacing.y = unit(0, 'cm'), #compress spacing between legend items, this is min
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 8),
         legend.background = element_rect(fill = "white", colour = NA), # element_blank(),
         panel.background = element_rect(fill = "white", colour = "grey50"), # white background
+        plot.background = element_rect(fill = "white", colour = "grey50"), # white background
         legend.key = element_blank()) # removed whitespace buffer around legend boxes which is nice
 
-# ggsave(paste0(today(), "_Hammertrack_", hammerdirs, ".png"),
-#        plot = last_plot(), device = "png", path = "../../Maps & Surveys/R_Plot_Outputs", scale = 1.75,
-#        #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
-#        width = 6, # 8 for Med # 7 normal # 3.8 miwingWhotspot, 7 wholearea 6 gsl 5 gom 5.5 centralAtl
-#        height = autoheight, #NA default; Then ggsave with defaults, changes from 7x7" to e.g.
-#        units = "in", dpi = 600, limitsize = TRUE)
-
-
-
-# geom_sf(
-#   data = lemon.poly.df.sf, aes(group = id),
-#   fill = "purple"
-# ) +
-#   scale_alpha(range = c(0, 1), "Utilization\nDistribution")
+ggsave(paste0(work.dir, out.dir, "Scaled/", today(), "_dBBMM-Homerange-95-50pct-KUDs.png"),
+       plot = last_plot(), device = "png", path = "", scale = 1,
+       #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
+       width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)
 ```
 
 Now that we have constructed individual movement models for complete movement trajectories, below we will do the same, but now we will discern different tidal phases when constructing the models.
