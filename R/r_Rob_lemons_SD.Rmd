@@ -18,7 +18,7 @@ Set the working directory depending on the user
 ```{r setup}
 print(Sys.info()["nodename"])
 if (grepl("aurits", Sys.info()["nodename"])) {
-  data.dir <- "~/Documents/Science/Projects/Rob Bullock - Bimini/dBBMM_HomeRange/data/"
+  data.dir <- "~/Documents/Science/Projects/Rob Bullock - Bimini/dBBMM_HomeRange_output/"
 }
 
 if (grepl("nautilus", Sys.info()["nodename"]) | grepl("Poseidon", Sys.info()["nodename"]) | grepl("aquarius", Sys.info()["nodename"])) {
@@ -58,7 +58,7 @@ Load data set
 
 ```{r read_files}
 # print(getwd()) # "/home/simon/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R"
-DET <- read.csv("../data/TRACKS1.csv")
+DET <- read.csv("./data/TRACKS1.csv")
 # the script environment location is where the script is i.e. dBBMM_HomeRange/R.
 # the console environment is the project root i.e. dBBMM_HomeRange
 # Error in file(file, "rt") : cannot open the connection
@@ -164,7 +164,7 @@ if (length(check1$Shark) != length(check2$Shark)) {
   check1
   check2 <- filter(check1, relocations > 23) # filter: no rows removed
   length(check1$Shark) == length(check2$Shark)
-} # DET: 1287 x 7
+} # DET: 1253 x 7
 ```
 
 In the next R code we create per individual a move object, project it, construct a dBBMM, calculate the volume area within the 50% and 95% contours and finally save the outcome as ASCII for plotting in an external GIS software.
@@ -178,7 +178,7 @@ DET %<>%
   group_by(Shark) %>%
   distinct(Datetime, .keep_all = TRUE) %>% # distinct (grouped): removed one row (<1%), 1,286 rows remaining
   # prevents duplicate Datetime crash in move() later
-  ungroup() # 1286 x 7 after removing as.numeric above
+  ungroup() # 1253 x 7 after removing as.numeric above
 
 # Loop through all unique tags
 counter <- 0
@@ -376,20 +376,20 @@ md <- bind_rows(bb.list,
 )
 
 write.csv(md,
-          file = paste0(data.dir, out.dir, "Lemon_VolumeArea.csv"),
+          file = paste0(data.dir, out.dir, "Lemons_VolumeArea_AbsoluteScale.csv"),
           row.names = FALSE
 )
 
 # Scale and sum individual rasters, followed by a rescaling to obtain an aggregated UD (.asc)
 print(Sys.info()["nodename"])
 if (grepl("aurits", Sys.info()["nodename"])) {
-  work.dir <- "~/Documents/Science/Projects/Rob Bullock - Bimini/dBBMM_HomeRange/"
+  work.dir <- "~/Documents/Science/Projects/Rob Bullock - Bimini/dBBMM_HomeRange_output/"
 }
 if (grepl("nautilus", Sys.info()["nodename"]) | grepl("Poseidon", Sys.info()["nodename"]) | grepl("aquarius", Sys.info()["nodename"])) {
   work.dir <- "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/"
 }
 
-source("scaleraster.R")
+source("./R/scaleraster.R")
 # Warning in file(filename, "r", encoding = encoding) :  cannot open file './R/scaleraster.R': No such file or directory
 # Error in file(filename, "r", encoding = encoding) : cannot open the connection
 # Again, works fine in console
@@ -411,7 +411,8 @@ Now we're ready for the final step: plotting!
 #   st_transform(4326)
 # stars:::is_curvilinear(lemons.ras) # TRUE
 
-lemons.ras <- read_stars(paste0(work.dir, "/dBBMM ASCII/Scaled/All_Rasters_Scaled.asc")) %>% # si directory
+lemons.ras <- read_stars(paste0(data.dir, "/dBBMM ASCII/Scaled/All_Rasters_Scaled.asc")) %>% 
+  # si directory
   st_set_crs(2958)
 # stars:::is_curvilinear(lemons.ras) # FALSE
 
@@ -496,12 +497,12 @@ ggmap(myMap) +
                             breaks = c(0.95)) %>%
             st_transform(3857), # Vector transform after st_contour()  4326
           fill = NA, inherit.aes = FALSE,
-          aes(colour = "KUD_95_pct")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
+          aes(colour = "UD_95_pct")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
   geom_sf(data = st_contour(x = lemons.ras, contour_lines = TRUE, breaks = c(0.5)) %>%
-            st_transform(3857), fill = NA, inherit.aes = FALSE, aes(colour = "KUD_50_pct")) +
-  scale_colour_manual(name = "Percent KUD Contours", values = c(KUD_95_pct = "red", KUD_50_pct = "orange")) +
-  ggtitle("95 and 50% dBBMM home range, lemon sharks, Bimini",
-          subtitle = "home ranges all scaled. n = 13") +
+            st_transform(3857), fill = NA, inherit.aes = FALSE, aes(colour = "UD_50_pct")) +
+  scale_colour_manual(name = "Percent UD Contours", values = c(KUD_95_pct = "red", KUD_50_pct = "orange")) +
+  ggtitle("50% and 95% contours, lemon sharks, Bimini",
+          subtitle = "contours all scaled. n = 13") +
   # make title & subtitle function params ####
   # DET %>% distinct(Shark) %>% nrow() # 13
   labs(x = "Longitude", y = "Latitude", caption = paste0("dBBMM_HomeRange, ", today())) +
@@ -517,8 +518,8 @@ ggmap(myMap) +
         plot.background = element_rect(fill = "white", colour = "grey50"), # white background
         legend.key = element_blank()) # removed whitespace buffer around legend boxes which is nice
 
-ggsave(paste0(work.dir, out.dir, "Scaled/", today(), "_dBBMM-Homerange-95-50pct-KUDs.png"),
-       plot = last_plot(), device = "png", path = "", scale = 1,
+ggsave(paste0(today(), "_dBBMM-Homerange-95-50pct-UDs.png"),
+       plot = last_plot(), device = "png", path = paste0(work.dir, out.dir, "Scaled"), scale = 1,
        #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
        width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)
 ```
