@@ -7,6 +7,14 @@ output:
   html_document: default
 ---
 
+```{r setup}
+print(getwd())
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+print(getwd())
+# set working directory to be package root, else it MIGHT be the location of this file, ~/R
+# https://stackoverflow.com/questions/42287348/issue-working-directory-in-r-studio-stuck-on-directory-containing-open-r-mark
+```
+
 ```{r clear_memory}
 rm(list = ls())
 ```
@@ -57,8 +65,8 @@ library(gbm.auto)
 Load data set
 
 ```{r read_files}
-# print(getwd()) # "/home/simon/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R"
-DET <- read.csv("./data/TRACKS1.csv")
+print(getwd()) # "/home/simon/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R"
+DET <- read.csv("../data/TRACKS1.csv")
 # the script environment location is where the script is i.e. dBBMM_HomeRange/R.
 # the console environment is the project root i.e. dBBMM_HomeRange
 # Error in file(file, "rt") : cannot open the connection
@@ -116,7 +124,9 @@ DET %<>%
   mutate(Datetime = as.POSIXct(Datetime,
                                format = "%m/%d/%y %H:%M",
                                tz = dat.TZ
-  )) %>%
+  ),
+  Shark = make.names(Shark) # prefixes "X" to numerical-named sharks to avoid issues later
+  ) %>%
   rename(
     Lat = N,
     Lon = W,
@@ -399,6 +409,7 @@ scaleraster(path = paste0(data.dir, out.dir))
 Now we're ready for the final step: plotting!
 
 ```{r plot}
+# Move this to separate script & source it####
 # Import raster
 # lemons.ras <- raster(paste0(work.dir, "/data/dBBMM ASCII/Scaled/All_Rasters_Scaled.asc")) # mo
 # lemons.ras <- raster(paste0(work.dir, "/dBBMM ASCII/Scaled/All_Rasters_Scaled.asc")) # si
@@ -420,7 +431,7 @@ lemons.ras <- read_stars(paste0(data.dir, "/dBBMM ASCII/Scaled/All_Rasters_Scale
 # is.na(lemons.ras$All_Rasters_Scaled.asc) <- lemons.ras$All_Rasters_Scaled.asc == 0 # replace char pattern (0) in whole df/tbl with NA
 # lemons.ras %<>% trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
 
-# myLocation to be function param, NULL by default so extents autocreated from data, but gives user the option to set extents
+# myLocation to be function param, NULL by default so extents autocreated from data, but gives user the option to set extents####
 myLocation <- NULL
 if (is.null(myLocation)) myLocation <- st_bbox(lemons.ras %>% st_transform(4326)) %>% as.vector() # xmin      ymin      xmax      ymax 
 myLocation <- c(-79.3, 25.68331, -79.24, 25.78)
@@ -495,15 +506,17 @@ ggmap(myMap) +
   geom_sf(data = st_contour(x = lemons.ras,
                             contour_lines = TRUE, # makes lines not polys regardless of T or F
                             breaks = c(0.95)) %>%
+            # breaks could be function param, but only allows 2 breaks. Whatevs ####
             st_transform(3857), # Vector transform after st_contour()  4326
           fill = NA, inherit.aes = FALSE,
           aes(colour = "UD_95_pct")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
   geom_sf(data = st_contour(x = lemons.ras, contour_lines = TRUE, breaks = c(0.5)) %>%
             st_transform(3857), fill = NA, inherit.aes = FALSE, aes(colour = "UD_50_pct")) +
-  scale_colour_manual(name = "Percent UD Contours", values = c(KUD_95_pct = "red", KUD_50_pct = "orange")) +
-  ggtitle("50% and 95% contours, lemon sharks, Bimini",
-          subtitle = "contours all scaled. n = 13") +
+  scale_colour_manual(name = "Percent UD Contours", values = c(UD_95_pct = "red", UD_50_pct = "orange")) +
+  ggtitle("Aggregated 95% and 50% contours, lemon sharks, Bimini",
+          subtitle = "Scaled contours. n = 13") +
   # make title & subtitle function params ####
+  # Can use the term 'home range' when an animal can be detected wherever it goes i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic receivers cover the entire home range of the study species. This term is problematic when applied to a passive acoustic telemetry setting where an array of non-overlapping receivers are used to assess local space use patterns i.e. the home range is bigger than the coverage by the acoustic array; put in Details ####
   # DET %>% distinct(Shark) %>% nrow() # 13
   labs(x = "Longitude", y = "Latitude", caption = paste0("dBBMM_HomeRange, ", today())) +
   theme_minimal() +
@@ -518,7 +531,7 @@ ggmap(myMap) +
         plot.background = element_rect(fill = "white", colour = "grey50"), # white background
         legend.key = element_blank()) # removed whitespace buffer around legend boxes which is nice
 
-ggsave(paste0(today(), "_dBBMM-Homerange-95-50pct-UDs.png"),
+ggsave(paste0(today(), "_dBBMM-contours.png"),
        plot = last_plot(), device = "png", path = paste0(work.dir, out.dir, "Scaled"), scale = 1,
        #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
        width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)

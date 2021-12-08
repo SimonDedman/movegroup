@@ -20,7 +20,7 @@ scaleraster <- function(path = NULL, # no terminal slash
   rasterlist <-
     lapply(filelist, function(x) raster(paste0(path, "/", x))) %>% # read in rasters
     lapply(function(x) setMinMax(x)) # set minmax values
-  names(rasterlist) <- filelist
+  names(rasterlist) <- filelist # need to get rid of extension e.g. ".asc"
 
   # Get max of maxes
   scalemax <-
@@ -35,7 +35,8 @@ scaleraster <- function(path = NULL, # no terminal slash
   rasterlist %<>%
     lapply(function(x) x / scalemax) %>% # scale
     lapply(function(x) writeRaster(x = x, # resave individual rasters
-                                   filename = paste0(path, "/", scalefolder, "/", names(x), pattern),
+                                   filename = paste0(path, "/", scalefolder, "/", names(x)), # , pattern removed ability to resave as different format
+                                   # error: adds X to start of numerical named objects####
                                    format = format,
                                    datatype = datatype,
                                    bylayer = bylayer,
