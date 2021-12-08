@@ -7,6 +7,14 @@ output:
   html_document: default
 ---
 
+```{r setup}
+print(getwd())
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+print(getwd())
+# set working directory to be package root, else it MIGHT be the location of this file, ~/R
+# https://stackoverflow.com/questions/42287348/issue-working-directory-in-r-studio-stuck-on-directory-containing-open-r-mark
+```
+
 ```{r clear_memory}
 rm(list = ls())
 ```
