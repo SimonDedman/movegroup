@@ -3,8 +3,8 @@ title: "Lemon sharks ecology Bimini"
 author: "Sprinkles (Maurits van Zinnicq Bergmann) & Simon Dedman" 
 date: "2021-09-07"
 output:
+  pdf_document: default
   html_document: default
-  pdf_document: default---
 ---
 
 ```{r clear_memory}
@@ -57,9 +57,13 @@ library(gbm.auto)
 Load data set
 
 ```{r read_files}
-DET <- read.csv("./data/TRACKS1.csv")
+# print(getwd()) # "/home/simon/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R"
+DET <- read.csv("../data/TRACKS1.csv")
+# the script environment location is where the script is i.e. dBBMM_HomeRange/R.
+# the console environment is the project root i.e. dBBMM_HomeRange
 # Error in file(file, "rt") : cannot open the connection
 # works if you paste it into the console. The command is correct. What's going on? Something with markdown?
+# env1 <- Sys.getenv() checked against console, only difference is console width
 ```
 
 Check data directory and create it if not present
@@ -138,16 +142,11 @@ colnames(cord.UTM) <- c("NewEastingUTM", "NewNorthingUTM")
 DET <- cbind(DET, cord.UTM) # 1308 x 7
 ```
 
-Construct movement models per individual. 
+Construct movement models per individual.
 
-Some notes regarding the 'move package and construction of movement models:
-Several arguments need to be used to run the model.
-1. Window size: corresponds with number of locations and moves along a given trajectory to estimate the MA parameter within defined subsections of the path. This increases the ability to detect breakpoints where changes in behaviour occur. The window size should relate to what kind of behaviours the model is desired to identify e.g., a window size of 23 means the sliding window is moved every 23 locations or every 23 hours (has to do with sampling interval)
-2. Margin: motion variance based on only the middle section of the trajectory; the ends of the movement trajectory where no changes are allowed because at some stage you want to have a few locations to base your estimation of the variance on and how many locations in either side of the window we use for this, is called the margin. Smaller values for window size and margin is expected to give a higher frequency of behavioural changes; make these large for looking at migrations.
-3. The raster dictates the grid cell size for the UD to be calculated per grid cell per individual. Create the raster of certain size that matches with coordinates used to make the move object
-4. Extent: is incorporated if there are animal locations that border the edges of the raster.
+Some notes regarding the 'move package and construction of movement models: Several arguments need to be used to run the model. 1. Window size: corresponds with number of locations and moves along a given trajectory to estimate the MA parameter within defined subsections of the path. This increases the ability to detect breakpoints where changes in behaviour occur. The window size should relate to what kind of behaviours the model is desired to identify e.g., a window size of 23 means the sliding window is moved every 23 locations or every 23 hours (has to do with sampling interval) 2. Margin: motion variance based on only the middle section of the trajectory; the ends of the movement trajectory where no changes are allowed because at some stage you want to have a few locations to base your estimation of the variance on and how many locations in either side of the window we use for this, is called the margin. Smaller values for window size and margin is expected to give a higher frequency of behavioural changes; make these large for looking at migrations. 3. The raster dictates the grid cell size for the UD to be calculated per grid cell per individual. Create the raster of certain size that matches with coordinates used to make the move object 4. Extent: is incorporated if there are animal locations that border the edges of the raster.
 
-A dBBMM is nor run if total detections of individual < window size (default value, 31). Below code checks and filters individuals with insufficient data. Below we set window size arbitrarily to 23
+A dBBMM is nor run if total detections of individual \< window size (default value, 31). Below code checks and filters individuals with insufficient data. Below we set window size arbitrarily to 23
 
 ```{r filter_data}
 check1 <- DET %>%
@@ -390,7 +389,7 @@ if (grepl("nautilus", Sys.info()["nodename"]) | grepl("Poseidon", Sys.info()["no
   work.dir <- "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/"
 }
 
-source("./R/scaleraster.R")
+source("scaleraster.R")
 # Warning in file(filename, "r", encoding = encoding) :  cannot open file './R/scaleraster.R': No such file or directory
 # Error in file(filename, "r", encoding = encoding) : cannot open the connection
 # Again, works fine in console
@@ -421,6 +420,7 @@ lemons.ras <- read_stars(paste0(work.dir, "/dBBMM ASCII/Scaled/All_Rasters_Scale
 # lemons.ras %<>% trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
 
 # myLocation to be function param, NULL by default so extents autocreated from data, but gives user the option to set extents
+myLocation <- NULL
 if (is.null(myLocation)) myLocation <- st_bbox(lemons.ras %>% st_transform(4326)) %>% as.vector() # xmin      ymin      xmax      ymax 
 myLocation <- c(-79.3, 25.68331, -79.24, 25.78)
 
@@ -439,7 +439,8 @@ myLocation <- c(-79.3, 25.68331, -79.24, 25.78)
 #                     layer = paste0("Crop_Map"),
 #                     quiet = TRUE) # read in worldmap
 
-# googlemap = TRUE # set as top parameter when this is a function
+# set googlemap as top parameter when this is a function ####
+googlemap = FALSE
 if (googlemap) { # grow bounds extents if requested
   expandfactor <- 1.6 # 1.3 - 1.5 same zoom as 1. 1.6 is a big leap up in zoom (out). 1.9 (& maybe 1.7 or 1.8 is another step out, done manually for #2, 200368, because some points were out of bounds.)
   # Still need to improve this part
