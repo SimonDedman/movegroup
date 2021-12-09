@@ -505,7 +505,7 @@ ggmap(myMap) +
   # scale_fill_viridis_c() + # for stars
   geom_sf(data = st_contour(x = lemons.ras,
                             contour_lines = TRUE, # makes lines not polys regardless of T or F
-                            breaks = c(0.95)) %>%
+                            breaks = c(0.05)) %>%
             # breaks could be function param, but only allows 2 breaks. Whatevs ####
             st_transform(3857), # Vector transform after st_contour()  4326
           fill = NA, inherit.aes = FALSE,
