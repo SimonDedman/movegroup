@@ -341,7 +341,6 @@ for (i in unique(DET$Shark)) { # i <- unique(DET$Shark)[1]
                                        burstType = "normal",
                                        raster = xAEQD.i,
                                        location.error = "LocationError",
-                                       time.step = 5,
                                        ext = 3,
                                        window.size = 23
   )
@@ -360,12 +359,12 @@ for (i in unique(DET$Shark)) { # i <- unique(DET$Shark)[1]
   
   # Export aggregated individual UDs to as ascii files for further exploration/spatial analysis in GIS software.
   # Needed for when the aim is to plot population-level and normalized UDs per species.
-  # asc <- writeRaster(bb,
-  #                   paste0(data.dir, out.dir, filename = i, ".asc"),
-  #                   format = "ascii",
-  #                   datatype = "FLT4S",
-  #                   bylayer = T,
-  #                   overwrite = T)
+  asc <- writeRaster(bb,
+                    paste0(data.dir, "/", out.dir, "/", filename = i, ".asc"),
+                    format = "ascii",
+                    datatype = "FLT4S",
+                    bylayer = T,
+                    overwrite = T)
   
   # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: absolute scale
   area.50 <- sum(values(getVolumeUD(bb) <= .50))
@@ -538,7 +537,7 @@ ggmap(myMap) +
         legend.key = element_blank()) # removed whitespace buffer around legend boxes which is nice
 
 ggsave(paste0(today(), "_dBBMM-contours.png"),
-       plot = last_plot(), device = "png", path = paste0(work.dir, out.dir, "Scaled"), scale = 1,
+       plot = last_plot(), device = "png", path = file.path(work.dir, out.dir, "Scaled"), scale = 1,
        #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
        width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)
 ```
@@ -731,12 +730,11 @@ for (i in unique(DET$T.Ph)) { # "H" "M" "L"
   # There are 2 types of burst: "normal" and "long". You can select for these in the dbbmm by selecting the factor level in the burstType command.
   
     
-    # Construct the model. The time.step should reflect the ping frequency of the tag (in minutes)
+  # Construct the model. The time.step should reflect the ping frequency of the tag (in minutes)
   bursted_dbbmm <- brownian.bridge.dyn(bursted,
                                        burstType = "normal",
                                        raster = xAEQD.i,
                                        location.error = "LocationError",
-                                       time.step = 5,
                                        ext = 3,
                                        window.size = 23
   )
@@ -823,9 +821,9 @@ plotting tidal phases
 #   st_transform(4326)
 # stars:::is_curvilinear(lemons.ras) # TRUE
 
-for (i in unique(DET$T.Ph)) { # "H" "M" "L"
+for (i in unique(DET$T.Ph)){
   
-  lemons.ras <- read_stars(file.path(data.dir, out.dir, "Tide", i, "Scaled/All_Rasters_Scaled.asc")) %>% 
+lemons.ras <- read_stars(file.path(data.dir, out.dir, "Tide", i, "Scaled/All_Rasters_Scaled.asc")) %>% 
   # si directory
   st_set_crs(2958)
 # stars:::is_curvilinear(lemons.ras) # FALSE
@@ -910,7 +908,7 @@ ggmap(myMap) +
                             contour_lines = TRUE, # makes lines not polys regardless of T or F
                             breaks = c(0.05)) %>%
             # breaks could be function param, but only allows 2 breaks. Whatevs ####
-            st_transform(3857), # Vector transform after st_contour()  4326
+          st_transform(3857), # Vector transform after st_contour()  4326
           fill = NA, inherit.aes = FALSE,
           aes(colour = "UD_95_pct")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
   geom_sf(data = st_contour(x = lemons.ras, contour_lines = TRUE, breaks = c(0.5)) %>%
@@ -919,9 +917,9 @@ ggmap(myMap) +
   ggtitle("Aggregated 95% and 50% contours, lemon sharks, Bimini",
           subtitle = "Scaled contours. n = 13") +
   # make title & subtitle function params ####
-  # Can use the term 'home range' when an animal can be detected wherever it goes i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic receivers cover the entire home range of the study species. This term is problematic when applied to a passive acoustic telemetry setting where an array of non-overlapping receivers are used to assess local space use patterns i.e. the home range is bigger than the coverage by the acoustic array; put in Details ####
-  # DET %>% distinct(Shark) %>% nrow() # 13
-  labs(x = "Longitude", y = "Latitude", caption = paste0("dBBMM_HomeRange, ", today())) +
+# Can use the term 'home range' when an animal can be detected wherever it goes i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic receivers cover the entire home range of the study species. This term is problematic when applied to a passive acoustic telemetry setting where an array of non-overlapping receivers are used to assess local space use patterns i.e. the home range is bigger than the coverage by the acoustic array; put in Details ####
+# DET %>% distinct(Shark) %>% nrow() # 13
+labs(x = "Longitude", y = "Latitude", caption = paste0("dBBMM_HomeRange, ", today())) +
   theme_minimal() +
   theme(legend.position = c(0.16, 0.92), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
         # Make legend.position as function param ####
@@ -938,7 +936,6 @@ ggsave(paste0(today(), "_dBBMM-contours.png"),
        plot = last_plot(), device = "png", path = file.path(work.dir, out.dir, "Tide", i, "Scaled"), scale = 1,
        #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
        width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)
-
 }
 ```
 
