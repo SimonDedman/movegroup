@@ -917,6 +917,7 @@ ggmap(myMap) +
   ggtitle("Aggregated 95% and 50% contours, lemon sharks, Bimini",
           subtitle = "Scaled contours. n = 13") +
   # make title & subtitle function params ####
+# make n a dynamic variable
 # Can use the term 'home range' when an animal can be detected wherever it goes i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic receivers cover the entire home range of the study species. This term is problematic when applied to a passive acoustic telemetry setting where an array of non-overlapping receivers are used to assess local space use patterns i.e. the home range is bigger than the coverage by the acoustic array; put in Details ####
 # DET %>% distinct(Shark) %>% nrow() # 13
 labs(x = "Longitude", y = "Latitude", caption = paste0("dBBMM_HomeRange, ", today())) +
