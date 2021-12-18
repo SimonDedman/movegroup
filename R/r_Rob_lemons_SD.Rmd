@@ -518,8 +518,8 @@ ggmap(myMap) +
   geom_sf(data = st_contour(x = lemons.ras, contour_lines = TRUE, breaks = c(0.5)) %>%
             st_transform(3857), fill = NA, inherit.aes = FALSE, aes(colour = "UD_50_pct")) +
   scale_colour_manual(name = "Percent UD Contours", values = c(UD_95_pct = "red", UD_50_pct = "orange")) +
-  ggtitle("Aggregated 95% and 50% contours, lemon sharks, Bimini",
-          subtitle = "Scaled contours. n = 13") +
+  ggtitle(paste0("95% and 50% UD contours"),
+        subtitle = paste0("Aggregated scaled contours. n = ", length(unique(check2$Shark)))) +
   # make title & subtitle function params ####
   # Can use the term 'home range' when an animal can be detected wherever it goes i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic receivers cover the entire home range of the study species. This term is problematic when applied to a passive acoustic telemetry setting where an array of non-overlapping receivers are used to assess local space use patterns i.e. the home range is bigger than the coverage by the acoustic array; put in Details ####
   # DET %>% distinct(Shark) %>% nrow() # 13
@@ -893,7 +893,7 @@ ggmap_bbox <- function(map) {
 myMap <- ggmap_bbox(myMap) # Use the function
 
 # Automate width * height adjustments for different map extent / ratio
-# 6 (manually chosen width, below), divided by width range times by height range
+# 6 (manually chosen width, below), divided by width range times by height ranges
 # Maintains ratio by scales height to width(6). Then *1.2 because it still wasn't perfect.
 # attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]] # longitude, x, width, bind as 6
 # attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]] # latitude, y, height
@@ -904,7 +904,7 @@ autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(my
 ggmap(myMap) +
   # geom_stars(data = lemons.ras %>% st_transform(3857), inherit.aes = FALSE) + # 4326
   # scale_fill_viridis_c() + # for stars
-  geom_sf(data = st_contour(x = lemons.ras,
+  geom_sf(data = st_contour(x = lemons.ras,s
                             contour_lines = TRUE, # makes lines not polys regardless of T or F
                             breaks = c(0.05)) %>%
             # breaks could be function param, but only allows 2 breaks. Whatevs ####
@@ -914,10 +914,9 @@ ggmap(myMap) +
   geom_sf(data = st_contour(x = lemons.ras, contour_lines = TRUE, breaks = c(0.5)) %>%
             st_transform(3857), fill = NA, inherit.aes = FALSE, aes(colour = "UD_50_pct")) +
   scale_colour_manual(name = "Percent UD Contours", values = c(UD_95_pct = "red", UD_50_pct = "orange")) +
-  ggtitle(paste0("95% and 50% contours, ", "Tide: ",i),
-          subtitle = paste0("Aggregated scaled contours. n = ", length(unique(check2$Shark)))) +
+  ggtitle(paste0("95% and 50% UD contours, ", "Tide: ",i),
+        subtitle = paste0("Aggregated scaled contours. n = ", length(unique(check2$Shark)))) +
   # make title & subtitle function params ####
-# make n a dynamic variable
 # Can use the term 'home range' when an animal can be detected wherever it goes i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic receivers cover the entire home range of the study species. This term is problematic when applied to a passive acoustic telemetry setting where an array of non-overlapping receivers are used to assess local space use patterns i.e. the home range is bigger than the coverage by the acoustic array; put in Details ####
 # DET %>% distinct(Shark) %>% nrow() # 13
 labs(x = "Longitude", y = "Latitude", caption = paste0("dBBMM_HomeRange, ", today())) +
