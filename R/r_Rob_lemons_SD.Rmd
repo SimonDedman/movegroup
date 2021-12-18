@@ -904,7 +904,7 @@ autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(my
 ggmap(myMap) +
   # geom_stars(data = lemons.ras %>% st_transform(3857), inherit.aes = FALSE) + # 4326
   # scale_fill_viridis_c() + # for stars
-  geom_sf(data = st_contour(x = lemons.ras,s
+  geom_sf(data = st_contour(x = lemons.ras,
                             contour_lines = TRUE, # makes lines not polys regardless of T or F
                             breaks = c(0.05)) %>%
             # breaks could be function param, but only allows 2 breaks. Whatevs ####
