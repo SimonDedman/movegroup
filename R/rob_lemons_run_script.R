@@ -23,5 +23,12 @@ write.csv(x = DET, file = "TracksCleaned.csv", row.names = FALSE) # Could load t
 
 dBBMM_HomeRange(
   data = DET,
+)
+
+scaleraster(
+  
+)
+
+dBBMM_plot(
   
 )
