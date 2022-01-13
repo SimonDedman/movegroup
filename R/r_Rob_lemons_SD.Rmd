@@ -367,13 +367,14 @@ for (i in unique(DET$Shark)) { # i <- unique(DET$Shark)[1]
   #                   overwrite = T)
   
   # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: absolute scale
+  # values are integers i.e. how many 1m2 cells qualify as having values >= 0.5 or 0.95
   area.50 <- sum(values(getVolumeUD(bb) <= .50))
   area.95 <- sum(values(getVolumeUD(bb) <= .95))
   
   # Combine in single df
   area.ct <- data.frame(
-    core.use = area.50,
-    general.use = area.95
+    core.use.50 = area.50,
+    general.use.95 = area.95
   )
   
   # Add Shark id
