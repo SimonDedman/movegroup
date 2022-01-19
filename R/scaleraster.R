@@ -14,7 +14,7 @@
 #' suggestions. See SimonDedman.com for links to walkthrough paper, and papers
 #' and thesis published using this package.
 #'
-#' @param grids Explantory data to predict to. Import with (e.g.) read.csv and
+#' @param grids Explanatory data to predict to. Import with (e.g.) read.csv and
 #' specify object name. Defaults to NULL (won't predict to grids).
 #' @param path no terminal slash.
 #' @param pattern default ".asc".
@@ -25,7 +25,7 @@
 #' @param scalefolder default "Scaled".
 #' @param summedname default "All_Rasters_Summed".
 #' @param scaledname default "All_Rasters_Scaled".
-#' @param returnObj Logical. Return the scaled objet to the parent environment? Default FALSE.
+#' @param returnObj Logical. Return the scaled object to the parent environment? Default FALSE.
 #' 
 #' @return Line, dot and bar plots, a report of all variables used, statistics
 #' for tests, variable interactions, predictors used and dropped, etc. If
