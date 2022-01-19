@@ -359,12 +359,12 @@ for (i in unique(DET$Shark)) { # i <- unique(DET$Shark)[1]
   
   # Export aggregated individual UDs to as ascii files for further exploration/spatial analysis in GIS software.
   # Needed for when the aim is to plot population-level and normalized UDs per species.
-  # asc <- writeRaster(bb,
-  #                   paste0(data.dir, "/", out.dir, "/", filename = i, ".asc"),
-  #                   format = "ascii",
-  #                   datatype = "FLT4S",
-  #                   bylayer = T,
-  #                   overwrite = T)
+  asc <- writeRaster(bb,
+                    paste0(data.dir, "/", out.dir, "/", filename = i, ".asc"),
+                    format = "ascii",
+                    datatype = "FLT4S",
+                    bylayer = T,
+                    overwrite = T)
   
   # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: absolute scale
   # values are integers i.e. how many 1m2 cells qualify as having values >= 0.5 or 0.95
