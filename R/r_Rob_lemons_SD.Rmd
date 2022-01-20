@@ -412,6 +412,69 @@ source("./R/scaleraster.R")
 scaleraster(path = file.path(data.dir, out.dir))
 ```
 
+```{r calculate volume area - merge with chunk above when finished}
+# retrieve IDs to loop over
+namevec <- list.files(path = file.path(data.dir, out.dir, "Aggregated/Scaled"), pattern = "asc")
+namevec <- namevec[-c(1,2)]
+namevec <- gsub('.asc', '', namevec)
+
+# Pull all raster names from path into a list
+filelist <- as.list(list.files(path = file.path(data.dir, out.dir, "Aggregated/Scaled"), pattern = "asc"))
+
+# Remove first 2 objects
+filelist[c(1,2)] <- NULL
+
+# Read in rasters and add to list
+rasterlist <-
+  lapply(filelist, function(x) raster(paste0(path, "/", x))) %>% # read in rasters
+  lapply(function(x) setMinMax(x)) # set minmax values
+
+bb.list <- list()
+counter <- 0
+for (i in 1:length(rasterlist)){
+  
+  counter <- counter + 1
+  
+  # Extract vector with non-zero values
+  temp <- rasterlist[[i]][which(rasterlist[[i]][] != 0)]
+  
+  # Extract maximum value
+  max <- maxValue(rasterlist[[i]])
+  
+  # 50%
+  area.50 <- length(which(rasterlist[[i]][] >= (max(temp)*.5)))
+  area.50
+  
+  # 95%
+  area.95 <- length(which(rasterlist[[i]][] >= (max(temp)*.05)))
+  area.95
+  
+  # Combine in single df
+  area.ct <- data.frame(
+    core.use.50 = area.50,
+    general.use.95 = area.95
+  )
+  
+  # Add Shark id
+  area.ct$Shark <- namevec[i]
+  
+  # Put in list
+  bb.list[[counter]] <- area.ct
+  bb.list
+  gc()
+}
+  
+# Put everything in a data.frame
+md <- bind_rows(bb.list,
+                .id = "column_label")
+
+write.csv(md,
+          file = file.path(data.dir, out.dir, "Aggregated/Scaled", "Lemons_VolumeArea_RelativeScale.csv"),
+          row.names = FALSE
+)
+
+```
+
 Now we're ready for the final step: plotting!
 
 ```{r plot}
@@ -782,7 +845,7 @@ for (i in unique(DET$T.Ph)) { # "H" "M" "L"
   
   write.csv(
     x = md,
-    file = file.path(data.dir, out.dir, "Tide",paste0("Lemon_VolumeArea_",i,".csv")),
+    file = file.path(data.dir, out.dir, "Tide",paste0("Lemons_VolumeArea_AbsoluteScale_",i,".csv")),
     row.names = FALSE
   )
   
@@ -800,6 +863,69 @@ source("./R/scaleraster.R")
 # Error in file(filename, "r", encoding = encoding) : cannot open the connection
 # Again, works fine in console
 scaleraster(path = file.path(data.dir, out.dir,"Tide",i))
+
+
+
+# Calculate volume areas for scaled individual UDs
+
+# retrieve IDs to loop over
+namevec <- list.files(path = file.path(data.dir, out.dir, "Tide", i,"Scaled"), pattern = "asc")
+namevec <- namevec[-c(1,2)]
+namevec <- gsub('.asc', '', namevec)
+
+# Pull all raster names from path into a list
+filelist <- as.list(list.files(path = file.path(data.dir, out.dir, "Tide", i,"Scaled"), pattern = "asc"))
+
+# Remove first 2 objects
+filelist[c(1,2)] <- NULL
+
+# Read in rasters and add to list
+rasterlist <-
+  lapply(filelist, function(x) raster(paste0(path, "/", x))) %>% # read in rasters
+  lapply(function(x) setMinMax(x)) # set minmax values
+
+bb.list <- list()
+counter <- 0
+for (j in 1:length(rasterlist)){
+  
+  counter <- counter + 1
+  
+  # Extract vector with non-zero values
+  temp <- rasterlist[[j]][which(rasterlist[[j]][] != 0)]
+  
+  # Extract maximum value
+  max <- maxValue(rasterlist[[j]])
+  
+  # 50%
+  area.50 <- length(which(rasterlist[[j]][] >= (max(temp)*.5)))
+  area.50
+  
+  # 95%
+  area.95 <- length(which(rasterlist[[j]][] >= (max(temp)*.05)))
+  area.95
+  
+  # Combine in single df
+  area.ct <- data.frame(
+    core.use.50 = area.50,
+    general.use.95 = area.95
+  )
+  
+  # Add Shark id
+  area.ct$Shark <- namevec[j]
+  
+  # Put in list
+  bb.list[[counter]] <- area.ct
+  bb.list
+  gc()
+}
+
+# Put everything in a data.frame
+md <- bind_rows(bb.list,
+                .id = "column_label")
+
+write.csv(md,
+          file = file.path(data.dir, out.dir, "Tide",paste0("Lemons_VolumeArea_RelativeScale_",i,".csv")),
+          row.names = FALSE)
 
 
 
