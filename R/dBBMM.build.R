@@ -74,6 +74,7 @@ dBBMM_HomeRange <- function(
   Group = NULL, # name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?
   dat.TZ = "US/Eastern", # timezone for as.POSIXct.
   proj = CRS("+proj=longlat +datum=WGS84"), # CRS for move function.
+  projectedCRS = "+init=epsg:32617", # EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone
   sensor = "VR2W", # sensor for move function.
   moveLocError = 1, # location error in metres for move function.
   timeDiffUnits = "hours", # units for time difference for move function.
@@ -130,9 +131,9 @@ dBBMM_HomeRange <- function(
   # gbm.rsb, gbm.valuemap, gbm.cons, gbm.basemap
   
   ####1. Check packages, start loop####
-  fam1 <- match.arg(fam1) # populate object from function argument in proper way
-  # tibble's don't collapse into a vector, instead an X x 1 df, which breaks various functionality.
-  if ("tbl" %in% class(grids)) grids <- as.data.frame(grids)
+  # fam1 <- match.arg(fam1) # populate object from function argument in proper way
+  # # tibble's don't collapse into a vector, instead an X x 1 df, which breaks various functionality.
+  # if ("tbl" %in% class(grids)) grids <- as.data.frame(grids)
 
   # prefixes "X" to numerical-named sharks to avoid issues later
   data %<>% mutate(ID = make.names(ID))
@@ -249,7 +250,7 @@ cord.dec <- SpatialPoints(cbind(data$Lon, data$Lat),
 )
 
 # Transform to UTM by setting the EPSG to 32617 for WGS 84, UTM zone 17, northern hemisphere. This is where Bimini is located.
-cord.UTM <- as.data.frame(spTransform(cord.dec, CRS("+init=epsg:32617")))
+cord.UTM <- as.data.frame(spTransform(cord.dec, CRS(projectedCRS)))
 colnames(cord.UTM) <- c("NewEastingUTM", "NewNorthingUTM")
 data <- cbind(data, cord.UTM) # 1308 x 7
 # ```
@@ -315,7 +316,7 @@ for (i in unique(data$ID)) { # i <- unique(data$ID)[1]
     x = data.i$Lon,
     y = data.i$Lat,
     time = data.i$Datetime,
-    proj = CRS("+proj=longlat +datum=WGS84"),
+    proj = proj,
     data = data.i,
     animal = data.i$ID,
     sensor = sensor
