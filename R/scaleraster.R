@@ -52,8 +52,9 @@
 #' @export
 
 #' @import raster
+#' @import magrittr
 
-scaleraster <- function(path = NULL, # no terminal slash
+scaleraster <- function(path = NULL, # Location of files created by dBBMM.build. No terminal slash.
                         pattern = ".asc",
                         format = "ascii",
                         datatype = "FLT4S",
@@ -85,9 +86,10 @@ scaleraster <- function(path = NULL, # no terminal slash
   # create new folder to save to
   dir.create(paste0(path, "/", scalefolder))
 
-  # scale to max of maxes & write individual rasters
-  rasterlist %<>%
-    lapply(function(x) x / scalemax) %>% # scale
+  # scale to individual maxes & write individual rasters
+  rasterlist %>%
+    lapply(function(x) x / cellStats(x, stat = 'max')) %>% # scale
+    # fromhere change scalemax to indidividual maxes####
     lapply(function(x) writeRaster(x = x, # resave individual rasters
                                    filename = paste0(path, "/", scalefolder, "/", names(x)), # , pattern: removed ability to resave as different format
                                    # error: adds X to start of numerical named objects####
@@ -95,6 +97,9 @@ scaleraster <- function(path = NULL, # no terminal slash
                                    datatype = datatype,
                                    bylayer = bylayer,
                                    overwrite = overwrite))
+  
+  # scale to max of maxes
+  rasterlist %<>% lapply(function(x) x / scalemax)
 
   # sum the normalised individual UDs
   rasterstack <- raster::stack(x = rasterlist)
