@@ -75,7 +75,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   rasterlist <-
     lapply(filelist, function(x) raster(paste0(path, "/", x))) %>% # read in rasters
     lapply(function(x) setMinMax(x)) # set minmax values
-  names(rasterlist) <- filelist # need to get rid of extension e.g. ".asc"
+  names(rasterlist) <- str_remove(filelist, pattern = pattern) # need to get rid of extension e.g. ".asc"
 
   # Get max of maxes
   scalemax <-
@@ -87,9 +87,8 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   dir.create(paste0(path, "/", scalefolder))
 
   # scale to individual maxes & write individual rasters
-  rasterlist %>%
-    lapply(function(x) x / cellStats(x, stat = 'max')) %>% # scale
-    # fromhere change scalemax to indidividual maxes####
+  scalelist <- rasterlist %>%
+    lapply(function(x) x / cellStats(x, stat = 'max')) %>% # scale to individual max
     lapply(function(x) writeRaster(x = x, # resave individual rasters
                                    filename = paste0(path, "/", scalefolder, "/", names(x)), # , pattern: removed ability to resave as different format
                                    # error: adds X to start of numerical named objects####
@@ -97,6 +96,15 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
                                    datatype = datatype,
                                    bylayer = bylayer,
                                    overwrite = overwrite))
+  # Calculate individual scaled ("relative") UD areas
+  area.50 <- scalelist %>% sapply(function(x) length(which(values(x) >= 0.5))) # 50%
+  area.95 <- scalelist %>% sapply(function(x) length(which(values(x) >= 0.05))) # 95%
+  area.ct <- data.frame(core.use = area.50, general.use = area.95) # Combine in single df
+  area.ct$ID <- row.names(area.ct) # create ID column from row.names
+  row.names(area.ct) <- NULL # kill row.names, reverts to 1,2,3
+  write.csv(area.ct,
+            file = paste0(path, "/", scalefolder, "/","VolumeAreas_ScaledPerID.csv"),
+            row.names = FALSE)
   
   # scale to max of maxes
   rasterlist %<>% lapply(function(x) x / scalemax)

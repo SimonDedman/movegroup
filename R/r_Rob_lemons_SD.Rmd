@@ -803,7 +803,7 @@ for (i in unique(DET$T.Ph)) { # "H" "M" "L"
   rm(bursted)
   rm(xAEQD.i)
     
-  # Warning: Some burst are omitted for variance calculation since there are not segements of interest
+  # Warning: Some burst are omitted for variance calculation since there are not segments of interest
     
     # Re-standardize (Dr. Kranstauber's trouble shooting solution). Occurring errors are
     # "due to limits of accuracy during calculations. Given the error is really small (<.000001 %)
@@ -816,13 +816,13 @@ for (i in unique(DET$T.Ph)) { # "H" "M" "L"
     
     # Export aggregated individual UDs to as ascii files for further exploration/spatial analysis in GIS software.
     # Needed for when the aim is to plot population-level and normalized UDs per species.
-    # asc <- writeRaster(bb,
-    #                    file.path(data.dir, out.dir, "Tide", i, filename = paste0(j, ".asc")),
-    #                    format = "ascii",
-    #                    datatype = "FLT4S",
-    #                    bylayer = T,
-    #                    overwrite = T
-    # )
+    asc <- writeRaster(bb,
+                       file.path(data.dir, out.dir, "Tide", i, filename = paste0(j, ".asc")),
+                       format = "ascii",
+                       datatype = "FLT4S",
+                       bylayer = T,
+                       overwrite = T
+    )
     
     # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours
     area.50 <- sum(values(getVolumeUD(bb) <= .50))
@@ -845,7 +845,7 @@ for (i in unique(DET$T.Ph)) { # "H" "M" "L"
   
   write.csv(
     x = md,
-    file = file.path(data.dir, out.dir, "Tide",paste0("Lemons_VolumeArea_AbsoluteScale_",i,".csv")),
+    file = file.path(data.dir, out.dir, "Tide", paste0("Lemons_VolumeArea_AbsoluteScale_", i, ".csv")),
     row.names = FALSE
   )
   

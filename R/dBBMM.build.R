@@ -544,7 +544,7 @@ dBBMM_HomeRange <- function(
     bb.list[[counter]] <- area.ct
     bb.list
     gc()
-  }
+  } # close for i in unique data$ID
   
   # Put everything in a data.frame
   md <- bind_rows(bb.list,
