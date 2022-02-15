@@ -80,6 +80,7 @@ dBBMM_HomeRange <- function(
     moveLocError = 1, # location error in metres for move function. Numeric. Either single or a vector of lenth nrow data.
     timeDiffLong = 2, # threshold length of time in timeDiffUnits designating long breaks in relocations.
     timeDiffUnits = "hours", # units for time difference for move function.
+    center = TRUE, # center move object within extent? See spTransform.
     buffpct = 0.3, # buffer extent for raster creation, proportion of 1.
     rasterCRS = CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation.
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres?
@@ -354,8 +355,7 @@ dBBMM_HomeRange <- function(
     } # close if exists movelocerror
     
     # Convert projection to Azimuthal Equi-Distance projection (aeqd)
-    r.i <- move::spTransform(move.i, center = TRUE)
-    # make centre an optional####
+    r.i <- spTransform(move.i, center = center)
     
     # Make sure it changed correctly
     proj4string(r.i) # "+proj=aeqd +lat_0=24.75136 +lon_0=-36.01593 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
@@ -422,6 +422,9 @@ dBBMM_HomeRange <- function(
     # resolution : 50, 50  (x, y)
     # extent     : 593395.5, 9951195, 2545826, 9676576  (xmin, xmax, ymin, ymax)
     # crs        : +proj=utm +zone=17 +datum=WGS84 +units=m +no_defs
+    
+    # This changes xUTM.i res from 50x50 to newTemplate res 43.3 x 52.2 (x, y)####
+    # Which breaks writeRaster later
     
     # Give newTemplate some values. Make Rep equal to the ncell dimension
     ones <- rep(1, ncell(newTemplate))
