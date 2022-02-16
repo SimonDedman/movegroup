@@ -96,18 +96,18 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
                                    datatype = datatype,
                                    bylayer = bylayer,
                                    overwrite = overwrite))
+  
+  # scale to max of maxes
+  rasterlist %<>% lapply(function(x) x / scalemax)
   # Calculate individual scaled ("relative") UD areas
-  area.50 <- scalelist %>% sapply(function(x) length(which(values(x) >= 0.5))) # 50%
-  area.95 <- scalelist %>% sapply(function(x) length(which(values(x) >= 0.05))) # 95%
+  area.50 <- rasterlist %>% sapply(function(x) length(which(values(x) >= 0.5))) # 50%
+  area.95 <- rasterlist %>% sapply(function(x) length(which(values(x) >= 0.05))) # 95%
   area.ct <- data.frame(core.use = area.50, general.use = area.95) # Combine in single df
   area.ct$ID <- row.names(area.ct) # create ID column from row.names
   row.names(area.ct) <- NULL # kill row.names, reverts to 1,2,3
   write.csv(area.ct,
-            file = paste0(path, "/", scalefolder, "/","VolumeAreas_ScaledPerID.csv"),
+            file = paste0(path, "/", scalefolder, "/","VolumeAreas_ScaledAllFish.csv"),
             row.names = FALSE)
-  
-  # scale to max of maxes
-  rasterlist %<>% lapply(function(x) x / scalemax)
 
   # sum the normalised individual UDs
   rasterstack <- raster::stack(x = rasterlist)
