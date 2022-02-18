@@ -121,11 +121,14 @@ dBBMM_HomeRange <- function(
   
   library(sp)
   library(move)
+  if (writeRasterFormat == "CDF") library(ncdf4)
+  # do this for other formats?####
+  
   
   # Create writeRasterExtension from writeRasterFormat
   if (is.null(writeRasterExtension)) writeRasterExtension <- switch(EXPR = writeRasterFormat,
                                                                     "ascii" = ".asc",
-                                                                    "raster" = ",grd",
+                                                                    "raster" = ".grd",
                                                                     "SAGA" = ".sdat",
                                                                     "IDRISI" = ".rst",
                                                                     "CDF" = ".nc",
@@ -307,6 +310,131 @@ dBBMM_HomeRange <- function(
     # prevents duplicate Datetime crash in move() later
     ungroup() # 1253 x 7 after removing as.numeric above
   
+  
+  
+  
+  
+  # Make a raster for the UD to plot into. Start with UTM.
+  # These coordinates need to be big enough to cover your data.
+  # May need to expand x and y ranges (i.e. the "e" variable below) if you encounter errors when constructing the DBBMM in the next code chunk.
+  # NOTE: "xUTM" grid should be larger than the "x" i.e. lower minima and higher maxima.
+  # The variable 'e' influences the extent [now done with buffpct]
+  # The resolution determines the grid size.
+  # Finer resolution/grid size (in m) i.e. lower value means longer computation time. May need/want to play with this value too.
+  # e <- 80 * 1000 # make e a function of range of extent as %
+  
+  # Error in .local(object, raster, location.error = location.error, ext = ext,  :
+  # Lower x grid not large enough, consider extending the raster in that direction or enlarging the ext argument
+  # make buffpct larger
+  xUTM <- raster(
+    xmn = min(data$NewEastingUTM, na.rm = TRUE) - ((max(data$NewEastingUTM, na.rm = TRUE) - min(data$NewEastingUTM, na.rm = TRUE)) * buffpct),
+    xmx = max(data$NewEastingUTM, na.rm = TRUE) + ((max(data$NewEastingUTM, na.rm = TRUE) - min(data$NewEastingUTM, na.rm = TRUE)) * buffpct),
+    ymn = min(data$NewNorthingUTM, na.rm = TRUE) - ((max(data$NewNorthingUTM, na.rm = TRUE) - min(data$NewNorthingUTM, na.rm = TRUE)) * buffpct),
+    ymx = max(data$NewNorthingUTM, na.rm = TRUE) + ((max(data$NewNorthingUTM, na.rm = TRUE) - min(data$NewNorthingUTM, na.rm = TRUE)) * buffpct),
+    crs = rasterCRS, # +proj=utm +zone=27 +datum=WGS84 +units=m +no_defs
+    resolution = rasterResolution # 50
+  ) 
+  proj4string(xUTM) # "+proj=utm +zone=27 +datum=WGS84 +units=m +no_defs"
+  xUTM
+  # class      : RasterLayer 
+  # dimensions : 97, 148, 14356  (nrow, ncol, ncell)
+  # resolution : 111000, 111000  (x, y)
+  # extent     : -11061354, 5366646, 462297.3, 11229297  (xmin, xmax, ymin, ymax)
+  # crs        : +proj=utm +zone=27 +datum=WGS84 +units=m +no_defs 
+  
+  
+  
+  # run move on all data together to generate global CRS for raster
+  alldata <- data %>%
+    arrange(Datetime) %>%
+    group_by(Datetime) %>% # remove duplicates
+    summarise(across(where(is.numeric), mean, na.rm = TRUE),
+              across(where(~ is.character(.) | is.POSIXt(.)), first)) %>% # library(lubridate)
+    mutate(across(where(is.numeric), ~ ifelse(is.nan(.), NA, .)), #convert NaN to NA. POSIX needs lubridate
+           across(where(~ is.character(.)), ~ ifelse(is.nan(.), NA, .))) %>% # https://community.rstudio.com/t/why-does-tidyrs-fill-work-with-nas-but-not-nans/25506/5
+    ungroup # Joining, by = c("toppid", "Date")
+  
+  alldata <- as.data.frame(alldata)
+  moveall <- move(
+    x = alldata$Lon,
+    y = alldata$Lat,
+    time = alldata$Datetime,
+    proj = proj,
+    data = alldata,
+    # animal = data$ID,
+    sensor = sensor
+  )
+  # Convert projection to Azimuthal Equi-Distance projection (aeqd)
+  rall <- spTransform(moveall, center = center)
+  proj4string(rall) # "+proj=aeqd +lat_0=44.99489997 +lon_0=-17.48575004 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+  rallCRS <- CRS(proj4string(rall))
+  class(rallCRS) # CRS
+  write.csv(proj4string(rall), paste0(savedir, "CRS.csv"), row.names = FALSE)
+  saveRDS(rallCRS, file = paste0(savedir, "CRS.Rds"))
+  rm(moveall)
+  rm(alldata)
+  
+  
+  # We now need to reproject this into AEQD. Make a dummy object to get the correct projection.
+  x.i <- raster(
+    xmn = min(data$NewEastingUTM),
+    xmx = max(data$NewEastingUTM),
+    ymn = min(data$NewNorthingUTM),
+    ymx = max(data$NewNorthingUTM),
+    crs = proj4string(rall) # if rasterCRS then same as above! trying proj4string(r.i) which is AEQD from spTransform
+    # could add here: resolution = rasterResolution # 50 ####
+  )
+  
+  # before loop, r.i doesn't exist
+  # in loop, r.i is aeqd'd from move.i which creates different lon & lat centres each time, hence the rasters don't stack
+  # need to create aeqd from data####
+  
+  # +proj=aeqd +lat_0=24.75136 +lon_0=-36.01593 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+  
+  proj4string(x.i) # "+proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+  x.i
+  # class      : RasterLayer 
+  # dimensions : 180, 360, 64800  (nrow, ncol, ncell)
+  # resolution : 28564.46, 37331.58  (x, y)
+  # extent     : -7976391, 2306816, 2493709, 9213392  (xmin, xmax, ymin, ymax)
+  # crs        : +proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs
+  
+  
+  # Use that to reproject UTM to AEQD
+  # ?projectExtent # project the values of a Raster object to a new Raster object with another projection (CRS), i.e. projectExtent(from, to, ...))
+  newTemplate <- projectExtent(xUTM, proj4string(x.i))
+  # change newTemplate to xAEQD####
+  proj4string(newTemplate) # "+proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+  newTemplate # get the number of pixels in newTemplate and write that number into the next function. This is an empty raster.
+  # class      : RasterLayer 
+  # dimensions : 97, 148, 14356  (nrow, ncol, ncell)
+  # resolution : 96002.62, 115886.2  (x, y)
+  # extent     : -7481255, 6727132, -3943493, 7297469  (xmin, xmax, ymin, ymax)
+  # crs        : +proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs 
+  
+  # This changes xUTM res from 50x50 to newTemplate res 43.3 x 52.2 (x, y)####
+  # Which breaks writeRaster later
+  rm(x.i)
+  
+  # change xAEQD res so x & y match. Kills values
+  res(newTemplate) <- rep(mean(res(newTemplate)), 2)
+  
+  # Give newTemplate some values. Make Rep equal to the ncell dimension
+  ones <- rep(1, ncell(newTemplate))
+  xAEQD <- setValues(newTemplate, ones)
+  rm(newTemplate)
+  rm(ones)
+  xAEQD
+  # class      : RasterLayer 
+  # dimensions : 105, 135, 14175  (nrow, ncol, ncell)
+  # resolution : 102405.1, 102405.1  (x, y)
+  # extent     : -8727700, 5096989, -4485671, 6266865  (xmin, xmax, ymin, ymax)
+  # crs        : +proj=aeqd +lat_0=44.99489997 +lon_0=-17.48575004 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs 
+  # source     : memory
+  # names      : layer 
+  # values     : 1, 1  (min, max)
+  
+  
   # Loop through all unique tags
   counter <- 0
   for (i in unique(data$ID)) { # i <- unique(data$ID)[1]
@@ -319,7 +447,7 @@ dBBMM_HomeRange <- function(
     ))
     
     # Filter individual data
-    data.i <- data[data$ID == i, ]
+    data.i <- as.data.frame(data[data$ID == i, ])
     
     # create move object
     move.i <- move(
@@ -355,12 +483,16 @@ dBBMM_HomeRange <- function(
     } # close if exists movelocerror
     
     # Convert projection to Azimuthal Equi-Distance projection (aeqd)
-    r.i <- spTransform(move.i, center = center)
+    # r.i <- spTransform(move.i, center = center)
+    r.i <- spTransform(move.i, CRSobj = rallCRS, center = center)
+    
     
     # Make sure it changed correctly
     proj4string(r.i) # "+proj=aeqd +lat_0=24.75136 +lon_0=-36.01593 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
     # irish tuna: "+proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
-    
+    # r.tmp <- projectExtent(r.i, proj4string(rall)) # kills the data in r.i
+    # proj4string(r.tmp)
+  
     # Calculate time lag between consecutive detections.
     # Obviously there is no time lag for the first detection, so we need to tell R this.
     # Knowing time lags in acoustic telemetry is important, as the motion variance is based on the
@@ -373,110 +505,19 @@ dBBMM_HomeRange <- function(
     long <- which(r.i$TimeDiff > timeDiffLong)
     # if no timediffs are longer than timedifflong, long is integer(0), a potentially dangerous object.
     
-    # Make a raster for the UD to plot into. Start with UTM.
-    # These coordinates need to be big enough to cover your data.
-    # May need to expand x and y ranges (i.e. the "e" variable below) if you encounter errors when constructing the DBBMM in the next code chunk.
-    # NOTE: "xUTM" grid should be larger than the "x" i.e. lower minima and higher maxima.
-    # The variable 'e' influences the extent [now done with buffpct]
-    # The resolution determines the grid size.
-    # Finer resolution/grid size (in m) i.e. lower value means longer computation time. May need/want to play with this value too.
-    # e <- 80 * 1000 # make e a function of range of extent as %
-    
-    # Error in .local(object, raster, location.error = location.error, ext = ext,  :
-    # Lower x grid not large enough, consider extending the raster in that direction or enlarging the ext argument
-    # make buffpct larger
-    xUTM.i <- raster(
-      xmn = min(data$NewEastingUTM, na.rm = TRUE) - ((max(data$NewEastingUTM, na.rm = TRUE) - min(data$NewEastingUTM, na.rm = TRUE)) * buffpct),
-      xmx = max(data$NewEastingUTM, na.rm = TRUE) + ((max(data$NewEastingUTM, na.rm = TRUE) - min(data$NewEastingUTM, na.rm = TRUE)) * buffpct),
-      ymn = min(data$NewNorthingUTM, na.rm = TRUE) - ((max(data$NewNorthingUTM, na.rm = TRUE) - min(data$NewNorthingUTM, na.rm = TRUE)) * buffpct),
-      ymx = max(data$NewNorthingUTM, na.rm = TRUE) + ((max(data$NewNorthingUTM, na.rm = TRUE) - min(data$NewNorthingUTM, na.rm = TRUE)) * buffpct),
-      crs = rasterCRS, # +proj=utm +zone=27 +datum=WGS84 +units=m +no_defs
-      resolution = rasterResolution # 50
-    ) 
-    
-    # We now need to reproject this into AEQD. Make a dummy object to get the correct projection.
-    x.i <- raster(
-      xmn = min(data$NewEastingUTM),
-      xmx = max(data$NewEastingUTM),
-      ymn = min(data$NewNorthingUTM),
-      ymx = max(data$NewNorthingUTM),
-      crs = proj4string(r.i) # if rasterCRS then same as above! trying proj4string(r.i) which is AEQD from spTransform
-    )
-    proj4string(x.i) # "+proj=utm +zone=17 +datum=WGS84 +units=m +no_defs"
-    # "+proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
-    x.i
-    # class      : RasterLayer 
-    # dimensions : 180, 360, 64800  (nrow, ncol, ncell)
-    # resolution : 28564.46, 37331.58  (x, y)
-    # extent     : -7976391, 2306816, 2493709, 9213392  (xmin, xmax, ymin, ymax)
-    # crs        : +proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs
-    
-    
-    # Use that to reproject UTM to AEQD
-    # ?projectExtent # project the values of a Raster object to a new Raster object with another projection (CRS), i.e. projectExtent(from, to, ...))
-    newTemplate <- projectExtent(xUTM.i, proj4string(x.i))
-    rm(x.i)
-    newTemplate # get the number of pixels in newTemplate and write that number into the next function. This is an empty raster.
-    # class      : RasterLayer
-    # dimensions : 142615, 187156, 26691252940  (nrow, ncol, ncell)
-    # resolution : 50, 50  (x, y)
-    # extent     : 593395.5, 9951195, 2545826, 9676576  (xmin, xmax, ymin, ymax)
-    # crs        : +proj=utm +zone=17 +datum=WGS84 +units=m +no_defs
-    
-    # This changes xUTM.i res from 50x50 to newTemplate res 43.3 x 52.2 (x, y)####
-    # Which breaks writeRaster later
-    
-    # Give newTemplate some values. Make Rep equal to the ncell dimension
-    ones <- rep(1, ncell(newTemplate))
-    xAEQD.i <- setValues(newTemplate, ones)
-    rm(newTemplate)
-    rm(ones)
-    xAEQD.i
-    # class      : RasterLayer
-    # dimensions : 3270, 3245, 10611150  (nrow, ncol, ncell)
-    # resolution : 50, 50  (x, y)
-    # extent     : 594830.7, 757080.7, 2763971, 2927471  (xmin, xmax, ymin, ymax)
-    # crs        : +proj=utm +zone=17 +datum=WGS84 +units=m +no_defs
-    # source     : memory
-    # names      : layer
-    # values     : 1, 1  (min, max)
-    
-    #xAEQD.i ISN'T in AEQD - SURELY that's incorrect?!####
-    # but res values are the same so it succeeds...
-    
-    # Reproject the move object r into AEQD
-    # It's already AEQD per L357! spTransform####
-    rNew.i <- spTransform(r.i, proj4string(xAEQD.i))
-    rNew.i
-    # class       : Move
-    # features    : 37
-    # extent      : 674830.7, 677094.8, 2843987, 2847471  (xmin, xmax, ymin, ymax)
-    # crs         : +proj=utm +zone=17 +datum=WGS84 +units=m +no_defs
-    # variables   : 7
-    # names       :   Datetime,      Lat,       Lon,    NewEastingUTM,   NewNorthingUTM, LocationError,         TimeDiff
-    # min values  : 1409777400, 25.70323, -79.25719, 674830.719845252, 2843986.90740363,             1,                0
-    # max values  : 1410148680, 25.73457, -79.23457, 677094.847481247, 2847470.56026671,             1, 31.1666666666667
-    # timestamps  : 2014-09-03 16:50:00 ... 2014-09-07 23:58:00 Time difference of 4 days  (start ... end, duration)
-    # sensors     : VR2W
-    # indiv. data : ID, T.Ph
-    # indiv. value: E07 L
-    # date created: 2021-08-25 01:42:43
     
     # We need to make sure that the projection of the move object is in the same format as our raster. Check below.
-    proj4string(xAEQD.i) # "+proj=utm +zone=17 +datum=WGS84 +units=m +no_defs"
-    proj4string(rNew.i) # "+proj=utm +zone=17 +datum=WGS84 +units=m +no_defs"
-    proj4string(xAEQD.i) == proj4string(rNew.i) # TRUE
+    proj4string(xAEQD) # "+proj=utm +zone=17 +datum=WGS84 +units=m +no_defs"
+    proj4string(r.i) # "+proj=utm +zone=17 +datum=WGS84 +units=m +no_defs"
+    proj4string(xAEQD) == proj4string(r.i) # TRUE
     
     # Below we exclude the data points that are 'long' i.e. create a large time gap. move::burst ?
     bursted <- burst(
-      rNew.i,
-      # change rNew.i to r.i, don't need rNew.i?####
-      c("normal", "long")[1 + (timeLag(rNew.i, units = timeDiffUnits) > timeDiffLong)]
+      r.i,
+      c("normal", "long")[1 + (timeLag(r.i, units = timeDiffUnits) > timeDiffLong)]
     )
-    rm(rNew.i)
+    rm(r.i)
     # There are 2 types of burst: "normal" and "long". You can select for these in the dbbmm by selecting the factor level in the burstType command.
-    
-    
     
     if (exists("bbdlocationerror")) {
       if (length(bbdlocationerror) == 1) {
@@ -496,17 +537,18 @@ dBBMM_HomeRange <- function(
     
     # location error needs to be a postive number. Replace zeroes with 0.00001
     bbdlocationerror.i[which(bbdlocationerror.i == 0)] <- 0.00001
-  
+    
     # Construct the model. The time.step should reflect the ping frequency of the tag (in minutes)
     bursted_dbbmm <- brownian.bridge.dyn(bursted,
                                          burstType = "normal",
-                                         raster = xAEQD.i, # has to be AEQD for metre-based calculations, presuambly?
+                                         raster = xAEQD, # has to be AEQD for metre-based calculations, presuambly?
+                                         # Error:The projection of the raster and the Move object are not equal.
+                                         # Need bursted, r.i, to be the same projection as xAEQD
                                          location.error = bbdlocationerror.i,
                                          ext = bbdext,
                                          window.size = bbdwindowsize
     )
     rm(bursted)
-    rm(xAEQD.i)
     
     # Re-standardize (Dr. Kranstauber's trouble shooting solution).
     # Occurring errors are "due to limits of accuracy during calculations.
@@ -517,15 +559,6 @@ dBBMM_HomeRange <- function(
     rm(bursted_dbbmm)
     bb <- new(".UD", tmp / sum(values(tmp))) # new() creates object from Class ("UD.")
     rm(tmp)
-    
-    # Export aggregated individual UDs to as ascii files for further exploration/spatial analysis in GIS software.
-    # Needed for when the aim is to plot population-level and normalized UDs per species.
-    asc <- writeRaster(bb, # x has unequal horizontal and vertical resolutions. Such data cannot be stored in arc-ascii format
-                       paste0(savedir, "/", filename = i, writeRasterExtension),
-                       format = writeRasterFormat,
-                       datatype = writeRasterDatatype,
-                       bylayer = TRUE,
-                       overwrite = TRUE)
     
     # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: absolute scale
     area.50 <- sum(values(getVolumeUD(bb) <= .50))
@@ -543,6 +576,56 @@ dBBMM_HomeRange <- function(
     # Put in list
     bb.list[[counter]] <- area.ct
     bb.list
+    
+    # need to reproject bb back to UTM else the resolution is unequal in x & y
+    # only an issue for ascii raster format
+    
+    # proj4string(bb) # "+proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+    # bbUTM <- projectExtent(bb, xUTM)
+    # proj4string(bbUTM) # "+proj=utm +zone=27 +datum=WGS84 +units=m +no_defs"
+    # bbUTM
+    # # class      : RasterLayer 
+    # # dimensions : 97, 148, 14356  (nrow, ncol, ncell)
+    # # resolution : 158649.6, 222066.9  (x, y)
+    # # extent     : -16099541, 7380606, -5468203, 16072285  (xmin, xmax, ymin, ymax)
+    # # crs        : +proj=utm +zone=27 +datum=WGS84 +units=m +no_defs 
+    # res(bb) # 96002.62 115886.21
+    # res(xUTM) # 111000 111000
+    # res(bbUTM) # 158649.6 222066.9
+    # res(bbUTM) <- res(xUTM)
+    
+    names(bb) <- i # puts name in slot, means scaleraster can name its output properly with lapply
+    bb
+    # class      : .UD 
+    # dimensions : 105, 135, 14175  (nrow, ncol, ncell)
+    # resolution : 102405.1, 102405.1  (x, y)
+    # extent     : -8727700, 5096989, -4485671, 6266865  (xmin, xmax, ymin, ymax)
+    # crs        : +proj=aeqd +lat_0=44.99489997 +lon_0=-17.48575004 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs 
+    # source     : memory
+    # names      : X5103448 
+    # values     : 0, 0.03363462  (min, max)
+    
+    # need to have all of these bb's in the same res, extent, dimensions.
+    # plot(bb)
+    # options(scipen = 5)
+    
+    # Export aggregated individual UDs to as ascii files for further exploration/spatial analysis in GIS software.
+    # Needed for when the aim is to plot population-level and normalized UDs per species.
+    writeRaster(bb, # x has unequal horizontal and vertical resolutions. Such data cannot be stored in arc-ascii format
+                paste0(savedir, filename = i, writeRasterExtension),
+                format = writeRasterFormat, # "ascii"
+                datatype = writeRasterDatatype, # "FLT4S"
+                if (writeRasterFormat != "CDF") bylayer = TRUE, # bylayer kills ncdf4
+                overwrite = TRUE)
+    # Error in .startAsciiWriting(x, filename, ...):x has unequal horizontal and vertical resolutions. Such data cannot be stored in arc-ascii format
+    # writeRasterFormat = "ascii"
+    # writeRasterExtension = ".asc"
+    # writeRasterFormat = "raster"
+    # writeRasterExtension = ".grd"
+    # library(ncdf4)
+    # writeRasterFormat = "CDF"
+    # writeRasterExtension = ".nc"
+    
     gc()
   } # close for i in unique data$ID
   

@@ -3,11 +3,12 @@
 
 dBBMM_plot <- function(
     x = paste0(data.dir, "Scaled/All_Rasters_Scaled.asc"), # path to scaled data
+    # dataCRS = 2958, # one of (i) character: a string accepted by GDAL, (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs.
     myLocation = NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
     # Default NULL, extents autocreated from data.
     # c(-79.3, 25.68331, -79.24, 25.78)
     googlemap = FALSE, # If pulling basemap from Google maps, this sets expansion
-    # factors since Google Maps timing zoom setup doesn't align to myLocation
+    # factors since Google Maps tiling zoom setup doesn't align to myLocation
     # extents.
     expandfactor = 1.6, # extents expansion factor for Google Map basemap.
     # 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out).
@@ -42,14 +43,26 @@ dBBMM_plot <- function(
   library(stars) # read_stars
   library(ggmap) # get_map
   
+  # tmp <- raster(x)
+  # setMinMax(tmp)
+  # plot(tmp)
+  # is.na(tmp)
+  # dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
+  # crs(tmp) <- dataCRS
+  
+
   # Import raster
   x <- read_stars(x) %>% st_set_crs(2958)
+  # read_stars doens't have most of the info that raster() has
+  # class(dataCRS)
   
   if(stars:::is_curvilinear(x)) stop(print("x is curvilinear; first reproject to planar"))
   
   # maybe don't do this trimming bit? ####
-  # is.na(x$All_Rasters_Scaled.asc) <- x$All_Rasters_Scaled.asc == 0 # replace char pattern (0) in whole df/tbl with NA
-  # x %<>% trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
+  is.na(x[[1]]) <- x$All_Rasters_Scaled.asc == 0 # replace char pattern (0) in whole df/tbl with NA
+  x %<>% starsExtra::trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
+  
+ 
   
   if (is.null(myLocation)) myLocation <- st_bbox(x %>% st_transform(4326)) %>% as.vector()
   
@@ -114,12 +127,16 @@ dBBMM_plot <- function(
   ggmap(myMap) +
     geom_sf(data = st_contour(x = x,
                               contour_lines = TRUE, # makes lines not polys regardless of T or F
-                              breaks = c(0.05)) %>%
+                              breaks = max(x[[1]], na.rm = TRUE) * 0.05
+                              ) %>%
               # breaks could be function param, but only allows 2 breaks. Whatevs ####
             st_transform(3857), # Vector transform after st_contour()  4326
             fill = NA, inherit.aes = FALSE,
             aes(colour = "UD_95_pct")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
-    geom_sf(data = st_contour(x = x, contour_lines = TRUE, breaks = c(0.5)) %>%
+    geom_sf(data = st_contour(x = x,
+                              contour_lines = TRUE,
+                              breaks = max(x[[1]], na.rm = TRUE) * 0.5
+                              ) %>%
               st_transform(3857), fill = NA, inherit.aes = FALSE, aes(colour = "UD_50_pct")) +
     scale_colour_manual(name = legendtitle, values = c(UD_95_pct = contour1colour, UD_50_pct = contour2colour)) +
     ggtitle(plottitle, subtitle = plotsubtitle) +

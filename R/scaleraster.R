@@ -63,6 +63,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
                         scalefolder = "Scaled",
                         summedname = "All_Rasters_Summed",
                         scaledname = "All_Rasters_Scaled",
+                        crsloc = NULL, # location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
                         returnObj = FALSE) {
   # library(raster)
   # If path has a terminal slash, remove it, it's added later
@@ -75,7 +76,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   rasterlist <-
     lapply(filelist, function(x) raster(paste0(path, "/", x))) %>% # read in rasters
     lapply(function(x) setMinMax(x)) # set minmax values
-  names(rasterlist) <- str_remove(filelist, pattern = pattern) # need to get rid of extension e.g. ".asc"
+  names(rasterlist) <- str_remove(filelist, pattern = pattern) # Name the list object (raster); need to get rid of extension e.g. ".asc"
 
   # Get max of maxes
   scalemax <-
@@ -86,31 +87,43 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   # create new folder to save to
   dir.create(paste0(path, "/", scalefolder))
 
-  # scale to individual maxes & write individual rasters
-  scalelist <- rasterlist %>%
-    lapply(function(x) x / cellStats(x, stat = 'max')) %>% # scale to individual max
+  rasterlist %<>%
+    lapply(function(x) x / scalemax) %>% # scale to max of maxes
+    # lapply(function(x) x / cellStats(x, stat = 'max')) %>% # scale to individual max
     lapply(function(x) writeRaster(x = x, # resave individual rasters
                                    filename = paste0(path, "/", scalefolder, "/", names(x)), # , pattern: removed ability to resave as different format
                                    # error: adds X to start of numerical named objects####
                                    format = format,
                                    datatype = datatype,
-                                   bylayer = bylayer,
+                                   if (format != "CDF") bylayer = bylayer,
                                    overwrite = overwrite))
-  
-  # scale to max of maxes
-  rasterlist %<>% lapply(function(x) x / scalemax)
-  # Calculate individual scaled ("relative") UD areas
-  area.50 <- rasterlist %>% sapply(function(x) length(which(values(x) >= 0.5))) # 50%
-  area.95 <- rasterlist %>% sapply(function(x) length(which(values(x) >= 0.05))) # 95%
-  area.ct <- data.frame(core.use = area.50, general.use = area.95) # Combine in single df
-  area.ct$ID <- row.names(area.ct) # create ID column from row.names
-  row.names(area.ct) <- NULL # kill row.names, reverts to 1,2,3
-  write.csv(area.ct,
-            file = paste0(path, "/", scalefolder, "/","VolumeAreas_ScaledAllFish.csv"),
-            row.names = FALSE)
 
+  # extentlist <- lapply(rasterlist, function(x) data.frame(xmin = as.vector(extent(x))[1],
+  #                                                         xmax = as.vector(extent(x))[2],
+  #                                                         ymin = as.vector(extent(x))[3],
+  #                                                         ymax = as.vector(extent(x))[4]))
+  # extentdf <- do.call(rbind, extentlist)
+  # fullextents <- c(min(extentdf$xmin, na.rm = TRUE),
+  #                  max(extentdf$xmax, na.rm = TRUE),
+  #                  min(extentdf$ymin, na.rm = TRUE),
+  #                  max(extentdf$ymax, na.rm = TRUE))
+  # rasterlist %<>% lapply(function(x) extent(x) <- fullextents)
+  # 
+  # extent(rasterlist[[2]]) <- fullextents
+  # rasterlist[[2]]@extent <- fullextents
+  
+  # rasterstack <- do.call(mosaic, rasterlist)
+  # tmp <- mosaic(x = rasterlist[[1]],
+  #               y = rasterlist[[2]])
+  # 
+  # st_crs(rasterlist[[1]])
+  # proj4string(rasterlist[[1]])
+  # proj4string(rasterlist[[2]])
+  
   # sum the normalised individual UDs
   rasterstack <- raster::stack(x = rasterlist)
+  # for nc: Error in compareRaster(x) : different extent: still need to fix this in build.R####
+  
   All_Rasters_Summed <- stackApply(x = rasterstack, # Raster* object or list of
                                    indices = rep(1, nlayers(rasterstack)), # Vector of length nlayers(x), performs the function (sum) PER UNIQUE index, i.e. 1:5 = 5 unique sums.
                                    fun = sum, # returns a single value, e.g. mean or min, and that takes a na.rm argument
@@ -131,6 +144,58 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
               datatype = datatype,
               bylayer = bylayer,
               overwrite = overwrite)
+  
+  # change projection of All_Rasters_Scaled to latlon for proper plotting
+  dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
+  crs(All_Rasters_Scaled) <- dataCRS
+  # proj = CRS("+proj=longlat +datum=WGS84")
+  All_Rasters_Scaled_LatLon <- projectRaster(All_Rasters_Scaled, crs = proj) # 2958
+  # with crs 2958:
+  # class      : RasterLayer 
+  # dimensions : 482, 284, 136888  (nrow, ncol, ncell)
+  # resolution : 84500, 84400  (x, y)
+  # extent     : -6893280, 17104720, -20266219, 20414581  (xmin, xmax, ymin, ymax)
+  # crs        : +proj=utm +zone=17 +ellps=GRS80 +units=m +no_defs 
+  # source     : memory
+  # names      : All_Rasters_Summed 
+  # values     : 0, 0.9535157  (min, max)
+  
+  # isn't latlon
+  # with proj
+  # class      : RasterLayer 
+  # dimensions : 140, 274, 38360  (nrow, ncol, ncell)
+  # resolution : 1.35, 0.855  (x, y)
+  # extent     : -186.3136, 183.5864, -24.71852, 94.98148  (xmin, xmax, ymin, ymax)
+  # crs        : +proj=longlat +datum=WGS84 +no_defs 
+  # source     : memory
+  # names      : All_Rasters_Summed 
+  # values     : 0, 0.8578524  (min, max)
+  # extents go past -180!
+  
+  # convert zeroes to NA, remove NAs, trim extents, save####
+  
+  writeRaster(x = All_Rasters_Scaled_LatLon, # resave individual rasters
+              filename = paste0(path, "/", scalefolder, "/", scaledname, "_LatLon", pattern),
+              format = format,
+              datatype = datatype,
+              bylayer = bylayer,
+              overwrite = overwrite)
+  
+  # Calculate individual scaled ("relative") UD areas
+  area.50 <- rasterlist %>% sapply(function(x) length(which(values(x) >= 0.5))) # 50%
+  area.95 <- rasterlist %>% sapply(function(x) length(which(values(x) >= 0.05))) # 95%
+  area.ct <- data.frame(core.use = area.50, general.use = area.95) # Combine in single df
+  area.ct$ID <- row.names(area.ct) # create ID column from row.names
+  row.names(area.ct) <- NULL # kill row.names, reverts to 1,2,3
+  area.ct <- rbind(area.ct, c(length(which(values(All_Rasters_Scaled) >= 0.5)), # add a row for All_Rasters_Scaled
+                              length(which(values(All_Rasters_Scaled) >= 0.05)),
+                              "All_Rasters_Scaled"
+                              )
+                   )
+  
+  write.csv(area.ct,
+            file = paste0(path, "/", scalefolder, "/","VolumeAreas_ScaledAllFish.csv"),
+            row.names = FALSE)
   
   if (returnObj) return(All_Rasters_Scaled)
 }
