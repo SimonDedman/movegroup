@@ -10,14 +10,16 @@ dBBMM_plot <- function(
     googlemap = FALSE, # If pulling basemap from Google maps, this sets expansion
     # factors since Google Maps tiling zoom setup doesn't align to myLocation
     # extents.
-    expandfactor = 1.6, # extents expansion factor for Google Map basemap.
+    gmapsAPI = NULL, # enter your google maps API here, quoted character string
+    expandfactor = 1.6, # extents expansion factor for basemap.
     # 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out).
     # 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
+    mapzoom = 5, # 3 (continent) - 21 (building)
     mapsource = "google", # Source for ggmap::get_map; uses Stamen as fallback if no Goole Maps API present.
     maptype = "satellite", # Type of map for ggmap::get_map.
     contour1colour = "red", # colour for contour 1, typically 95%.
     contour2colour = "orange", # colour for contour 2, typically 50%.
-    plottitle = "Aggregated 95% and 50% contours, lemon sharks, Bimini",
+    plottitle = "Aggregated 95% and 50% UD contours",
     # Can use the term 'home range' when an animal can be detected wherever it goes
     # i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic
     # receivers cover the entire home range of the study species. 
@@ -42,6 +44,7 @@ dBBMM_plot <- function(
   
   library(stars) # read_stars
   library(ggmap) # get_map
+  library(magrittr) # %<>%
   
   # tmp <- raster(x)
   # setMinMax(tmp)
@@ -50,21 +53,19 @@ dBBMM_plot <- function(
   # dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
   # crs(tmp) <- dataCRS
   
-
+  
   # Import raster
-  x <- read_stars(x) %>% st_set_crs(2958)
+  x <- read_stars(x) %>% st_set_crs(4326) # 2958
   # read_stars doens't have most of the info that raster() has
   # class(dataCRS)
-  
   if(stars:::is_curvilinear(x)) stop(print("x is curvilinear; first reproject to planar"))
   
-  # maybe don't do this trimming bit? ####
-  is.na(x[[1]]) <- x$All_Rasters_Scaled.asc == 0 # replace char pattern (0) in whole df/tbl with NA
-  x %<>% starsExtra::trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
+  y <- x # make dupe object else removing all data < 0.05 means the 0.05 contour doesn't work in ggplot
+  is.na(y[[1]]) <- y[[1]] == 0 # replace char pattern (0) in whole df/tbl with NA
+  is.na(y[[1]]) <- y[[1]] < (max(y[[1]], na.rm = TRUE) * 0.05) # replace anything < 95% contour with NA since it won't be drawn
+  y %<>% starsExtra::trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
   
- 
-  
-  if (is.null(myLocation)) myLocation <- st_bbox(x %>% st_transform(4326)) %>% as.vector()
+  if (is.null(myLocation)) myLocation <- st_bbox(y) %>% as.vector() # st_bbox(y %>% st_transform(4326))
   
   # Create basemap with gbm.auto####
   # # Remove gbm.auto from dependency at top if not using
@@ -81,7 +82,13 @@ dBBMM_plot <- function(
   #                     layer = paste0("Crop_Map"),
   #                     quiet = TRUE) # read in worldmap
   
-  if (googlemap) { # grow bounds extents if requested
+  # if (is.null(gmapsAPI)) register_google(key = gmapsAPI, # an api key
+  #                                        account_type = "standard",
+  #                                        write = TRUE)
+  
+  if (maptype != "google") googlemap <- FALSE # in case user forgot to set both
+  
+  if (expandfactor != 0) { # grow bounds extents if requested
     xmid <- mean(myLocation[c(1,3)])
     ymid <- mean(myLocation[c(2,4)])
     xmax <- ((myLocation[3] - xmid) * expandfactor) + xmid #updated for sf/st
@@ -89,12 +96,22 @@ dBBMM_plot <- function(
     ymax <- ((myLocation[4] - ymid) * expandfactor) + ymid
     ymin <- ymid - ((ymid - myLocation[2]) * expandfactor)
     myLocation <- c(xmin, ymin, xmax, ymax)
+    if (googlemap) myLocation <- c(mean(c(myLocation[1], myLocation[3])), mean(c(myLocation[2], myLocation[4]))) # googlemap needs a center lon lat
   }
-  
-  myMap <- get_map(location = myLocation,
-                   source = mapsource, # using stamen as fallback
-                   maptype = maptype,
-                   crop = FALSE) # google maps crs = 4326
+
+  myMap <- get_map(
+    location = myLocation, # -62.57564  28.64368  33.78889  63.68533 # stamen etc want a bounding box
+    zoom = mapzoom, # 3 (continent) - 21 (building)
+    # scale = "auto", # default "auto", 1, 2, 4 all the same
+    source = mapsource, # "google" # using stamen as fallback
+    maptype = maptype, # "satellite"
+    messaging = TRUE,
+    crop = TRUE # google maps crs = 4326
+  ) 
+
+  # class(myMap) # "ggmap"  "raster"
+  # tmp <- raster::crop(x = myMap, y = myLocation)
+  # Error in (function (classes, fdef, mtable): unable to find an inherited method for function ‘crop’ for signature ‘"ggmap"’
   
   # Define a function to fix the bbox to be in EPSG:3857
   # https://stackoverflow.com/a/50844502/1736291
@@ -105,7 +122,7 @@ dBBMM_plot <- function(
     # Extract the bounding box (in lat/lon) from the ggmap to a numeric vector, 
     # and set the names to what sf::st_bbox expects:
     map_bbox <- setNames(unlist(attr(map, "bb")), c("ymin", "xmin", "ymax", "xmax"))
-    # Coonvert the bbox to an sf polygon, transform it to 3857, 
+    # Convert the bbox to an sf polygon, transform it to 3857, 
     # and convert back to a bbox (convoluted, but it works)
     bbox_3857 <- st_bbox(st_transform(st_as_sfc(st_bbox(map_bbox, crs = 4326)), 3857))
     # Overwrite the bbox of the ggmap object with the transformed coordinates 
@@ -128,17 +145,25 @@ dBBMM_plot <- function(
     geom_sf(data = st_contour(x = x,
                               contour_lines = TRUE, # makes lines not polys regardless of T or F
                               breaks = max(x[[1]], na.rm = TRUE) * 0.05
-                              ) %>%
-              # breaks could be function param, but only allows 2 breaks. Whatevs ####
-            st_transform(3857), # Vector transform after st_contour()  4326
-            fill = NA, inherit.aes = FALSE,
-            aes(colour = "UD_95_pct")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
+    ) %>%
+      # breaks could be function param, but only allows 2 breaks. Whatevs ####
+    st_transform(3857), # Vector transform after st_contour()  4326
+    fill = NA, inherit.aes = FALSE,
+    aes(colour = "UD_95_pct")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
     geom_sf(data = st_contour(x = x,
                               contour_lines = TRUE,
                               breaks = max(x[[1]], na.rm = TRUE) * 0.5
-                              ) %>%
-              st_transform(3857), fill = NA, inherit.aes = FALSE, aes(colour = "UD_50_pct")) +
+    ) %>%
+      st_transform(3857), fill = NA, inherit.aes = FALSE, aes(colour = "UD_50_pct")) +
     scale_colour_manual(name = legendtitle, values = c(UD_95_pct = contour1colour, UD_50_pct = contour2colour)) +
+    # https://stackoverflow.com/questions/64425970/ggmap-in-r-keep-google-copyright-information-on-cropped-map
+    # scale_x_continuous(limits = c(myLocation[1], myLocation[3]), expand = c(0, 0)) +
+    # scale_y_continuous(limits = c(myLocation[2], myLocation[4]), expand = c(0, 0)) +
+  #   Coordinate system already present. Adding new coordinate system, which will replace the existing one.
+  # Scale for 'x' is already present. Adding another scale for 'x', which will replace the existing scale.
+  # Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
+  # Warning message:
+  #   Removed 1 rows containing missing values (geom_rect). 
     ggtitle(plottitle, subtitle = plotsubtitle) +
     labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
     theme_minimal() +

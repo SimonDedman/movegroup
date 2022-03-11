@@ -83,10 +83,14 @@ dBBMM_HomeRange <- function(
     center = TRUE, # center move object within extent? See spTransform.
     buffpct = 0.3, # buffer extent for raster creation, proportion of 1.
     rasterCRS = CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation.
-    rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres?
+    rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
     bbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
     bbdext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
-    bbdwindowsize = 31, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
+    bbdwindowsize = 31, # window.size param in brownian.bridge.dyn. The size of the moving window
+    # along the track. Larger windows provide more stable/accurate estimates of the brownian motion
+    # variance but are less well able to capture more frequent changes in behavior. This number has 
+    # to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
+    # Must be >=2*margin which is 11 so >=22, but needs to be odd so >=23
     writeRasterFormat = "ascii",
     writeRasterExtension = ".asc",
     writeRasterDatatype = "FLT4S",
@@ -95,7 +99,7 @@ dBBMM_HomeRange <- function(
     # change to current directory e.g. "/home/me/folder". Do not use getwd() here.
     alerts = TRUE # audio warning for failures
 ) {
-  # ToDo:
+  # TODO:
   # option to use motion variance as the dependent variable, not the UD
   # clean up all notes, package elements, authorship, dependencies etc.
   # Add examples
@@ -169,6 +173,14 @@ dBBMM_HomeRange <- function(
          Lat = .data[[Lat]],
          Lon = .data[[Lon]]) %>%
     mutate(ID = make.names(ID))
+  
+  # Add movelocationerror and bbdlocationerror as columns if they're vectors, else their length
+  # desyncs from nrow(data) if any IDs < windowsize
+  if (nrow(data) == length(moveLocError)) data$moveLocError <- moveLocError
+  if (nrow(data) == length(bbdlocationerror)) data$bbdlocationerror <- bbdlocationerror
+  
+  
+  
   
   # title: "Lemon sharks ecology Bimini"
   # author: "Sprinkles (Maurits van Zinnicq Bergmann) & Simon Dedman" 
@@ -290,7 +302,7 @@ dBBMM_HomeRange <- function(
     check2 <- filter(check1, relocations >= bbdwindowsize) # filter: no rows removed
     length(check1$ID) == length(check2$ID)
   } # data: 1253 x 7
-  # ToDo: improve this####
+  # TODO: improve this####
   # also
   # print which IDs get removed ####
   
@@ -437,7 +449,7 @@ dBBMM_HomeRange <- function(
   
   # Loop through all unique tags
   counter <- 0
-  for (i in unique(data$ID)) { # i <- unique(data$ID)[1]
+  for (i in unique(data$ID)) { # i <- unique(data$ID)[6]
     
     # Print individual
     counter <- counter + 1
@@ -466,21 +478,26 @@ dBBMM_HomeRange <- function(
     # Incorporate uncertainty in the model by including a location error.
     # From communication with Rob, the gps location of a shark is estimated, from:
     # the boat coordinates, bearing and distance estimate, to be 1 m.
-    if (exists("moveLocError")) {
-      if (length(moveLocError) == 1) {
-        move.i$LocationError <- moveLocError # single value, replicated down for each relocation
-        # Robs: 1 m: gps loc of shark inferred from boat coord + bearing + distance estimate
-      } else { # else if multiple values
-        if (length(moveLocError) == nrow(data)) { # should be same length as full dataset
-          move.i$LocationError <- data %>% # take the full dataset,
-            bind_cols(moveLocError = moveLocError) %>% # cbind the full movelocerror
-            filter(ID == i) %>% # filter for just this ID
-            pull(moveLocError) # and pull just the movelocerror for this ID
-        } else { # if not length 1 and not length of nrow(data)
-          stop(print("moveLocError must be either length 1 or length(nrow(data))")) # if not stop and tell user
-        } # close not length1 not same length as full dataset else
-      } # close length1 or else
-    } # close if exists movelocerror
+    
+    if ("moveLocError" %in% colnames(data.i)) {
+      move.i$moveLocError <- data.i$moveLocError
+    } else {
+      if (exists("moveLocError")) {
+        if (length(moveLocError) == 1) {
+          move.i$LocationError <- moveLocError # single value, replicated down for each relocation
+          # Robs: 1 m: gps loc of shark inferred from boat coord + bearing + distance estimate
+        } else { # else if multiple values
+          if (length(moveLocError) == nrow(data.i)) { # should be same length as full dataset
+            move.i$LocationError <- data.i %>% # take the full dataset,
+              bind_cols(moveLocError = moveLocError) %>% # cbind the full movelocerror
+              filter(ID == i) %>% # filter for just this ID
+              pull(moveLocError) # and pull just the movelocerror for this ID
+          } else { # if not length 1 and not length of nrow(data)
+            stop(print("moveLocError must be either length 1 or length(nrow(data))")) # if not stop and tell user
+          } # close not length1 not same length as full dataset else
+        } # close length1 or else
+      } # close if exists movelocerror
+    }
     
     # Convert projection to Azimuthal Equi-Distance projection (aeqd)
     # r.i <- spTransform(move.i, center = center)
@@ -519,21 +536,27 @@ dBBMM_HomeRange <- function(
     rm(r.i)
     # There are 2 types of burst: "normal" and "long". You can select for these in the dbbmm by selecting the factor level in the burstType command.
     
-    if (exists("bbdlocationerror")) {
-      if (length(bbdlocationerror) == 1) {
-        bbdlocationerror.i <- bbdlocationerror # single value, replicated down for each relocation
-        # Robs: 1 m: gps loc of shark inferred from boat coord + bearing + distance estimate
-      } else { # else if multiple values
-        if (length(bbdlocationerror) == nrow(data)) { # should be same length as full dataset
-          bbdlocationerror.i <- data %>% # take the full dataset,
-            bind_cols(bbdlocationerror = bbdlocationerror) %>% # cbind the full movelocerror
-            filter(ID == i) %>% # filter for just this ID
-            pull(bbdlocationerror) # and pull just the movelocerror for this ID
-        } else { # if not length 1 and not length of nrow(data)
-          stop(print("bbdlocationerror must be either length 1 or length(nrow(data))")) # if not stop and tell user
-        } # close not length1 not same length as full dataset else
-      } # close length1 or else
-    } # close if exists movelocerror
+    if ("bbdlocationerror" %in% colnames(data.i)) {
+      bbdlocationerror.i <- data.i$bbdlocationerror
+    } else {
+      if (exists("bbdlocationerror")) {
+        if (length(bbdlocationerror) == 1) {
+          bbdlocationerror.i <- bbdlocationerror # single value, replicated down for each relocation
+          # Robs: 1 m: gps loc of shark inferred from boat coord + bearing + distance estimate
+        } else { # else if multiple values
+          if (length(bbdlocationerror) == nrow(data)) { # should be same length as full dataset
+            bbdlocationerror.i <- data %>% # take the full dataset,
+              bind_cols(bbdlocationerror = bbdlocationerror) %>% # cbind the full movelocerror
+              filter(ID == i) %>% # filter for just this ID
+              pull(bbdlocationerror) # and pull just the movelocerror for this ID
+          } else { # if not length 1 and not length of nrow(data)
+            stop(print("bbdlocationerror must be either length 1 or length(nrow(data))")) # if not stop and tell user
+          } # close not length1 not same length as full dataset else
+        } # close length1 or else
+      } # close if exists bbdlocationerror
+    }
+    
+
     
     # location error needs to be a postive number. Replace zeroes with 0.00001
     bbdlocationerror.i[which(bbdlocationerror.i == 0)] <- 0.00001
@@ -544,10 +567,87 @@ dBBMM_HomeRange <- function(
                                          raster = xAEQD, # has to be AEQD for metre-based calculations, presuambly?
                                          # Error:The projection of the raster and the Move object are not equal.
                                          # Need bursted, r.i, to be the same projection as xAEQD
-                                         location.error = bbdlocationerror.i,
-                                         ext = bbdext,
-                                         window.size = bbdwindowsize
+                                         location.error = bbdlocationerror.i, # bbdlocationerror.i
+                                         ext = 0, # bbdext
+                                         window.size = bbdwindowsize #  must be >=2*margin which is 11 so >=22, but odd so >=23
     )
+    
+    data.i$NewEastingUTMmin <- data.i$NewEastingUTM - data.i$bbdlocationerror
+    data.i$NewEastingUTMmax <- data.i$NewEastingUTM + data.i$bbdlocationerror
+    data.i$NewNorthingUTMmin <- data.i$NewNorthingUTM - data.i$bbdlocationerror
+    data.i$NewNorthingUTMmax <- data.i$NewNorthingUTM + data.i$bbdlocationerror
+    
+    data.i$EastRastExtentMin <- extent(xAEQD)[1]
+    data.i$EastRastExtentMax <- extent(xAEQD)[2]
+    data.i$NorthRastExtentMin <- extent(xAEQD)[3]
+    data.i$NorthRastExtentMax <- extent(xAEQD)[4]
+    
+    # TODO ext size error ####
+    # Error in .local(object, raster, location.error = location.error, ext = ext,  : 
+    # Higher x grid not large enough, consider extending the raster in that direction or enlarging the ext argument
+    # Season==Winter Fish#6
+    
+    # > xAEQD
+    # class      : RasterLayer
+    # dimensions : 342, 402, 137484  (nrow, ncol, ncell)
+    # resolution : 25705.69, 25705.69  (x, y)
+    # extent     : -7587818, 2745872, -3540761, 5250587  (xmin, xmax, ymin, ymax)
+    # crs        : +proj=aeqd +lat_0=42.43218337 +lon_0=-30.08680803 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs
+    # source     : memory
+    # names      : layer
+    # values     : 1, 1  (min, max)
+    # 
+    # > bursted
+    # class       : MoveBurst
+    # features    : 90
+    # extent      : 1286895, 1910646, -1295349, 317435  (xmin, xmax, ymin, ymax)
+    # crs         : +proj=aeqd +lat_0=42.43218337 +lon_0=-30.08680803 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs
+    # variables   : 9
+    # names       :         Lat,          Lon,   Datetime,    MarineZone,     moveLocError, bbdlocationerror,     NewEastingUTM,  NewNorthingUTM, TimeDiff
+    # min values  : 29.16504378, -15.05470771, 1480550400, Bay_of_Biscay, 15963.1149120894, 15963.1149120894, -1675882.39631877, 3396669.2275379,        0
+    # max values  : 44.09076622, -9.703392913, 1488240000,         Other, 317635.883473968, 317635.883473968, -1080176.75804222, 5479499.2258687,        1
+    # timestamps  : 2016-11-30 16:00:00 ... 2017-02-27 16:00:00 Time difference of 89 days  (start ... end, duration)
+    # sensors     : unknown
+    # indiv. data : ID, Season
+    # indiv. value: X5116032 Winter
+    # bursts      : normal: 89
+    # date created: 2022-01-03 16:40:03
+    
+    # But runs with location.error = 1 & ext = 0, even though some NewNorthingUTMs are outside xAEQD extents (xmin & ymax)
+    # plot(x = data.i$NewEastingUTM,
+    #      y = data.i$NewNorthingUTM)
+    
+    plot(x = c(extent(xAEQD)[1], extent(xAEQD)[1], extent(xAEQD)[2], extent(xAEQD)[2]),
+           y = c(extent(xAEQD)[4], extent(xAEQD)[3], extent(xAEQD)[4], extent(xAEQD)[3]),
+           pch = 19, col = "red")
+    points(bursted@coords)
+    points(x = c(extent(bursted)[1], extent(bursted)[1], extent(bursted)[2], extent(bursted)[2]),
+         y = c(extent(bursted)[4], extent(bursted)[3], extent(bursted)[4], extent(bursted)[3]),
+         col = "green")
+    points(x = c(extent(bursted)[1] - max(data.i$bbdlocationerror),
+                 extent(bursted)[1] - max(data.i$bbdlocationerror),
+                 extent(bursted)[2] + max(data.i$bbdlocationerror),
+                 extent(bursted)[2] + max(data.i$bbdlocationerror)),
+           y = c(extent(bursted)[4] + max(data.i$bbdlocationerror),
+                 extent(bursted)[3] - max(data.i$bbdlocationerror),
+                 extent(bursted)[4] + max(data.i$bbdlocationerror),
+                 extent(bursted)[3] - max(data.i$bbdlocationerror)),
+           col = "blue")
+    # Bursted + max location error still isn't outside xAEQD extents
+    
+    # calculate the dynamic brownian motion variance of the gappy track
+    dbbv <- brownian.motion.variance.dyn(bursted,
+                                         location.error=bbdlocationerror.i,
+                                         window.size=bbdwindowsize,
+                                         margin=11
+                                         )
+    
+    bursted$Datetime
+    tl <- timeLag(bursted, units = "hours")
+    # posted online https://gitlab.com/bartk/move/-/issues/58 ####
+    
+    
+    
     rm(bursted)
     
     # Re-standardize (Dr. Kranstauber's trouble shooting solution).

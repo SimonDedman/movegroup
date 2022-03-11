@@ -149,7 +149,21 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
   crs(All_Rasters_Scaled) <- dataCRS
   # proj = CRS("+proj=longlat +datum=WGS84")
-  All_Rasters_Scaled_LatLon <- projectRaster(All_Rasters_Scaled, crs = proj) # 2958
+  
+  
+  All_Rasters_Scaled_LatLon <- projectExtent(object = All_Rasters_Scaled, crs = CRS("+proj=longlat")) # crs = proj
+  # returns RasterLayer with projected extent, but no values. Can be adjusted (e.g. by setting its 
+  # resolution) and used as a template 'to' in projectRaster.
+  
+  # change res so x & y match. Kills values
+  res(All_Rasters_Scaled_LatLon) <- rep(mean(res(All_Rasters_Scaled_LatLon)), 2)
+  # TODO: increase res if blocky? do further up?####
+  
+  
+  All_Rasters_Scaled_LatLon <- projectRaster(from = All_Rasters_Scaled,
+                                             to = All_Rasters_Scaled_LatLon)
+  
+  # All_Rasters_Scaled_LatLon <- projectRaster(from = All_Rasters_Scaled, crs = proj) # 2958
   # with crs 2958:
   # class      : RasterLayer 
   # dimensions : 482, 284, 136888  (nrow, ncol, ncell)
@@ -160,8 +174,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   # names      : All_Rasters_Summed 
   # values     : 0, 0.9535157  (min, max)
   
-  # isn't latlon
-  # with proj
+  # with proj=longlat:
   # class      : RasterLayer 
   # dimensions : 140, 274, 38360  (nrow, ncol, ncell)
   # resolution : 1.35, 0.855  (x, y)
@@ -170,9 +183,6 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   # source     : memory
   # names      : All_Rasters_Summed 
   # values     : 0, 0.8578524  (min, max)
-  # extents go past -180!
-  
-  # convert zeroes to NA, remove NAs, trim extents, save####
   
   writeRaster(x = All_Rasters_Scaled_LatLon, # resave individual rasters
               filename = paste0(path, "/", scalefolder, "/", scaledname, "_LatLon", pattern),
@@ -180,6 +190,8 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
               datatype = datatype,
               bylayer = bylayer,
               overwrite = overwrite)
+  # Error in .startAsciiWriting(x, filename, ...) : x has unequal horizontal and vertical resolutions.
+  # Such data cannot be stored in arc-ascii format
   
   # Calculate individual scaled ("relative") UD areas
   area.50 <- rasterlist %>% sapply(function(x) length(which(values(x) >= 0.5))) # 50%
