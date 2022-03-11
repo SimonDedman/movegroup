@@ -86,11 +86,7 @@ dBBMM_HomeRange <- function(
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
     bbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
     bbdext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
-    bbdwindowsize = 31, # window.size param in brownian.bridge.dyn. The size of the moving window
-    # along the track. Larger windows provide more stable/accurate estimates of the brownian motion
-    # variance but are less well able to capture more frequent changes in behavior. This number has 
-    # to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
-    # Must be >=2*margin which is 11 so >=22, but needs to be odd so >=23
+    bbdwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
     writeRasterFormat = "ascii",
     writeRasterExtension = ".asc",
     writeRasterDatatype = "FLT4S",
