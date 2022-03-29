@@ -4,6 +4,7 @@
 dBBMM_plot <- function(
     x = paste0(data.dir, "Scaled/All_Rasters_Scaled.asc"), # path to scaled data
     # dataCRS = 2958, # one of (i) character: a string accepted by GDAL, (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs.
+    trim = TRUE, # remove NA & 0 values and crop to remaining date extents? Default TRUE
     myLocation = NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
     # Default NULL, extents autocreated from data.
     # c(-79.3, 25.68331, -79.24, 25.78)
@@ -61,9 +62,11 @@ dBBMM_plot <- function(
   if (stars:::is_curvilinear(x)) stop(print("x is curvilinear; first reproject to planar"))
   
   y <- x # make dupe object else removing all data < 0.05 means the 0.05 contour doesn't work in ggplot
-  is.na(y[[1]]) <- y[[1]] == 0 # replace char pattern (0) in whole df/tbl with NA
-  is.na(y[[1]]) <- y[[1]] < (max(y[[1]], na.rm = TRUE) * 0.05) # replace anything < 95% contour with NA since it won't be drawn
-  y %<>% starsExtra::trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
+  if (trim) { # trim raster extent to data?
+    is.na(y[[1]]) <- y[[1]] == 0 # replace char pattern (0) in whole df/tbl with NA
+    is.na(y[[1]]) <- y[[1]] < (max(y[[1]], na.rm = TRUE) * 0.05) # replace anything < 95% contour with NA since it won't be drawn
+  }
+    y %<>% starsExtra::trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
   
   if (is.null(myLocation)) myLocation <- st_bbox(y) %>% as.vector() # st_bbox(y %>% st_transform(4326))
   
@@ -98,7 +101,7 @@ dBBMM_plot <- function(
     myLocation <- c(xmin, ymin, xmax, ymax)
     if (googlemap) myLocation <- c(mean(c(myLocation[1], myLocation[3])), mean(c(myLocation[2], myLocation[4]))) # googlemap needs a center lon lat
   }
-
+  
   myMap <- get_map(
     location = myLocation, # -62.57564  28.64368  33.78889  63.68533 # stamen etc want a bounding box
     zoom = mapzoom, # 3 (continent) - 21 (building)
@@ -108,7 +111,7 @@ dBBMM_plot <- function(
     messaging = TRUE,
     crop = TRUE # google maps crs = 4326
   ) 
-
+  
   # class(myMap) # "ggmap"  "raster"
   # tmp <- raster::crop(x = myMap, y = myLocation)
   # Error in (function (classes, fdef, mtable): unable to find an inherited method for function ‘crop’ for signature ‘"ggmap"’
@@ -159,11 +162,11 @@ dBBMM_plot <- function(
     # https://stackoverflow.com/questions/64425970/ggmap-in-r-keep-google-copyright-information-on-cropped-map
     # scale_x_continuous(limits = c(myLocation[1], myLocation[3]), expand = c(0, 0)) +
     # scale_y_continuous(limits = c(myLocation[2], myLocation[4]), expand = c(0, 0)) +
-  #   Coordinate system already present. Adding new coordinate system, which will replace the existing one.
-  # Scale for 'x' is already present. Adding another scale for 'x', which will replace the existing scale.
-  # Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
-  # Warning message:
-  #   Removed 1 rows containing missing values (geom_rect). 
+    #   Coordinate system already present. Adding new coordinate system, which will replace the existing one.
+    # Scale for 'x' is already present. Adding another scale for 'x', which will replace the existing scale.
+    # Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
+    # Warning message:
+    #   Removed 1 rows containing missing values (geom_rect). 
     ggtitle(plottitle, subtitle = plotsubtitle) +
     labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
     theme_minimal() +

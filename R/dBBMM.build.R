@@ -82,6 +82,8 @@ dBBMM_HomeRange <- function(
     timeDiffUnits = "hours", # units for time difference for move function.
     center = TRUE, # center move object within extent? See spTransform.
     buffpct = 0.3, # buffer extent for raster creation, proportion of 1.
+    rasterExtent = NULL, # if NULL, raster extent calculated from data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 for ymax
+    # Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash
     rasterCRS = CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation.
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
     bbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
@@ -334,6 +336,18 @@ dBBMM_HomeRange <- function(
   # Error in .local(object, raster, location.error = location.error, ext = ext,  :
   # Lower x grid not large enough, consider extending the raster in that direction or enlarging the ext argument
   # make buffpct larger
+  if (exists("rasterExtent")) { # if xUTM object exists
+    xUTM <- SpatialPoints(cbind(c(rasterExtent[1], rasterExtent[2]), c(rasterExtent[3], rasterExtent[4])), proj4string = CRS("+proj=longlat"))
+    xUTM <- as.data.frame(spTransform(xUTM, CRS(projectedCRS))) # Transform to UTM
+    xUTM <- raster( # create a raster
+      xmn = xUTM[1,1] - ((xUTM[2,1] - xUTM[1,1]) * buffpct), # with xUTM's values as extents
+      xmx = xUTM[2,1] + ((xUTM[2,1] - xUTM[1,1]) * buffpct),
+      ymn = xUTM[1,2] - ((xUTM[2,2] - xUTM[1,2]) * buffpct),
+      ymx = xUTM[2,2] + ((xUTM[2,2] - xUTM[1,2]) * buffpct),
+      crs = rasterCRS, # +proj=utm +zone=27 +datum=WGS84 +units=m +no_defs
+      resolution = rasterResolution # 50
+    ) # close raster
+  } else { # exists(xUTM), else create from data
   xUTM <- raster(
     xmn = min(data$NewEastingUTM, na.rm = TRUE) - ((max(data$NewEastingUTM, na.rm = TRUE) - min(data$NewEastingUTM, na.rm = TRUE)) * buffpct),
     xmx = max(data$NewEastingUTM, na.rm = TRUE) + ((max(data$NewEastingUTM, na.rm = TRUE) - min(data$NewEastingUTM, na.rm = TRUE)) * buffpct),
@@ -341,7 +355,8 @@ dBBMM_HomeRange <- function(
     ymx = max(data$NewNorthingUTM, na.rm = TRUE) + ((max(data$NewNorthingUTM, na.rm = TRUE) - min(data$NewNorthingUTM, na.rm = TRUE)) * buffpct),
     crs = rasterCRS, # +proj=utm +zone=27 +datum=WGS84 +units=m +no_defs
     resolution = rasterResolution # 50
-  ) 
+  ) # close raster
+  } # close else
   proj4string(xUTM) # "+proj=utm +zone=27 +datum=WGS84 +units=m +no_defs"
   xUTM
   # class      : RasterLayer 
