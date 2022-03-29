@@ -14,7 +14,7 @@ dBBMM_plot <- function(
     expandfactor = 1.6, # extents expansion factor for basemap.
     # 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out).
     # 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
-    mapzoom = 5, # 3 (continent) - 21 (building)
+    mapzoom = 5, # google: 3 (continent) - 21 (building). stamen: 0-18
     mapsource = "google", # Source for ggmap::get_map; uses Stamen as fallback if no Goole Maps API present.
     maptype = "satellite", # Type of map for ggmap::get_map.
     contour1colour = "red", # colour for contour 1, typically 95%.
@@ -55,10 +55,10 @@ dBBMM_plot <- function(
   
   
   # Import raster
-  x <- read_stars(x) %>% st_set_crs(4326) # 2958
+  x <- read_stars(x) %>% st_set_crs(4326) # 4326 2958
   # read_stars doens't have most of the info that raster() has
   # class(dataCRS)
-  if(stars:::is_curvilinear(x)) stop(print("x is curvilinear; first reproject to planar"))
+  if (stars:::is_curvilinear(x)) stop(print("x is curvilinear; first reproject to planar"))
   
   y <- x # make dupe object else removing all data < 0.05 means the 0.05 contour doesn't work in ggplot
   is.na(y[[1]]) <- y[[1]] == 0 # replace char pattern (0) in whole df/tbl with NA
@@ -86,7 +86,7 @@ dBBMM_plot <- function(
   #                                        account_type = "standard",
   #                                        write = TRUE)
   
-  if (maptype != "google") googlemap <- FALSE # in case user forgot to set both
+  if (mapsource != "google") googlemap <- FALSE # in case user forgot to set both
   
   if (expandfactor != 0) { # grow bounds extents if requested
     xmid <- mean(myLocation[c(1,3)])

@@ -445,7 +445,7 @@ dBBMM_HomeRange <- function(
   
   # Loop through all unique tags
   counter <- 0
-  for (i in unique(data$ID)) { # i <- unique(data$ID)[6]
+  for (i in unique(data$ID)) { # i <- unique(data$ID)[1]
     
     # Print individual
     counter <- counter + 1
@@ -564,20 +564,20 @@ dBBMM_HomeRange <- function(
                                          # Error:The projection of the raster and the Move object are not equal.
                                          # Need bursted, r.i, to be the same projection as xAEQD
                                          location.error = bbdlocationerror.i, # bbdlocationerror.i
-                                         ext = 0, # bbdext
+                                         ext = bbdext, # bbdext
                                          window.size = bbdwindowsize #  must be >=2*margin which is 11 so >=22, but odd so >=23
     )
     
-    data.i$NewEastingUTMmin <- data.i$NewEastingUTM - data.i$bbdlocationerror
-    data.i$NewEastingUTMmax <- data.i$NewEastingUTM + data.i$bbdlocationerror
-    data.i$NewNorthingUTMmin <- data.i$NewNorthingUTM - data.i$bbdlocationerror
-    data.i$NewNorthingUTMmax <- data.i$NewNorthingUTM + data.i$bbdlocationerror
-    
-    data.i$EastRastExtentMin <- extent(xAEQD)[1]
-    data.i$EastRastExtentMax <- extent(xAEQD)[2]
-    data.i$NorthRastExtentMin <- extent(xAEQD)[3]
-    data.i$NorthRastExtentMax <- extent(xAEQD)[4]
-    
+    # data.i$NewEastingUTMmin <- data.i$NewEastingUTM - data.i$bbdlocationerror
+    # data.i$NewEastingUTMmax <- data.i$NewEastingUTM + data.i$bbdlocationerror
+    # data.i$NewNorthingUTMmin <- data.i$NewNorthingUTM - data.i$bbdlocationerror
+    # data.i$NewNorthingUTMmax <- data.i$NewNorthingUTM + data.i$bbdlocationerror
+    # 
+    # data.i$EastRastExtentMin <- extent(xAEQD)[1]
+    # data.i$EastRastExtentMax <- extent(xAEQD)[2]
+    # data.i$NorthRastExtentMin <- extent(xAEQD)[3]
+    # data.i$NorthRastExtentMax <- extent(xAEQD)[4]
+    # 
     # TODO ext size error ####
     # Error in .local(object, raster, location.error = location.error, ext = ext,  : 
     # Higher x grid not large enough, consider extending the raster in that direction or enlarging the ext argument
@@ -613,36 +613,34 @@ dBBMM_HomeRange <- function(
     # plot(x = data.i$NewEastingUTM,
     #      y = data.i$NewNorthingUTM)
     
-    plot(x = c(extent(xAEQD)[1], extent(xAEQD)[1], extent(xAEQD)[2], extent(xAEQD)[2]),
-           y = c(extent(xAEQD)[4], extent(xAEQD)[3], extent(xAEQD)[4], extent(xAEQD)[3]),
-           pch = 19, col = "red")
-    points(bursted@coords)
-    points(x = c(extent(bursted)[1], extent(bursted)[1], extent(bursted)[2], extent(bursted)[2]),
-         y = c(extent(bursted)[4], extent(bursted)[3], extent(bursted)[4], extent(bursted)[3]),
-         col = "green")
-    points(x = c(extent(bursted)[1] - max(data.i$bbdlocationerror),
-                 extent(bursted)[1] - max(data.i$bbdlocationerror),
-                 extent(bursted)[2] + max(data.i$bbdlocationerror),
-                 extent(bursted)[2] + max(data.i$bbdlocationerror)),
-           y = c(extent(bursted)[4] + max(data.i$bbdlocationerror),
-                 extent(bursted)[3] - max(data.i$bbdlocationerror),
-                 extent(bursted)[4] + max(data.i$bbdlocationerror),
-                 extent(bursted)[3] - max(data.i$bbdlocationerror)),
-           col = "blue")
-    # Bursted + max location error still isn't outside xAEQD extents
+    # plot(x = c(extent(xAEQD)[1], extent(xAEQD)[1], extent(xAEQD)[2], extent(xAEQD)[2]),
+    #        y = c(extent(xAEQD)[4], extent(xAEQD)[3], extent(xAEQD)[4], extent(xAEQD)[3]),
+    #        pch = 19, col = "red")
+    # points(bursted@coords)
+    # points(x = c(extent(bursted)[1], extent(bursted)[1], extent(bursted)[2], extent(bursted)[2]),
+    #      y = c(extent(bursted)[4], extent(bursted)[3], extent(bursted)[4], extent(bursted)[3]),
+    #      col = "green")
+    # points(x = c(extent(bursted)[1] - max(data.i$bbdlocationerror),
+    #              extent(bursted)[1] - max(data.i$bbdlocationerror),
+    #              extent(bursted)[2] + max(data.i$bbdlocationerror),
+    #              extent(bursted)[2] + max(data.i$bbdlocationerror)),
+    #        y = c(extent(bursted)[4] + max(data.i$bbdlocationerror),
+    #              extent(bursted)[3] - max(data.i$bbdlocationerror),
+    #              extent(bursted)[4] + max(data.i$bbdlocationerror),
+    #              extent(bursted)[3] - max(data.i$bbdlocationerror)),
+    #        col = "blue")
+    # # Bursted + max location error still isn't outside xAEQD extents
     
     # calculate the dynamic brownian motion variance of the gappy track
-    dbbv <- brownian.motion.variance.dyn(bursted,
-                                         location.error=bbdlocationerror.i,
-                                         window.size=bbdwindowsize,
-                                         margin=11
-                                         )
-    
-    bursted$Datetime
-    tl <- timeLag(bursted, units = "hours")
-    # posted online https://gitlab.com/bartk/move/-/issues/58 ####
-    
-    
+    # dbbv <- brownian.motion.variance.dyn(bursted,
+    #                                      location.error=bbdlocationerror.i,
+    #                                      window.size=bbdwindowsize,
+    #                                      margin=11
+    #                                      )
+    # 
+    # bursted$Datetime
+    # tl <- timeLag(bursted, units = "hours")
+    # # posted online https://gitlab.com/bartk/move/-/issues/58 ####
     
     rm(bursted)
     
