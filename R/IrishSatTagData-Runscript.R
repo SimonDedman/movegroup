@@ -11,6 +11,10 @@
 # source("~/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R/scaleraster.R")
 # source("~/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R/dBBMM.plot.R")
 
+# Dummy AllDailies so package installs without error
+AllDailies <- data.frame(lon = c(1,2,3),
+                         lat = c(1,2,3))
+
 saveloc <- "/home/simon/Dropbox/Blocklab Monterey/Data/IrishTags/dBBMM/"
 
 # moveLocError should be a vector of metres of error for each point. Need to create that from each polygon.
