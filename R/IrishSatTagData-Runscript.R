@@ -82,7 +82,7 @@ AllDailies %>%
   pull()
 # 29
 
-dBBMM_HomeRange(
+dBBMMhomeRange(
   data = AllDailies %>% dplyr::select(toppid, lat, lon, Datetime, MarineZone), # data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping columns.
   ID = "toppid", # column name of IDs of individuals.
   Datetime = "Datetime", # name of Datetime column. Must be in POSIXct format.
@@ -130,7 +130,7 @@ dBBMM_plot(
   plottitle = "Aggregated 95% and 50% UD contours",
   plotsubtitle = "Scaled contours. Irish-tagged Atlantic bluefin tuna. n = 51", # data %>% distinct(ID) %>% nrow() # 13
   legendtitle = "Percent UD Contours",
-  plotcaption = paste0("dBBMM_HomeRange, ", today()),
+  plotcaption = paste0("dBBMMhomeRange, ", today()),
   axisxlabel = "Longitude",
   axisylabel = "Latitude",
   legend.position = c(0.11, 0.9), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top.
@@ -139,9 +139,9 @@ dBBMM_plot(
 )
 
 # dBBMM seasons loop ####
-source("~/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R/dBBMM.build.R")
-source("~/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R/scaleraster.R")
-source("~/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R/dBBMM.plot.R")
+source("~/Dropbox/Galway/Analysis/R/dBBMMhomeRange/R/dBBMM.build.R")
+source("~/Dropbox/Galway/Analysis/R/dBBMMhomeRange/R/scaleraster.R")
+source("~/Dropbox/Galway/Analysis/R/dBBMMhomeRange/R/dBBMM.plot.R")
 seasonsdir <- "/home/simon/Dropbox/Blocklab Monterey/Data/IrishTags/dBBMM/Seasonal/"
 seasonextent <- c(-68, 16, 23, 57) # c(xmn, xmx, ymn, ymx)
 

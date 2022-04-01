@@ -77,6 +77,9 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
     lapply(filelist, function(x) raster(paste0(path, "/", x))) %>% # read in rasters
     lapply(function(x) setMinMax(x)) # set minmax values
   names(rasterlist) <- str_remove(filelist, pattern = pattern) # Name the list object (raster); need to get rid of extension e.g. ".asc"
+  
+  # get resolution from first raster in rasterlist (they all have same res), assign it object, squared
+  rasterres <- (res(rasterlist[[1]])[1]) ^ 2
 
   # Get max of maxes
   scalemax <-
@@ -190,17 +193,17 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
               datatype = datatype,
               bylayer = bylayer,
               overwrite = overwrite)
-  # Error in .startAsciiWriting(x, filename, ...) : x has unequal horizontal and vertical resolutions.
-  # Such data cannot be stored in arc-ascii format
   
   # Calculate individual scaled ("relative") UD areas
   area.50 <- rasterlist %>% sapply(function(x) length(which(values(x) >= 0.5))) # 50%
+  area.50 <- round(area.50 * rasterres, 1) # convert from cells to metres squared area
   area.95 <- rasterlist %>% sapply(function(x) length(which(values(x) >= 0.05))) # 95%
+  area.95 <- round(area.95 * rasterres, 1)
   area.ct <- data.frame(core.use = area.50, general.use = area.95) # Combine in single df
   area.ct$ID <- row.names(area.ct) # create ID column from row.names
   row.names(area.ct) <- NULL # kill row.names, reverts to 1,2,3
-  area.ct <- rbind(area.ct, c(length(which(values(All_Rasters_Scaled) >= 0.5)), # add a row for All_Rasters_Scaled
-                              length(which(values(All_Rasters_Scaled) >= 0.05)),
+  area.ct <- rbind(area.ct, c(round(length(which(values(All_Rasters_Scaled) >= 0.5)) * rasterres, 1), # add a row for All_Rasters_Scaled
+                                    round(length(which(values(All_Rasters_Scaled) >= 0.05)) * rasterres, 1),
                               "All_Rasters_Scaled"
                               )
                    )

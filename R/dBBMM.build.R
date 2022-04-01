@@ -66,7 +66,7 @@
 #' @importFrom stringi stri_split_fixed
 
 
-dBBMM_HomeRange <- function(
+dBBMMhomeRange <- function(
     data = NULL, # data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping columns.
     ID = NULL, # column name of IDs of individuals.
     Datetime = NULL, # name of Datetime column. Must be in POSIXct format.
@@ -457,6 +457,8 @@ dBBMM_HomeRange <- function(
   # names      : layer 
   # values     : 1, 1  (min, max)
   
+  # get resolution from raster in rasterlist, assign it object, squared
+  rasterres <- (res(xAEQD)[1]) ^ 2
   
   # Loop through all unique tags
   counter <- 0
@@ -566,8 +568,6 @@ dBBMM_HomeRange <- function(
         } # close length1 or else
       } # close if exists bbdlocationerror
     }
-    
-
     
     # location error needs to be a postive number. Replace zeroes with 0.00001
     bbdlocationerror.i[which(bbdlocationerror.i == 0)] <- 0.00001
@@ -743,6 +743,9 @@ dBBMM_HomeRange <- function(
                   .id = "column_label"
   ) %>%
     dplyr::select(!column_label) # remove column_label column
+  
+  md$core.use <- rasterres * md$core.use # convert from cells/pixels to metres squared area
+  md$general.use <- rasterres * md$general.use
   
   write.csv(md,
             file = file.path(savedir, absVolumeAreaSaveName),
