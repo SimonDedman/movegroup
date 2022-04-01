@@ -8,9 +8,10 @@ library(tidylog)
 library(remotes)
 remotes::install_github("SimonDedman/dBBMMhomeRange")
 library(dBBMMhomeRange)
-source("./R/dBBMM.build.R")
-source("./R/scaleraster.R")
-source("./R/dBBMM.plot.R")
+# source("./R/dBBMM.build.R")
+# library(move)
+# source("./R/scaleraster.R")
+# source("./R/dBBMM.plot.R")
 saveloc <- "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/" # si
 # DET <- read.csv("./data/TRACKS1.csv")
 # 
