@@ -11,7 +11,7 @@ weightraster <- function(locations = c("array1", "array2"), # assumes they have 
 
     tmp <- 123
 
-for (f in list.files("/home/simon/Dropbox/Galway/Analysis/R/dBBMMhomeRange/R", full.names = TRUE)) {
-  print(f)
-  parse(f)
-}
+# for (f in list.files("/home/simon/Dropbox/Galway/Analysis/R/dBBMMhomeRange/R", full.names = TRUE)) {
+#   print(f)
+#   parse(f)
+# }

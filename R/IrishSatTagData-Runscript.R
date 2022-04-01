@@ -4,9 +4,9 @@
 # dBBMM ####
 # by month? season? region?
 
-library(remotes)
-remotes::install_github("SimonDedman/dBBMMhomeRange")
-library(dBBMMhomeRange)
+# library(remotes)
+# remotes::install_github("SimonDedman/dBBMMhomeRange")
+# library(dBBMMhomeRange)
 # source("~/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R/dBBMM.build.R")
 # source("~/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R/scaleraster.R")
 # source("~/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R/dBBMM.plot.R")
