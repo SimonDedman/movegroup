@@ -12,7 +12,8 @@
 # source("~/Dropbox/Galway/Analysis/R/dBBMM_HomeRange/R/dBBMM.plot.R")
 
 # Dummy AllDailies so package installs without error
-AllDailies <- data.frame(lon = c(1,2,3),
+AllDailies <- data.frame(data = c(1,2,3),
+                         lon = c(1,2,3),
                          lat = c(1,2,3))
 
 saveloc <- "/home/simon/Dropbox/Blocklab Monterey/Data/IrishTags/dBBMM/"
