@@ -6,5 +6,12 @@
 weightraster <- function(locations = c("array1", "array2"), # assumes they have subfolders called Scaled with files called All_Rasters_Scaled.asc
                          weightings = c(1, 2),
                          saveloc = "location") # respective weightings per array
-# 4. run scaleraster on the 3 outputs (All_Rasters_Scaled.asc (which you weighted) * 3)
-# 5. run plot
+  # 4. run scaleraster on the 3 outputs (All_Rasters_Scaled.asc (which you weighted) * 3)
+  # 5. run plot
+
+    tmp <- 123
+
+for (f in list.files("/home/simon/Dropbox/Galway/Analysis/R/dBBMMhomeRange/R", full.names = TRUE)) {
+  print(f)
+  parse(f)
+}

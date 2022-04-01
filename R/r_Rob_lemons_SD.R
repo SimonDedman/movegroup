@@ -7,25 +7,25 @@
 #   pdf_document: default---
 # ---
 
-```{r clear_memory}
+# ```{r clear_memory}
 rm(list = ls())
-```
+# ```
 
 ## Data loading
 
-Set the working directory depending on the user
+# Set the working directory depending on the user
 
-```{r setup}
+# ```{r setup}
 print(Sys.info()["nodename"])
 if (grepl("aurits", Sys.info()["nodename"])) {
   data.dir <- "~/Documents/Science/Projects/Rob Bullock - Bimini/data/"}
 if (grepl("nautilus", Sys.info()["nodename"]) | grepl("Poseidon", Sys.info()["nodename"]) | grepl("aquarius", Sys.info()["nodename"])) {
   data.dir <- "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/"}
-```
+# ```
 
-Load libraries
+# Load libraries
 
-```{r load_library,result='hide',message=F}
+# ```{r load_library,result='hide',message=F}
 library(dplyr)
 library(devtools)
 # install_git('https://gitlab.com/bartk/move.git') #Installs 'move' development version
@@ -39,33 +39,33 @@ library(knitr)
 library(magrittr) # %<>%
 library(tidyr) # drop_na
 library(tidylog) # verbose functions
-```
+# ```
 
-Load data set
+# Load data set
 
-```{r read_files}
+# ```{r read_files}
 DET <- read.csv(file.path(data.dir, "/TRACKS1.csv")) # 1308 x 7
-```
+# ```
 
-Check data directory and create it if not present
+# Check data directory and create it if not present
 
-```{r data directory}
+# ```{r data directory}
 #set path to general folder where output files will be written
 out.dir <- "dBBMM ASCII/"
 if (!dir.exists(data.dir)) stop(paste0("Directory not found: \n",
                                        "       ", gsub("\\.", getwd(), data.dir)))
 if (!dir.exists(out.dir)) dir.create(paste0(data.dir, out.dir))
-```
+# ```
 
-Define some global variables
+# Define some global variables
 
-```{r global_vars}
+# ```{r global_vars}
 dat.TZ = "US/Eastern"
-```
+# ```
 
-Explore the data set
+# Explore the data set
 
-```{r explore}
+# ```{r explore}
 names(DET)
 str(DET)
 dim(DET)
@@ -73,11 +73,11 @@ head(DET)
 table(DET$Tidal.Phase)
 table(DET$Shark, DET$Tidal.Phase)
 table(DET$Shark)
-```
+# ```
 
-Housekeeping and tidy up
+# Housekeeping and tidy up
 
-```{r housekeeping}
+# ```{r housekeeping}
 DET %<>%
   mutate(Datetime = as.POSIXct(Datetime,
                                format = "%m/%d/%y %H:%M",
@@ -89,11 +89,11 @@ DET %<>%
   arrange(Shark, Datetime) # df size: 1308 x 5
 
 write.csv(x = DET, file = "TracksCleaned.csv", row.names = FALSE) # Could load this directly here
-```
+# ```
 
-Convert lonlat to UTM
+# Convert lonlat to UTM
 
-```{r coord_UTM}
+# ```{r coord_UTM}
 # First convert coordinate sets to SpatialPoints and project
 cord.dec = SpatialPoints(cbind(DET$Lon, DET$Lat),
                          proj4string = CRS("+proj=longlat"))
@@ -102,7 +102,7 @@ cord.dec = SpatialPoints(cbind(DET$Lon, DET$Lat),
 cord.UTM <- as.data.frame(spTransform(cord.dec, CRS("+init=epsg:32617")))
 colnames(cord.UTM) <- c("NewEastingUTM", "NewNorthingUTM")
 DET <- cbind(DET, cord.UTM) # 1308 x 7
-```
+# ```
 
 # Construct movement models per individual.
 #
@@ -115,7 +115,7 @@ DET <- cbind(DET, cord.UTM) # 1308 x 7
 #
 # A dBBMM is nor run if total detections of individual < window size (default value, 31). Below code checks and filters individuals with insufficient data. Below we set window size arbitrarily to 23
 
-```{r filter_data}
+# ```{r filter_data}
 check1 <- DET %>%
   group_by(Shark) %>%
   summarise(relocations = length(Datetime))
@@ -132,11 +132,11 @@ if (length(check1$Shark) != length(check2$Shark)) {
   check2 <- filter(check1, relocations > 23) # filter: no rows removed
   length(check1$Shark) == length(check2$Shark)
 } # DET: 1287 x 7
-```
+# ```
 
-In the next R code we create per individual a move object, project it, construct a dBBMM, calculate the volume area within the 50% and 95% contours and finally save the outcome as ASCII for plotting in an external GIS software.
+# In the next R code we create per individual a move object, project it, construct a dBBMM, calculate the volume area within the 50% and 95% contours and finally save the outcome as ASCII for plotting in an external GIS software.
 
-```{r construct_dBMMMM}
+# ```{r construct_dBMMMM}
 bb <- list()
 bb.list <- list()
 
@@ -341,11 +341,11 @@ if (grepl("nautilus", Sys.info()["nodename"]) | grepl("Poseidon", Sys.info()["no
 source(paste0(work.dir, "scaleraster.R"))
 scaleraster(path = paste0(data.dir, out.dir))
 
-```
+# ```
 
-Now that we have constructed individual movement models for complete movement trajectories, below we will do the same, but now we will discern different tidal phases when constructing the models.
+# Now that we have constructed individual movement models for complete movement trajectories, below we will do the same, but now we will discern different tidal phases when constructing the models.
 
-```{r dir}
+# ```{r dir}
 #set path to general folders where output files will be written
 if (!dir.exists("dBBMM ASCII/Tide")) dir.create("dBBMM ASCII/Tide")
 out.dir_h <- "dBBMM ASCII/Tide/H"
@@ -354,9 +354,9 @@ out.dir_l <- "dBBMM ASCII/Tide/L"
 if (!dir.exists(out.dir_l)) dir.create(paste0(data.dir, out.dir_l))
 out.dir_m <- "dBBMM ASCII/Tide/M"
 if (!dir.exists(out.dir_m)) dir.create(paste0(data.dir, out.dir_m))
-```
+# ```
 
-```{r construct_tidal_dbbmm}
+# ```{r construct_tidal_dbbmm}
 # Loop through the different tidal phases
 for (i in unique(DET$T.Ph)) { # "H" "M" "L"
 
@@ -544,6 +544,4 @@ for (i in unique(DET$T.Ph)) { # "H" "M" "L"
   # Normalise rasters
   scaleraster(path = paste0(data.dir, out.dir))
 }
-```
-
-
+# ```
