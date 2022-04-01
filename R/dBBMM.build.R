@@ -54,16 +54,10 @@
 #' @import sf
 #' @import sp SpatialPoints and maybe others
 #' @import knitr
-#' @import kableExtra LaTeX format tables via pipe structure
 #' @import lubridate today() and other datetime operations as needed.
 #' @import stars ggplot rasters in plot sections.
 #' @import starsExtra ggplot rasters in plot sections; trim2
-#' @import devtools
-#install_github("SimonDedman/gbm.auto")
-#' @import gbm.auto
-
-# importFrom example
-#' @importFrom stringi stri_split_fixed
+#' @importFrom rlang .data
 
 
 dBBMMhomeRange <- function(
@@ -121,8 +115,8 @@ dBBMMhomeRange <- function(
   } # close options subcurly
   ) # close options
   
-  library(sp)
-  library(move)
+  # library(sp)
+  # library(move)
   if (writeRasterFormat == "CDF") library(ncdf4)
   # do this for other formats?####
   
@@ -166,11 +160,11 @@ dBBMMhomeRange <- function(
   # Unless I can rename the user entry to "ID" # done
   # Same for Lat & Lon
   # And Datetime. And group.
-  rename(Datetime = .data[[Datetime]],
+  dplyr::rename(Datetime = .data[[Datetime]],
          ID = .data[[ID]],
          Lat = .data[[Lat]],
          Lon = .data[[Lon]]) %>%
-    mutate(ID = make.names(ID))
+    dplyr::mutate(ID = make.names(ID))
   
   # Add movelocationerror and bbdlocationerror as columns if they're vectors, else their length
   # desyncs from nrow(data) if any IDs < windowsize
@@ -288,16 +282,16 @@ dBBMMhomeRange <- function(
   
   # ```{r filter_data}
   check1 <- data %>%
-    group_by(ID) %>%
-    summarise(relocations = length(Datetime))
-  check2 <- filter(check1, relocations >= bbdwindowsize) # filter: removed 2 rows (14%), 12 rows remaining
+    dplyr::group_by(.data$ID) %>%
+    dplyr::summarise(relocations = length(.data$Datetime))
+  check2 <- dplyr::filter(check1, .data$relocations >= bbdwindowsize) # filter: removed 2 rows (14%), 12 rows remaining
   
   if (length(check1$ID) != length(check2$ID)) {
     data <- semi_join(data, check2) # Joining, by = "ID". semi_join: added no columns
     check1 <- data %>%
-      group_by(ID) %>%
-      summarise(relocations = length(Datetime))
-    check2 <- filter(check1, relocations >= bbdwindowsize) # filter: no rows removed
+      dplyr::group_by(.data$ID) %>%
+      dplyr::summarise(relocations = length(.data$Datetime))
+    check2 <- dplyr::filter(check1, .data$relocations >= bbdwindowsize) # filter: no rows removed
     length(check1$ID) == length(check2$ID)
   } # data: 1253 x 7
   # TODO: improve this####
@@ -315,8 +309,8 @@ dBBMMhomeRange <- function(
   
   data %<>%
     tidyr::drop_na(ID) %>%
-    group_by(ID) %>%
-    distinct(Datetime, .keep_all = TRUE) %>% # distinct (grouped): removed one row (<1%), 1,286 rows remaining
+    dplyr::group_by(ID) %>%
+    dplyr::distinct(Datetime, .keep_all = TRUE) %>% # distinct (grouped): removed one row (<1%), 1,286 rows remaining
     # prevents duplicate Datetime crash in move() later
     ungroup() # 1253 x 7 after removing as.numeric above
   
@@ -336,7 +330,7 @@ dBBMMhomeRange <- function(
   # Error in .local(object, raster, location.error = location.error, ext = ext,  :
   # Lower x grid not large enough, consider extending the raster in that direction or enlarging the ext argument
   # make buffpct larger
-  if (exists("rasterExtent")) { # if xUTM object exists
+  if (!is.null(rasterExtent)) { # if xUTM object exists
     xUTM <- SpatialPoints(cbind(c(rasterExtent[1], rasterExtent[2]), c(rasterExtent[3], rasterExtent[4])), proj4string = CRS("+proj=longlat"))
     xUTM <- as.data.frame(spTransform(xUTM, CRS(projectedCRS))) # Transform to UTM
     xUTM <- raster( # create a raster
@@ -378,7 +372,7 @@ dBBMMhomeRange <- function(
     ungroup # Joining, by = c("toppid", "Date")
   
   alldata <- as.data.frame(alldata)
-  moveall <- move(
+  moveall <- move::move(
     x = alldata$Lon,
     y = alldata$Lat,
     time = alldata$Datetime,
@@ -387,6 +381,10 @@ dBBMMhomeRange <- function(
     # animal = data$ID,
     sensor = sensor
   )
+  # document() error####
+  # Error in (function (classes, fdef, mtable): unable to find an inherited method for function ‘move’ for signature ‘"numeric", "numeric", "character", "data.frame", "CRS"’
+  
+  
   # Convert projection to Azimuthal Equi-Distance projection (aeqd)
   rall <- spTransform(moveall, center = center)
   proj4string(rall) # "+proj=aeqd +lat_0=44.99489997 +lon_0=-17.48575004 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
