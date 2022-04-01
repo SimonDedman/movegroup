@@ -5,7 +5,7 @@
 
 
 # load packages ####
-# RB: still not complete,bad internet limiting downloads
+# RB: still not complete, bad internet limiting downloads
 library(nlme)
 library(mgcv)
 library(plotfunctions)
@@ -24,10 +24,10 @@ library(tidyverse)
 today() # "2021-01-17"
 
 # set WD ####
-root <- "C:/Users/sosf-/Documents/Rob PhD paper"
-root <- "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/"
-setwd(root)
-getwd()
+# root <- "C:/Users/sosf-/Documents/Rob PhD paper"
+# root <- "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/"
+# setwd(root)
+# getwd()
 
 # read data either 1h or 5min ####
 GAMMdata <- read.csv("./data/sharksgamm1h.csv") # 1h
@@ -63,7 +63,7 @@ attach(GAMMdata)
 kruskal.test(ODBA ~ Tidal_Phase)
 # 1h: significant
 # 5m: Kruskal-Wallis chi-squared = 354.58, df = 2, p-value < 2.2e-16
-pairwise.wilcox.test(ODBA_hour, Tidal_Phase, p.adjust.method = "BH")
+# pairwise.wilcox.test(ODBA_hour, Tidal_Phase, p.adjust.method = "BH")
 # bug ####
 # object 'ODBA_hour' not found
 kruskal.test(ODBA ~ Diel_Phase)
@@ -138,7 +138,7 @@ kruskal.test(bursting ~ Season)
 
 # ACF for GAMM 1 ODBA
 ACFODBAgammfit1 <- gam((ODBA) ~ s(Size) + s(Tidal_Phase, bs = "fs") + s(Diel_Phase, bs = "fs") + s(Season, bs = "fs"), random = list(ID = ~1), data = GAMMdata)
-png(paste0(root, today(), "_GAMResiduals_", GAMMtimeRes, "_ODBA_GAMM1.png"))
+png(paste0(today(), "_GAMResiduals_", GAMMtimeRes, "_ODBA_GAMM1.png"))
 acfODBAgamm1 <- acf(residuals(ACFODBAgammfit1), plot = T)
 dev.off()
 # @RB ####
@@ -204,7 +204,7 @@ gam.check(gammdataODBA1$gam)
 
 # ACF for GAMM2 ODBA
 ACFODBAgammfit2 <- gam((ODBA) ~ s(Tidal_Phase, bs = "fs") + s(Diel_Phase, bs = "fs") + s(Size), random = list(ID = ~1), data = GAMMdata)
-png(paste0(root, today(), "_GAMResiduals_", GAMMtimeRes, "_ODBA_GAMM2.png"))
+png(paste0(today(), "_GAMResiduals_", GAMMtimeRes, "_ODBA_GAMM2.png"))
 acfODBAgamm2 <- acf(residuals(ACFODBAgammfit2), plot = T)
 dev.off()
 acfODBAgammout2 <- acfODBAgamm2$acf[2]
@@ -217,6 +217,9 @@ gammdataODBA2 <- gamm(ODBA ~ s(Tidal_Phase, bs = "fs") + s(Diel_Phase, bs = "fs"
   data = GAMMdata,
   na.action = na.omit
 )
+# error in document()####
+# Error in solve.default(-val) : Lapack routine dgesv: system is exactly singular: U[2,2] = 0
+
 end_time <- Sys.time()
 run_time <- end_time - start_time
 writeLines(paste0(as.character(run_time), " secs"), con = paste0("gammruntime_ODBA_2.txt"))
@@ -261,7 +264,7 @@ gam.check(gammdataODBA2$gam)
 
 # ACF3 ODBA
 ACFODBAgammfit3 <- gam((ODBA) ~ s(Tidal_Phase, bs = "fs") + s(Size, bs = "cr"), random = list(ID = ~1), data = GAMMdata)
-png(paste0(root, today(), "_GAMResiduals_", GAMMtimeRes, "_ODBA_GAMM3.png"))
+png(paste0(today(), "_GAMResiduals_", GAMMtimeRes, "_ODBA_GAMM3.png"))
 acfODBAgamm3 <- acf(residuals(ACFODBAgammfit3), plot = T)
 dev.off()
 acfODBAgammout3 <- acfODBAgamm3$acf[2]
@@ -310,13 +313,13 @@ gam.check(gammdataODBA3$gam)
 #   ---
 #   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-png(paste0(root, today(), "_plot.gam_ACFODBAgammfit3_", GAMMtimeRes, ".png"))
+png(paste0(today(), "_plot.gam_ACFODBAgammfit3_", GAMMtimeRes, ".png"))
 plot.gam(ACFODBAgammfit3)
 dev.off()
-png(paste0(root, today(), "_ODBA-Size_", GAMMtimeRes, ".png"))
+png(paste0(today(), "_ODBA-Size_", GAMMtimeRes, ".png"))
 plot(ODBA ~ Size, data = GAMMdata)
 dev.off()
-png(paste0(root, today(), "_ODBA-Tidal_", GAMMtimeRes, ".png"))
+png(paste0(today(), "_ODBA-Tidal_", GAMMtimeRes, ".png"))
 plot(ODBA ~ Tidal_Phase, data = GAMMdata) # not useful, will run some interaction.plots of means to represent factor interactions.
 dev.off()
 
@@ -340,7 +343,7 @@ AIC(gammdataODBA1, gammdataODBA2, gammdataODBA3)
 
 # ACF for GAMM 1 resting
 ACFrestinggammfit1 <- gam((resting) ~ s(Size, bs = "cr") + s(Tidal_Phase, bs = "fs") + s(Diel_Phase, bs = "fs") + s(Season, bs = "fs"), random = list(ID = ~1), data = GAMMdata)
-png(paste0(root, today(), "_GAMResiduals_", GAMMtimeRes, "_Resting_GAMM1.png"))
+png(paste0(today(), "_GAMResiduals_", GAMMtimeRes, "_Resting_GAMM1.png"))
 acfrestinggamm1 <- acf(residuals(ACFrestinggammfit1), plot = T)
 dev.off()
 acfrestinggammout1 <- acfrestinggamm1$acf[2]
@@ -399,7 +402,7 @@ gam.check(gammdataresting1$gam)
 
 # ACF for GAMM2 resting
 ACFrestinggammfit2 <- gam((resting) ~ s(Tidal_Phase, bs = "fs") + s(Diel_Phase, bs = "fs") + s(Size, bs = "cr"), random = list(ID = ~1), data = GAMMdata)
-png(paste0(root, today(), "_GAMResiduals_", GAMMtimeRes, "_Resting_GAMM2.png"))
+png(paste0(today(), "_GAMResiduals_", GAMMtimeRes, "_Resting_GAMM2.png"))
 acfrestinggamm2 <- acf(residuals(ACFrestinggammfit2), plot = T)
 dev.off()
 acfrestinggammout2 <- acfrestinggamm2$acf[2]
@@ -439,7 +442,7 @@ summary(gammdataresting2$gam)
 # R-sq.(adj) =  0.0413
 # Scale est. = 456.08    n = 25075
 gam.check(gammdataresting2$gam)
-#5m:
+# 5m:
 # 'gamm' based fit - care required with interpretation.
 # Checks based on working residuals may be misleading.
 # Basis dimension (k) checking results. Low p-value (k-index<1) may
@@ -457,7 +460,7 @@ gam.check(gammdataresting2$gam)
 # Tidal Phase and Size predictors (ommitting season and Diel phase)
 # ACF3 resting
 ACFrestinggammfit3 <- gam((resting) ~ s(Tidal_Phase, bs = "fs") + s(Size, bs = "cr"), random = list(ID = ~1), data = GAMMdata)
-png(paste0(root, today(), "_GAMResiduals_", GAMMtimeRes, "_Resting_GAMM3.png"))
+png(paste0(today(), "_GAMResiduals_", GAMMtimeRes, "_Resting_GAMM3.png"))
 acfrestinggamm3 <- acf(residuals(ACFrestinggammfit3), plot = T)
 dev.off()
 acfrestinggammout3 <- acfrestinggamm3$acf[2]
@@ -476,7 +479,7 @@ writeLines(paste0(as.character(run_time), " secs"), con = paste0("gammruntime_Re
 save(gammdataresting3, file = "gammdataresting3.RData", compress = "xz")
 # load("gammdataresting3.RData")
 summary(gammdataresting3$gam)
-#5m:
+# 5m:
 # Family: gaussian
 # Link function: identity
 # Formula:
@@ -495,7 +498,7 @@ summary(gammdataresting3$gam)
 # R-sq.(adj) =  0.0404
 # Scale est. = 456.44    n = 25075
 gam.check(gammdataresting3$gam)
-#5m:
+# 5m:
 # 'gamm' based fit - care required with interpretation.
 # Checks based on working residuals may be misleading.
 # Basis dimension (k) checking results. Low p-value (k-index<1) may
@@ -508,24 +511,20 @@ gam.check(gammdataresting3$gam)
 
 
 ##### plotting smooths for size against resting
-png(paste0(root, today(), "_plot.gam_ACFrestinggammfit3_", GAMMtimeRes, ".png"))
+png(paste0(today(), "_plot.gam_ACFrestinggammfit3_", GAMMtimeRes, ".png"))
 plot.gam(ACFrestinggammfit3)
 dev.off()
-png(paste0(root, today(), "_resting-Size_", GAMMtimeRes, ".png"))
+png(paste0(today(), "_resting-Size_", GAMMtimeRes, ".png"))
 plot(resting ~ Size, data = GAMMdata)
 dev.off()
 
 ##### model selection and fit via AIC
 AIC(gammdataresting1, gammdataresting2, gammdataresting3)
-#5m:
+# 5m:
 #                  df      AIC
 # gammdataresting1  9 209591.3
 # gammdataresting2  8 209589.3
 # gammdataresting3  7 209588.4
-
-
-
-
 
 
 
@@ -536,7 +535,7 @@ AIC(gammdataresting1, gammdataresting2, gammdataresting3)
 
 # ACF for GAMM 1 bursting
 ACFburstinggammfit1 <- gam((bursting) ~ s(Size, bs = "cr") + s(Tidal_Phase, bs = "fs") + s(Diel_Phase, bs = "fs") + s(Season, bs = "fs"), random = list(ID = ~1), data = GAMMdata)
-png(paste0(root, today(), "_GAMResiduals_", GAMMtimeRes, "_Bursting_GAMM1.png"))
+png(paste0(today(), "_GAMResiduals_", GAMMtimeRes, "_Bursting_GAMM1.png"))
 acfburstinggamm1 <- acf(residuals(ACFburstinggammfit1), plot = T)
 dev.off()
 acfburstinggammout1 <- acfburstinggamm1$acf[2]
@@ -597,7 +596,7 @@ gam.check(gammdatabursting1$gam)
 
 # ACF for GAMM2 bursting
 ACFburstinggammfit2 <- gam((bursting) ~ s(Tidal_Phase, bs = "fs") + s(Diel_Phase, bs = "fs") + s(Season, bs = "fs"), random = list(ID = ~1), data = GAMMdata)
-png(paste0(root, today(), "_GAMResiduals_", GAMMtimeRes, "_Bursting_GAMM2.png"))
+png(paste0(today(), "_GAMResiduals_", GAMMtimeRes, "_Bursting_GAMM2.png"))
 acfburstinggamm2 <- acf(residuals(ACFburstinggammfit2), plot = T) ## could you check this, doesnt plot residuals here and gives an error
 dev.off()
 acfburstinggammout2 <- acfburstinggamm2$acf[2]
@@ -651,7 +650,7 @@ gam.check(gammdatabursting2$gam)
 
 # ACF3 bursting
 ACFburstinggammfit3 <- gam((bursting) ~ s(Tidal_Phase, bs = "fs") + s(Diel_Phase, bs = "fs"), random = list(ID = ~1), data = GAMMdata)
-png(paste0(root, today(), "_GAMResiduals_", GAMMtimeRes, "_Bursting_GAMM3.png"))
+png(paste0(today(), "_GAMResiduals_", GAMMtimeRes, "_Bursting_GAMM3.png"))
 acfburstinggamm3 <- acf(residuals(ACFburstinggammfit3), plot = T) ## could you check this, doesnt plot residuals here and gives an error
 dev.off()
 acfburstinggammout3 <- acfburstinggamm3$acf[2]
@@ -698,10 +697,10 @@ gam.check(gammdatabursting3$gam)
 # s(Diel_Phase)  4.000000 2.116687      NA      NA
 
 ##### plotting factors against bursting
-png(paste0(root, today(), "_plot.gam_ACFburstinggammfit1_", GAMMtimeRes, ".png"))
+png(paste0(today(), "_plot.gam_ACFburstinggammfit1_", GAMMtimeRes, ".png"))
 plot.gam(ACFburstinggammfit1)
 dev.off()
-png(paste0(root, today(), "_bursting-Size_", GAMMtimeRes, ".png"))
+png(paste0(today(), "_bursting-Size_", GAMMtimeRes, ".png"))
 plot(bursting ~ Size, data = GAMMdata) #### just for fun
 dev.off()
 

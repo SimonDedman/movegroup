@@ -111,11 +111,12 @@ dBBMM_plot(
 )
 
 # Tidal Cycle Loop ####
-
 for (thistide in unique(DET$T.Ph)) {
   
+  saveloc <- paste0("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/", thistide, "/") # si
+  
   dBBMMhomeRange(
-    data = DET, # data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping columns.
+    data = DET %>% filter(T.Ph == thistide), # data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping columns.
     ID = "Shark", # column name of IDs of individuals.
     Datetime = "Datetime", # name of Datetime column. Must be in POSIXct format.
     Lat = "Lat", # name of Lat & Lon columns in data.
@@ -157,29 +158,16 @@ for (thistide in unique(DET$T.Ph)) {
   
   dBBMM_plot(
     x = paste0(saveloc, "dBBMM ASCII/Scaled/All_Rasters_Scaled_LatLon.asc"), # path to scaled data
-    # dataCRS = 2958, # one of (i) character: a string accepted by GDAL, (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs.
     myLocation = NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
-    # Default NULL, extents autocreated from data.
-    # c(-79.3, 25.68331, -79.24, 25.78)
     googlemap = TRUE, # If pulling basemap from Google maps, this sets expansion # FALSE
-    # factors since Google Maps tiling zoom setup doesn't align to myLocation
-    # extents.
     gmapsAPI = NULL, # enter your google maps API here, quoted character string
     expandfactor = 1.6, # extents expansion factor for basemap.
-    # 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out).
-    # 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
     mapzoom = 13, # 3 (continent) - 21 (building)
     mapsource = "google", # Source for ggmap::get_map; uses Stamen as fallback if no Goole Maps API present. # stamen
     maptype = "satellite", # Type of map for ggmap::get_map. # terrain
     contour1colour = "red", # colour for contour 1, typically 95%.
     contour2colour = "orange", # colour for contour 2, typically 50%.
     plottitle = "Aggregated 95% and 50% UD contours",
-    # Can use the term 'home range' when an animal can be detected wherever it goes
-    # i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic
-    # receivers cover the entire home range of the study species. 
-    # This term is problematic when applied to a passive acoustic telemetry setting
-    # where an array of non-overlapping receivers are used to assess local space use patterns
-    # i.e. the home range is bigger than the coverage by the acoustic array; put in Details
     plotsubtitle = "Scaled contours. n = 13", # data %>% distinct(ID) %>% nrow() # 13
     legendtitle = "Percent UD Contours",
     plotcaption = paste0("dBBMMhomeRange, ", today()),
