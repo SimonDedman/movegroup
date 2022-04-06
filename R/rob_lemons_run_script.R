@@ -3,7 +3,9 @@
 
 # library(tidyverse)
 # library(magrittr)
-# library(lubridate)
+library(lubridate)
+library(sp)
+library(dplyr)
 # library(tidylog)
 # library(remotes)
 # remotes::install_github("SimonDedman/dBBMMhomeRange", force = TRUE)
@@ -12,6 +14,12 @@
 # library(move)
 # source("./R/scaleraster.R")
 # source("./R/dBBMM.plot.R")
+
+utils::globalVariables("where") # https://github.com/r-lib/tidyselect/issues/201
+# https://stackoverflow.com/questions/40251801/how-to-use-utilsglobalvariables
+# https://github.com/r-lib/tidyselect/issues/248
+
+
 saveloc <- "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/" # si
 # DET <- read.csv("./data/TRACKS1.csv")
 # 
@@ -42,7 +50,7 @@ dBBMMhomeRange(
   Lon = "Lon",
   Group = NULL, # name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?
   dat.TZ = "US/Eastern", # timezone for as.POSIXct.
-  proj = CRS("+proj=longlat +datum=WGS84"), # CRS for move function.
+  proj = sp::CRS("+proj=longlat +datum=WGS84"), # CRS for move function.
   projectedCRS = "+init=epsg:32617", # 32617 EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone
   sensor = "VR2W", # sensor for move function. Single character or vector with length of the number of coordinates. Optional.
   moveLocError = 1, # location error in metres for move function. Numeric. Either single or a vector of lenth nrow data.
@@ -50,7 +58,7 @@ dBBMMhomeRange(
   timeDiffUnits = "hours", # units for time difference for move function.
   center = TRUE, # center move object within extent? See spTransform.
   buffpct = 3, # buffer extent for raster creation, proportion of 1.
-  rasterCRS = CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. 17
+  rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. 17
   rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
   bbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
   bbdext = 0.3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
@@ -102,11 +110,11 @@ dBBMM_plot(
   # i.e. the home range is bigger than the coverage by the acoustic array; put in Details
   plotsubtitle = "Scaled contours. n = 13", # data %>% distinct(ID) %>% nrow() # 13
   legendtitle = "Percent UD Contours",
-  plotcaption = paste0("dBBMMhomeRange, ", today()),
+  plotcaption = paste0("dBBMMhomeRange, ", lubridate::today()),
   axisxlabel = "Longitude",
   axisylabel = "Latitude",
   legend.position = c(0.16, 0.92), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top.
-  filesavename = paste0(today(), "_dBBMM-contours.png"),
+  filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
   savedir = paste0(saveloc, "dBBMM ASCII/Plot/") # file.path(work.dir, out.dir, "Scaled")
 )
 
@@ -116,7 +124,7 @@ for (thistide in unique(DET$T.Ph)) {
   saveloc <- paste0("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/", thistide, "/") # si
   
   dBBMMhomeRange(
-    data = DET %>% filter(T.Ph == thistide), # data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping columns.
+    data = DET %>% dplyr::filter(T.Ph == thistide), # data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping columns.
     ID = "Shark", # column name of IDs of individuals.
     Datetime = "Datetime", # name of Datetime column. Must be in POSIXct format.
     Lat = "Lat", # name of Lat & Lon columns in data.
@@ -131,7 +139,7 @@ for (thistide in unique(DET$T.Ph)) {
     timeDiffUnits = "hours", # units for time difference for move function.
     center = TRUE, # center move object within extent? See spTransform.
     buffpct = 3, # buffer extent for raster creation, proportion of 1.
-    rasterCRS = CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. 17
+    rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. 17
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
     bbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
     bbdext = 0.3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
@@ -170,11 +178,11 @@ for (thistide in unique(DET$T.Ph)) {
     plottitle = "Aggregated 95% and 50% UD contours",
     plotsubtitle = "Scaled contours. n = 13", # data %>% distinct(ID) %>% nrow() # 13
     legendtitle = "Percent UD Contours",
-    plotcaption = paste0("dBBMMhomeRange, ", today()),
+    plotcaption = paste0("dBBMMhomeRange, ", lubridate::today()),
     axisxlabel = "Longitude",
     axisylabel = "Latitude",
     legend.position = c(0.16, 0.92), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top.
-    filesavename = paste0(today(), "_dBBMM-contours.png"),
+    filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
     savedir = paste0(saveloc, "dBBMM ASCII/Plot/") # file.path(work.dir, out.dir, "Scaled")
   )
 } # close thistide loop

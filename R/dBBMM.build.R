@@ -57,6 +57,7 @@
 #' @import lubridate today() and other datetime operations as needed.
 #' @import stars ggplot rasters in plot sections.
 #' @import starsExtra ggplot rasters in plot sections; trim2
+#' @import utils
 #' @importFrom rlang .data
 
 
@@ -68,7 +69,7 @@ dBBMMhomeRange <- function(
     Lon = NULL,
     Group = NULL, # name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?
     dat.TZ = "US/Eastern", # timezone for as.POSIXct.
-    proj = CRS("+proj=longlat +datum=WGS84"), # CRS for move function.
+    proj = sp::CRS("+proj=longlat +datum=WGS84"), # CRS for move function.
     projectedCRS = "+init=epsg:32617", # EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone
     sensor = "VR2W", # sensor for move function. Single character or vector with length of the number of coordinates. Optional.
     moveLocError = 1, # location error in metres for move function. Numeric. Either single or a vector of lenth nrow data.
@@ -78,7 +79,7 @@ dBBMMhomeRange <- function(
     buffpct = 0.3, # buffer extent for raster creation, proportion of 1.
     rasterExtent = NULL, # if NULL, raster extent calculated from data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 for ymax
     # Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash
-    rasterCRS = CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation.
+    rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation.
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
     bbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
     bbdext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
@@ -100,6 +101,10 @@ dBBMMhomeRange <- function(
   # Simon Dedman, 2012-6 simondedman@gmail.com GitHub.com/SimonDedman/gbm.auto
   
   # source("scaleraster.R") # might not be needed if included as function in same package
+  
+  utils::globalVariables("where") # https://github.com/r-lib/tidyselect/issues/201
+  # https://stackoverflow.com/questions/40251801/how-to-use-utilsglobalvariables
+  # https://github.com/r-lib/tidyselect/issues/248
   
   oldpar <- par(no.readonly = TRUE) # defensive block, thanks to Gregor Sayer
   oldwd <- getwd()
@@ -161,9 +166,9 @@ dBBMMhomeRange <- function(
   # Same for Lat & Lon
   # And Datetime. And group.
   dplyr::rename(Datetime = .data[[Datetime]],
-         ID = .data[[ID]],
-         Lat = .data[[Lat]],
-         Lon = .data[[Lon]]) %>%
+                ID = .data[[ID]],
+                Lat = .data[[Lat]],
+                Lon = .data[[Lon]]) %>%
     dplyr::mutate(ID = make.names(ID))
   
   # Add movelocationerror and bbdlocationerror as columns if they're vectors, else their length
@@ -262,12 +267,12 @@ dBBMMhomeRange <- function(
   # ```{r coord_UTM}
   
   # First convert coordinate sets to SpatialPoints and project
-  cord.dec <- SpatialPoints(cbind(data$Lon, data$Lat),
-                            proj4string = CRS("+proj=longlat")
+  cord.dec <- sp::SpatialPoints(cbind(data$Lon, data$Lat),
+                                proj4string = sp::CRS("+proj=longlat")
   )
   
   # Transform to UTM by setting the EPSG to 32617 for WGS 84, UTM zone 17, northern hemisphere. This is where Bimini is located.
-  cord.UTM <- as.data.frame(spTransform(cord.dec, CRS(projectedCRS)))
+  cord.UTM <- as.data.frame(sp::spTransform(cord.dec, sp::CRS(projectedCRS)))
   colnames(cord.UTM) <- c("NewEastingUTM", "NewNorthingUTM")
   data <- cbind(data, cord.UTM) # 1308 x 7
   # ```
@@ -287,7 +292,7 @@ dBBMMhomeRange <- function(
   check2 <- dplyr::filter(check1, .data$relocations >= bbdwindowsize) # filter: removed 2 rows (14%), 12 rows remaining
   
   if (length(check1$ID) != length(check2$ID)) {
-    data <- semi_join(data, check2) # Joining, by = "ID". semi_join: added no columns
+    data <- dplyr::semi_join(data, check2) # Joining, by = "ID". semi_join: added no columns
     check1 <- data %>%
       dplyr::group_by(.data$ID) %>%
       dplyr::summarise(relocations = length(.data$Datetime))
@@ -312,7 +317,7 @@ dBBMMhomeRange <- function(
     dplyr::group_by(ID) %>%
     dplyr::distinct(Datetime, .keep_all = TRUE) %>% # distinct (grouped): removed one row (<1%), 1,286 rows remaining
     # prevents duplicate Datetime crash in move() later
-    ungroup() # 1253 x 7 after removing as.numeric above
+    dplyr::ungroup() # 1253 x 7 after removing as.numeric above
   
   
   
@@ -331,9 +336,9 @@ dBBMMhomeRange <- function(
   # Lower x grid not large enough, consider extending the raster in that direction or enlarging the ext argument
   # make buffpct larger
   if (!is.null(rasterExtent)) { # if xUTM object exists
-    xUTM <- SpatialPoints(cbind(c(rasterExtent[1], rasterExtent[2]), c(rasterExtent[3], rasterExtent[4])), proj4string = CRS("+proj=longlat"))
-    xUTM <- as.data.frame(spTransform(xUTM, CRS(projectedCRS))) # Transform to UTM
-    xUTM <- raster( # create a raster
+    xUTM <- sp::SpatialPoints(cbind(c(rasterExtent[1], rasterExtent[2]), c(rasterExtent[3], rasterExtent[4])), proj4string = sp::CRS("+proj=longlat"))
+    xUTM <- as.data.frame(sp::spTransform(xUTM, sp::CRS(projectedCRS))) # Transform to UTM
+    xUTM <- raster::raster( # create a raster
       xmn = xUTM[1,1] - ((xUTM[2,1] - xUTM[1,1]) * buffpct), # with xUTM's values as extents
       xmx = xUTM[2,1] + ((xUTM[2,1] - xUTM[1,1]) * buffpct),
       ymn = xUTM[1,2] - ((xUTM[2,2] - xUTM[1,2]) * buffpct),
@@ -342,16 +347,16 @@ dBBMMhomeRange <- function(
       resolution = rasterResolution # 50
     ) # close raster
   } else { # exists(xUTM), else create from data
-  xUTM <- raster(
-    xmn = min(data$NewEastingUTM, na.rm = TRUE) - ((max(data$NewEastingUTM, na.rm = TRUE) - min(data$NewEastingUTM, na.rm = TRUE)) * buffpct),
-    xmx = max(data$NewEastingUTM, na.rm = TRUE) + ((max(data$NewEastingUTM, na.rm = TRUE) - min(data$NewEastingUTM, na.rm = TRUE)) * buffpct),
-    ymn = min(data$NewNorthingUTM, na.rm = TRUE) - ((max(data$NewNorthingUTM, na.rm = TRUE) - min(data$NewNorthingUTM, na.rm = TRUE)) * buffpct),
-    ymx = max(data$NewNorthingUTM, na.rm = TRUE) + ((max(data$NewNorthingUTM, na.rm = TRUE) - min(data$NewNorthingUTM, na.rm = TRUE)) * buffpct),
-    crs = rasterCRS, # +proj=utm +zone=27 +datum=WGS84 +units=m +no_defs
-    resolution = rasterResolution # 50
-  ) # close raster
+    xUTM <- raster::raster(
+      xmn = min(data$NewEastingUTM, na.rm = TRUE) - ((max(data$NewEastingUTM, na.rm = TRUE) - min(data$NewEastingUTM, na.rm = TRUE)) * buffpct),
+      xmx = max(data$NewEastingUTM, na.rm = TRUE) + ((max(data$NewEastingUTM, na.rm = TRUE) - min(data$NewEastingUTM, na.rm = TRUE)) * buffpct),
+      ymn = min(data$NewNorthingUTM, na.rm = TRUE) - ((max(data$NewNorthingUTM, na.rm = TRUE) - min(data$NewNorthingUTM, na.rm = TRUE)) * buffpct),
+      ymx = max(data$NewNorthingUTM, na.rm = TRUE) + ((max(data$NewNorthingUTM, na.rm = TRUE) - min(data$NewNorthingUTM, na.rm = TRUE)) * buffpct),
+      crs = rasterCRS, # +proj=utm +zone=27 +datum=WGS84 +units=m +no_defs
+      resolution = rasterResolution # 50
+    ) # close raster
   } # close else
-  proj4string(xUTM) # "+proj=utm +zone=27 +datum=WGS84 +units=m +no_defs"
+  sp::proj4string(xUTM) # "+proj=utm +zone=27 +datum=WGS84 +units=m +no_defs"
   xUTM
   # class      : RasterLayer 
   # dimensions : 97, 148, 14356  (nrow, ncol, ncell)
@@ -363,13 +368,13 @@ dBBMMhomeRange <- function(
   
   # run move on all data together to generate global CRS for raster
   alldata <- data %>%
-    arrange(Datetime) %>%
-    group_by(Datetime) %>% # remove duplicates
-    summarise(across(where(is.numeric), mean, na.rm = TRUE),
-              across(where(~ is.character(.) | is.POSIXt(.)), first)) %>% # library(lubridate)
-    mutate(across(where(is.numeric), ~ ifelse(is.nan(.), NA, .)), #convert NaN to NA. POSIX needs lubridate
-           across(where(~ is.character(.)), ~ ifelse(is.nan(.), NA, .))) %>% # https://community.rstudio.com/t/why-does-tidyrs-fill-work-with-nas-but-not-nans/25506/5
-    ungroup # Joining, by = c("toppid", "Date")
+    dplyr::arrange(Datetime) %>%
+    dplyr::group_by(Datetime) %>% # remove duplicates
+    dplyr::summarise(dplyr::across(tidyselect::where(~ is.numeric(.)), mean, na.rm = TRUE),
+                     dplyr::across(tidyselect::where(~ is.character(.) | is.POSIXt(.)), dplyr::first())) %>% # library(lubridate)
+    dplyr::mutate(dplyr::across(tidyselect::where(~ is.numeric(.)), ~ ifelse(is.nan(.), NA, .)), #convert NaN to NA. POSIX needs lubridate
+                  dplyr::across(tidyselect::where(~ is.character(.)), ~ ifelse(is.nan(.), NA, .))) %>% # https://community.rstudio.com/t/why-does-tidyrs-fill-work-with-nas-but-not-nans/25506/5
+    dplyr::ungroup() # Joining, by = c("toppid", "Date")
   
   alldata <- as.data.frame(alldata)
   moveall <- move::move(
@@ -386,23 +391,23 @@ dBBMMhomeRange <- function(
   
   
   # Convert projection to Azimuthal Equi-Distance projection (aeqd)
-  rall <- spTransform(moveall, center = center)
-  proj4string(rall) # "+proj=aeqd +lat_0=44.99489997 +lon_0=-17.48575004 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
-  rallCRS <- CRS(proj4string(rall))
+  rall <- sp::spTransform(moveall, center = center)
+  sp::proj4string(rall) # "+proj=aeqd +lat_0=44.99489997 +lon_0=-17.48575004 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+  rallCRS <- sp::CRS(sp::proj4string(rall))
   class(rallCRS) # CRS
-  write.csv(proj4string(rall), paste0(savedir, "CRS.csv"), row.names = FALSE)
+  write.csv(sp::proj4string(rall), paste0(savedir, "CRS.csv"), row.names = FALSE)
   saveRDS(rallCRS, file = paste0(savedir, "CRS.Rds"))
   rm(moveall)
   rm(alldata)
   
   
   # We now need to reproject this into AEQD. Make a dummy object to get the correct projection.
-  x.i <- raster(
+  x.i <- raster::raster(
     xmn = min(data$NewEastingUTM),
     xmx = max(data$NewEastingUTM),
     ymn = min(data$NewNorthingUTM),
     ymx = max(data$NewNorthingUTM),
-    crs = proj4string(rall) # if rasterCRS then same as above! trying proj4string(r.i) which is AEQD from spTransform
+    crs = sp::proj4string(rall) # if rasterCRS then same as above! trying proj4string(r.i) which is AEQD from spTransform
     # could add here: resolution = rasterResolution # 50 ####
   )
   
@@ -412,7 +417,7 @@ dBBMMhomeRange <- function(
   
   # +proj=aeqd +lat_0=24.75136 +lon_0=-36.01593 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
   
-  proj4string(x.i) # "+proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+  sp::proj4string(x.i) # "+proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
   x.i
   # class      : RasterLayer 
   # dimensions : 180, 360, 64800  (nrow, ncol, ncell)
@@ -423,9 +428,9 @@ dBBMMhomeRange <- function(
   
   # Use that to reproject UTM to AEQD
   # ?projectExtent # project the values of a Raster object to a new Raster object with another projection (CRS), i.e. projectExtent(from, to, ...))
-  newTemplate <- projectExtent(xUTM, proj4string(x.i))
+  newTemplate <- raster::projectExtent(xUTM, sp::proj4string(x.i))
   # change newTemplate to xAEQD####
-  proj4string(newTemplate) # "+proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+  sp::proj4string(newTemplate) # "+proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
   newTemplate # get the number of pixels in newTemplate and write that number into the next function. This is an empty raster.
   # class      : RasterLayer 
   # dimensions : 97, 148, 14356  (nrow, ncol, ncell)
@@ -438,11 +443,11 @@ dBBMMhomeRange <- function(
   rm(x.i)
   
   # change xAEQD res so x & y match. Kills values
-  res(newTemplate) <- rep(mean(res(newTemplate)), 2)
+  raster::res(newTemplate) <- rep(mean(raster::res(newTemplate)), 2)
   
   # Give newTemplate some values. Make Rep equal to the ncell dimension
-  ones <- rep(1, ncell(newTemplate))
-  xAEQD <- setValues(newTemplate, ones)
+  ones <- rep(1, raster::ncell(newTemplate))
+  xAEQD <- raster::setValues(newTemplate, ones)
   rm(newTemplate)
   rm(ones)
   xAEQD
@@ -456,7 +461,7 @@ dBBMMhomeRange <- function(
   # values     : 1, 1  (min, max)
   
   # get resolution from raster in rasterlist, assign it object, squared
-  rasterres <- (res(xAEQD)[1]) ^ 2
+  rasterres <- (raster::res(xAEQD)[1]) ^ 2
   
   # Loop through all unique tags
   counter <- 0
@@ -473,7 +478,7 @@ dBBMMhomeRange <- function(
     data.i <- as.data.frame(data[data$ID == i, ])
     
     # create move object
-    move.i <- move(
+    move.i <- move::move(
       x = data.i$Lon,
       y = data.i$Lat,
       time = data.i$Datetime,
@@ -484,7 +489,7 @@ dBBMMhomeRange <- function(
     )
     
     # Check the current projection
-    proj4string(move.i) # "+proj=longlat +datum=WGS84 +no_defs"
+    sp::proj4string(move.i) # "+proj=longlat +datum=WGS84 +no_defs"
     
     # Incorporate uncertainty in the model by including a location error.
     # From communication with Rob, the gps location of a shark is estimated, from:
@@ -500,9 +505,9 @@ dBBMMhomeRange <- function(
         } else { # else if multiple values
           if (length(moveLocError) == nrow(data.i)) { # should be same length as full dataset
             move.i$LocationError <- data.i %>% # take the full dataset,
-              bind_cols(moveLocError = moveLocError) %>% # cbind the full movelocerror
-              filter(ID == i) %>% # filter for just this ID
-              pull(moveLocError) # and pull just the movelocerror for this ID
+              dplyr::bind_cols(moveLocError = moveLocError) %>% # cbind the full movelocerror
+              dplyr::filter(ID == i) %>% # filter for just this ID
+              dplyr::pull(moveLocError) # and pull just the movelocerror for this ID
           } else { # if not length 1 and not length of nrow(data)
             stop(print("moveLocError must be either length 1 or length(nrow(data))")) # if not stop and tell user
           } # close not length1 not same length as full dataset else
@@ -512,15 +517,15 @@ dBBMMhomeRange <- function(
     
     # Convert projection to Azimuthal Equi-Distance projection (aeqd)
     # r.i <- spTransform(move.i, center = center)
-    r.i <- spTransform(move.i, CRSobj = rallCRS, center = center)
+    r.i <- sp::spTransform(move.i, CRSobj = rallCRS, center = center)
     
     
     # Make sure it changed correctly
-    proj4string(r.i) # "+proj=aeqd +lat_0=24.75136 +lon_0=-36.01593 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+    sp::proj4string(r.i) # "+proj=aeqd +lat_0=24.75136 +lon_0=-36.01593 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
     # irish tuna: "+proj=aeqd +lat_0=39.53798259 +lon_0=-39.4894484505 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
     # r.tmp <- projectExtent(r.i, proj4string(rall)) # kills the data in r.i
     # proj4string(r.tmp)
-  
+    
     # Calculate time lag between consecutive detections.
     # Obviously there is no time lag for the first detection, so we need to tell R this.
     # Knowing time lags in acoustic telemetry is important, as the motion variance is based on the
@@ -528,21 +533,21 @@ dBBMMhomeRange <- function(
     # bridge where the animal could've been and therefore potentially inflates the motion variance.
     # Below code deals with this issue by identifying the location and number of detections with
     # large time gaps. Below we will use an arbitrary value of 2 h.
-    TimeDiff <- timeLag(r.i, units = timeDiffUnits)
+    TimeDiff <- move::timeLag(r.i, units = timeDiffUnits)
     r.i$TimeDiff <- append(0, TimeDiff)
     long <- which(r.i$TimeDiff > timeDiffLong)
     # if no timediffs are longer than timedifflong, long is integer(0), a potentially dangerous object.
     
     
     # We need to make sure that the projection of the move object is in the same format as our raster. Check below.
-    proj4string(xAEQD) # "+proj=utm +zone=17 +datum=WGS84 +units=m +no_defs"
-    proj4string(r.i) # "+proj=utm +zone=17 +datum=WGS84 +units=m +no_defs"
-    proj4string(xAEQD) == proj4string(r.i) # TRUE
+    sp::proj4string(xAEQD) # "+proj=utm +zone=17 +datum=WGS84 +units=m +no_defs"
+    sp::proj4string(r.i) # "+proj=utm +zone=17 +datum=WGS84 +units=m +no_defs"
+    sp::proj4string(xAEQD) == sp::proj4string(r.i) # TRUE
     
     # Below we exclude the data points that are 'long' i.e. create a large time gap. move::burst ?
-    bursted <- burst(
+    bursted <- move::burst(
       r.i,
-      c("normal", "long")[1 + (timeLag(r.i, units = timeDiffUnits) > timeDiffLong)]
+      c("normal", "long")[1 + (move::timeLag(r.i, units = timeDiffUnits) > timeDiffLong)]
     )
     rm(r.i)
     # There are 2 types of burst: "normal" and "long". You can select for these in the dbbmm by selecting the factor level in the burstType command.
@@ -557,9 +562,9 @@ dBBMMhomeRange <- function(
         } else { # else if multiple values
           if (length(bbdlocationerror) == nrow(data)) { # should be same length as full dataset
             bbdlocationerror.i <- data %>% # take the full dataset,
-              bind_cols(bbdlocationerror = bbdlocationerror) %>% # cbind the full movelocerror
-              filter(ID == i) %>% # filter for just this ID
-              pull(bbdlocationerror) # and pull just the movelocerror for this ID
+              dplyr::bind_cols(bbdlocationerror = bbdlocationerror) %>% # cbind the full movelocerror
+              dplyr::filter(ID == i) %>% # filter for just this ID
+              dplyr::pull(bbdlocationerror) # and pull just the movelocerror for this ID
           } else { # if not length 1 and not length of nrow(data)
             stop(print("bbdlocationerror must be either length 1 or length(nrow(data))")) # if not stop and tell user
           } # close not length1 not same length as full dataset else
@@ -571,14 +576,14 @@ dBBMMhomeRange <- function(
     bbdlocationerror.i[which(bbdlocationerror.i == 0)] <- 0.00001
     
     # Construct the model. The time.step should reflect the ping frequency of the tag (in minutes)
-    bursted_dbbmm <- brownian.bridge.dyn(bursted,
-                                         burstType = "normal",
-                                         raster = xAEQD, # has to be AEQD for metre-based calculations, presuambly?
-                                         # Error:The projection of the raster and the Move object are not equal.
-                                         # Need bursted, r.i, to be the same projection as xAEQD
-                                         location.error = bbdlocationerror.i, # bbdlocationerror.i
-                                         ext = bbdext, # bbdext
-                                         window.size = bbdwindowsize #  must be >=2*margin which is 11 so >=22, but odd so >=23
+    bursted_dbbmm <- move::brownian.bridge.dyn(bursted,
+                                               burstType = "normal",
+                                               raster = xAEQD, # has to be AEQD for metre-based calculations, presuambly?
+                                               # Error:The projection of the raster and the Move object are not equal.
+                                               # Need bursted, r.i, to be the same projection as xAEQD
+                                               location.error = bbdlocationerror.i, # bbdlocationerror.i
+                                               ext = bbdext, # bbdext
+                                               window.size = bbdwindowsize #  must be >=2*margin which is 11 so >=22, but odd so >=23
     )
     
     # data.i$NewEastingUTMmin <- data.i$NewEastingUTM - data.i$bbdlocationerror
@@ -668,8 +673,8 @@ dBBMMhomeRange <- function(
     rm(tmp)
     
     # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: absolute scale
-    area.50 <- sum(values(getVolumeUD(bb) <= .50))
-    area.95 <- sum(values(getVolumeUD(bb) <= .95))
+    area.50 <- sum(raster::values(move::getVolumeUD(bb) <= .50))
+    area.95 <- sum(raster::values(move::getVolumeUD(bb) <= .95))
     
     # Combine in single df
     area.ct <- data.frame(
@@ -718,12 +723,12 @@ dBBMMhomeRange <- function(
     
     # Export aggregated individual UDs to as ascii files for further exploration/spatial analysis in GIS software.
     # Needed for when the aim is to plot population-level and normalized UDs per species.
-    writeRaster(bb, # x has unequal horizontal and vertical resolutions. Such data cannot be stored in arc-ascii format
-                paste0(savedir, filename = i, writeRasterExtension),
-                format = writeRasterFormat, # "ascii"
-                datatype = writeRasterDatatype, # "FLT4S"
-                if (writeRasterFormat != "CDF") bylayer = TRUE, # bylayer kills ncdf4
-                overwrite = TRUE)
+    raster::writeRaster(bb, # x has unequal horizontal and vertical resolutions. Such data cannot be stored in arc-ascii format
+                        paste0(savedir, filename = i, writeRasterExtension),
+                        format = writeRasterFormat, # "ascii"
+                        datatype = writeRasterDatatype, # "FLT4S"
+                        if (writeRasterFormat != "CDF") bylayer = TRUE, # bylayer kills ncdf4
+                        overwrite = TRUE)
     # Error in .startAsciiWriting(x, filename, ...):x has unequal horizontal and vertical resolutions. Such data cannot be stored in arc-ascii format
     # writeRasterFormat = "ascii"
     # writeRasterExtension = ".asc"
@@ -737,8 +742,8 @@ dBBMMhomeRange <- function(
   } # close for i in unique data$ID
   
   # Put everything in a data.frame
-  md <- bind_rows(bb.list,
-                  .id = "column_label"
+  md <- dplyr::bind_rows(bb.list,
+                         .id = "column_label"
   ) %>%
     dplyr::select(!column_label) # remove column_label column
   
@@ -760,3 +765,7 @@ dBBMMhomeRange <- function(
   # }
   
 } # close function
+
+utils::globalVariables("where") # https://github.com/r-lib/tidyselect/issues/201
+# https://stackoverflow.com/questions/40251801/how-to-use-utilsglobalvariables
+# https://github.com/r-lib/tidyselect/issues/248

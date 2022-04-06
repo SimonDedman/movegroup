@@ -17,5 +17,6 @@ import(
   sf,
   shapefiles,
   stats,
-  stringi
+  stringi,
+  tidyselect
 )
