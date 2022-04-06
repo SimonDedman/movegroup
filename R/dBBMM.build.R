@@ -1,6 +1,6 @@
-#' Automated Boosted Regression Tree modelling and mapping suite
+#' Succinct title 8 words max
 #'
-#' Automates delta log normal boosted regression trees abundance prediction.
+#' Description paragraph: Automates delta log normal boosted regression trees abundance prediction.
 #' Loops through all permutations of parameters provided (learning
 #' rate, tree complexity, bag fraction), chooses the best, then simplifies it.
 #' Generates line, dot and bar plots, and outputs these and the predictions
@@ -11,55 +11,60 @@
 #' suggestions. See SimonDedman.com for links to walkthrough paper, and papers
 #' and thesis published using this package.
 #'
-#' @param grids Explantory data to predict to. Import with (e.g.) read.csv and
-#' specify object name. Defaults to NULL (won't predict to grids).
+#' @param data Data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping columns.
+#' @param ID Column name of IDs of individuals.
+#' @param Datetime Name of Datetime column. Must be in POSIXct format.
+#' @param Lat Name of Lat & Lon columns in data.
+#' @param Lon Name of Lat & Lon columns in data.
+#' @param Group Name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?.
+#' @param dat.TZ Timezone for as.POSIXct.
+#' @param proj CRS for move function.
+#' @param projectedCRS EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone.
+#' @param sensor Sensor for move function. Single character or vector with length of the number of coordinates. Optional.
+#' @param moveLocError Location error in metres for move function. Numeric. Either single or a vector of lenth nrow data.
+#' @param timeDiffLong Threshold length of time in timeDiffUnits designating long breaks in relocations.
+#' @param timeDiffUnits Units for time difference for move function.
+#' @param center Centre move object within extent? See spTransform.
+#' @param buffpct Buffer extent for raster creation, proportion of 1.
+#' @param rasterExtent If NULL, raster extent calculated from data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 for ymax. Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash.
+#' @param rasterCRS CRS for raster creation.
+#' @param rasterResolution Numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km.
+#' @param bbdlocationerror Location.error param in brownian.bridge.dyn. Could use the same as moveLocError?.
+#' @param bbdext Ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.
+#' @param bbdwindowsize window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
+#' @param writeRasterFormat ascii.
+#' @param writeRasterExtension .asc.
+#' @param writeRasterDatatype FLT4S.
+#' @param absVolumeAreaSaveName VolumeArea_AbsoluteScale.csv.
+#' @param savedir Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here.
+#' @param alerts Audio warning for failures.
 #' 
-#' @return Line, dot and bar plots, a report of all variables used, statistics
-#' for tests, variable interactions, predictors used and dropped, etc. If
-#' selected generates predicted abundance maps, and Unrepresentativeness surface
+#' @return what are the outputs?
 #'
 #' @details Errors and their origins:
 #' @examples
 #' \donttest{
-#' # Not run. Note: grids file was heavily cropped for CRAN upload so output map
-#' # predictions only cover patchy chunks of the Irish Sea, not the whole area.
-#' # Full versions of these files:
-#' # https://drive.google.com/file/d/1WHYpftP3roozVKwi_R_IpW7tlZIhZA7r
-#' # /view?usp=sharing
-#' library(gbm.auto)
-#' data(grids)
-#' data(samples)
-#' # Set your working directory
-#' gbm.auto(grids = grids, samples = samples, expvar = c(4:8, 10), resvar = 11,
-#' tc = c(2,7), lr = c(0.005, 0.001), ZI = TRUE, savegbm = FALSE)}
+#' # Not run
+#' }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #'
 #' @export
 
-#' @import dplyr
-#' @import devtools
 # install_git('https://gitlab.com/bartk/move.git') #Installs 'move' development version
-#' @import move
-#' @import ggplot2
-#' @import maptools
-#' @import circular
-#' @import ggmap
-#' @import mapproj
-#' @import knitr
-#' @import magrittr %<>%
-#' @import tidyr drop_na
-#' @import tidylog verbose functions
-#' @import raster
-#' @import sf
-#' @import sp SpatialPoints and maybe others
-#' @import knitr
-#' @import lubridate today() and other datetime operations as needed.
-#' @import stars ggplot rasters in plot sections.
-#' @import starsExtra ggplot rasters in plot sections; trim2
 #' @import utils
+#' @importFrom sp CRS SpatialPoints spTransform proj4string
+#' @importFrom beepr beep
+#' @importFrom dplyr mutate rename group_by summarise filter semi_join distinct ungroup arrange across bind_cols pull
+#' @importFrom tidyr drop_na
+#' @importFrom raster raster projectExtent res ncell setValues calc values writeRaster
+#' @importFrom move move timeLag burst brownian.bridge.dyn getVolumeUD
 #' @importFrom rlang .data
-
+#' @importFrom magrittr %<>% %>%
+#' @importFrom grDevices graphics.off
+#' @importFrom graphics par
+#' @importFrom methods new
+#' @importFrom stats setNames
 
 dBBMMhomeRange <- function(
     data = NULL, # data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping columns.
@@ -102,9 +107,9 @@ dBBMMhomeRange <- function(
   
   # source("scaleraster.R") # might not be needed if included as function in same package
   
-  utils::globalVariables("where") # https://github.com/r-lib/tidyselect/issues/201
-  # https://stackoverflow.com/questions/40251801/how-to-use-utilsglobalvariables
-  # https://github.com/r-lib/tidyselect/issues/248
+  # @import circular
+  # @import devtools
+  # @import knitr
   
   oldpar <- par(no.readonly = TRUE) # defensive block, thanks to Gregor Sayer
   oldwd <- getwd()
@@ -114,7 +119,7 @@ dBBMMhomeRange <- function(
   on.exit(options(oldoptions), add = TRUE)
   setwd(savedir)
   if (alerts) options(error = function() {
-    beep(9)# give warning noise if it fails
+    beepr::beep(9)# give warning noise if it fails
     graphics.off()# kill all graphics devices
     setwd(oldwd) # reinstate original working directory. Probably redundant given on.exit
   } # close options subcurly
@@ -122,7 +127,7 @@ dBBMMhomeRange <- function(
   
   # library(sp)
   # library(move)
-  if (writeRasterFormat == "CDF") library(ncdf4)
+  # if (writeRasterFormat == "CDF") library(ncdf4)
   # do this for other formats?####
   
   
@@ -170,6 +175,8 @@ dBBMMhomeRange <- function(
                 Lat = .data[[Lat]],
                 Lon = .data[[Lon]]) %>%
     dplyr::mutate(ID = make.names(ID))
+  
+  if (!any(class(data$Datetime) == "POSIXct")) stop("Datetime column must be POSIXct")
   
   # Add movelocationerror and bbdlocationerror as columns if they're vectors, else their length
   # desyncs from nrow(data) if any IDs < windowsize
@@ -320,9 +327,6 @@ dBBMMhomeRange <- function(
     dplyr::ungroup() # 1253 x 7 after removing as.numeric above
   
   
-  
-  
-  
   # Make a raster for the UD to plot into. Start with UTM.
   # These coordinates need to be big enough to cover your data.
   # May need to expand x and y ranges (i.e. the "e" variable below) if you encounter errors when constructing the DBBMM in the next code chunk.
@@ -370,21 +374,22 @@ dBBMMhomeRange <- function(
   alldata <- data %>%
     dplyr::arrange(Datetime) %>%
     dplyr::group_by(Datetime) %>% # remove duplicates
-    dplyr::summarise(dplyr::across(tidyselect::where(~ is.numeric(.)), mean, na.rm = TRUE),
-                     dplyr::across(tidyselect::where(~ is.character(.) | is.POSIXt(.)), dplyr::first())) %>% # library(lubridate)
-    dplyr::mutate(dplyr::across(tidyselect::where(~ is.numeric(.)), ~ ifelse(is.nan(.), NA, .)), #convert NaN to NA. POSIX needs lubridate
-                  dplyr::across(tidyselect::where(~ is.character(.)), ~ ifelse(is.nan(.), NA, .))) %>% # https://community.rstudio.com/t/why-does-tidyrs-fill-work-with-nas-but-not-nans/25506/5
-    dplyr::ungroup() # Joining, by = c("toppid", "Date")
+    dplyr::summarise(dplyr::across(where(~ is.numeric(.)), mean, na.rm = TRUE),
+                     dplyr::across(where(~ is.character(.) | is.POSIXt(.)), dplyr::first)) %>% # library(lubridate)
+    dplyr::mutate(dplyr::across(where(~ is.numeric(.)), ~ ifelse(is.nan(.), NA, .)), #convert NaN to NA. POSIX needs lubridate
+                  dplyr::across(where(~ is.character(.)), ~ ifelse(is.nan(.), NA, .))) %>% # https://community.rstudio.com/t/why-does-tidyrs-fill-work-with-nas-but-not-nans/25506/5
+    dplyr::ungroup()
   
   alldata <- as.data.frame(alldata)
   moveall <- move::move(
-    x = alldata$Lon,
-    y = alldata$Lat,
-    time = alldata$Datetime,
-    proj = proj,
-    data = alldata,
+    x = alldata$Lon, # numeric vector with x coordinates if non-Movebank data are provided (e.g. data$x).
+    y = alldata$Lat, # numeric vector with y coordinates if non-Movebank data are provided (e.g. data$y).
+    time = alldata$Datetime, # vector of time stamps with POSIXct conversion if non-Movebank data are provided,
+    # i.e. as.POSIXct(data$timestamp, format="%Y-%m-%d %H:%M:%S", tz="UTC")
+    data = alldata, # extra data associated with the relocations
+    proj = proj, # projection method for non-Movebank data; requires a valid CRS (see CRS-class) object, e.g. CRS("+proj=longlat +ellps=WGS84")
     # animal = data$ID,
-    sensor = sensor
+    sensor = sensor # Sensor name(s), either single character or a vector with length of the number of coordinates.
   )
   # document() error####
   # Error in (function (classes, fdef, mtable): unable to find an inherited method for function ‘move’ for signature ‘"numeric", "numeric", "character", "data.frame", "CRS"’
@@ -666,10 +671,10 @@ dBBMMhomeRange <- function(
     # Occurring errors are "due to limits of accuracy during calculations.
     # Given the error is really small (<.000001 %) I would not worry to much and re-standardize".
     # Then aggregate UD segments.
-    tmp <- calc(bursted_dbbmm, sum) # raster::calc :Calculate values for a new Raster* object from another Raster* object
+    tmp <- raster::calc(bursted_dbbmm, sum) # raster::calc :Calculate values for a new Raster* object from another Raster* object
     # using a formula. returns a RasterLayer if fun returns a single value (e.g. sum)
     rm(bursted_dbbmm)
-    bb <- new(".UD", tmp / sum(values(tmp))) # new() creates object from Class ("UD.")
+    bb <- new(".UD", tmp / sum(raster::values(tmp))) # new() creates object from Class ("UD.")
     rm(tmp)
     
     # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: absolute scale
@@ -765,7 +770,3 @@ dBBMMhomeRange <- function(
   # }
   
 } # close function
-
-utils::globalVariables("where") # https://github.com/r-lib/tidyselect/issues/201
-# https://stackoverflow.com/questions/40251801/how-to-use-utilsglobalvariables
-# https://github.com/r-lib/tidyselect/issues/248

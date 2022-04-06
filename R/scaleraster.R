@@ -14,17 +14,16 @@
 #' suggestions. See SimonDedman.com for links to walkthrough paper, and papers
 #' and thesis published using this package.
 #'
-#' @param grids Explanatory data to predict to. Import with (e.g.) read.csv and
-#' specify object name. Defaults to NULL (won't predict to grids).
-#' @param path no terminal slash.
-#' @param pattern default ".asc".
-#' @param format default "ascii".
-#' @param datatype default "FLT4S".
-#' @param bylayer default TRUE.
-#' @param overwrite default TRUE.
-#' @param scalefolder default "Scaled".
-#' @param summedname default "All_Rasters_Summed".
-#' @param scaledname default "All_Rasters_Scaled".
+#' @param path No terminal slash.
+#' @param pattern Default ".asc".
+#' @param format Default "ascii".
+#' @param datatype Default "FLT4S".
+#' @param bylayer Default TRUE.
+#' @param overwrite Default TRUE.
+#' @param scalefolder Default "Scaled".
+#' @param summedname Default "All_Rasters_Summed".
+#' @param scaledname Default "All_Rasters_Scaled".
+#' @param crsloc Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
 #' @param returnObj Logical. Return the scaled object to the parent environment? Default FALSE.
 #' 
 #' @return Line, dot and bar plots, a report of all variables used, statistics
@@ -34,25 +33,17 @@
 #' @details Errors and their origins:
 #' @examples
 #' \donttest{
-#' # Not run. Note: grids file was heavily cropped for CRAN upload so output map
-#' # predictions only cover patchy chunks of the Irish Sea, not the whole area.
-#' # Full versions of these files:
-#' # https://drive.google.com/file/d/1WHYpftP3roozVKwi_R_IpW7tlZIhZA7r
-#' # /view?usp=sharing
-#' library(gbm.auto)
-#' data(grids)
-#' data(samples)
-#' # Set your working directory
-#' gbm.auto(grids = grids, samples = samples, expvar = c(4:8, 10), resvar = 11,
-#' tc = c(2,7), lr = c(0.005, 0.001), ZI = TRUE, savegbm = FALSE)}
-#'
+#' # Not run
+#' }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #'
 #' @export
 
-#' @import raster
-#' @import magrittr
+#' @importFrom raster raster setMinMax res maxValue writeRaster stack stackApply nlayers projectExtent crs projectRaster values
+#' @importFrom magrittr %<>% %>%
+#' @importFrom stringr str_remove
+#' @importFrom sp CRS
 
 scaleraster <- function(path = NULL, # Location of files created by dBBMM.build. No terminal slash.
                         pattern = ".asc",
@@ -74,16 +65,16 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
 
   # Read in rasters and add to list
   rasterlist <-
-    lapply(filelist, function(x) raster(paste0(path, "/", x))) %>% # read in rasters
-    lapply(function(x) setMinMax(x)) # set minmax values
-  names(rasterlist) <- str_remove(filelist, pattern = pattern) # Name the list object (raster); need to get rid of extension e.g. ".asc"
+    lapply(filelist, function(x) raster::raster(paste0(path, "/", x))) %>% # read in rasters
+    lapply(function(x) raster::setMinMax(x)) # set minmax values
+  names(rasterlist) <- stringr::str_remove(filelist, pattern = pattern) # Name the list object (raster); need to get rid of extension e.g. ".asc"
   
   # get resolution from first raster in rasterlist (they all have same res), assign it object, squared
-  rasterres <- (res(rasterlist[[1]])[1]) ^ 2
+  rasterres <- (raster::res(rasterlist[[1]])[1]) ^ 2
 
   # Get max of maxes
   scalemax <-
-    lapply(rasterlist, function(x) maxValue(x)) %>% # extract maxes
+    lapply(rasterlist, function(x) raster::maxValue(x)) %>% # extract maxes
     unlist() %>% # to vector
     max(na.rm = TRUE) # get max of maxes
 
@@ -93,7 +84,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   rasterlist %<>%
     lapply(function(x) x / scalemax) %>% # scale to max of maxes
     # lapply(function(x) x / cellStats(x, stat = 'max')) %>% # scale to individual max
-    lapply(function(x) writeRaster(x = x, # resave individual rasters
+    lapply(function(x) raster::writeRaster(x = x, # resave individual rasters
                                    filename = paste0(path, "/", scalefolder, "/", names(x)), # , pattern: removed ability to resave as different format
                                    # error: adds X to start of numerical named objects####
                                    format = format,
@@ -127,8 +118,8 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   rasterstack <- raster::stack(x = rasterlist)
   # for nc: Error in compareRaster(x) : different extent: still need to fix this in build.R####
   
-  All_Rasters_Summed <- stackApply(x = rasterstack, # Raster* object or list of
-                                   indices = rep(1, nlayers(rasterstack)), # Vector of length nlayers(x), performs the function (sum) PER UNIQUE index, i.e. 1:5 = 5 unique sums.
+  All_Rasters_Summed <- raster::stackApply(x = rasterstack, # Raster* object or list of
+                                   indices = rep(1, raster::nlayers(rasterstack)), # Vector of length nlayers(x), performs the function (sum) PER UNIQUE index, i.e. 1:5 = 5 unique sums.
                                    fun = sum, # returns a single value, e.g. mean or min, and that takes a na.rm argument
                                    na.rm = TRUE, # If TRUE, NA cells are removed from calculations
                                    filename = paste0(path, "/", scalefolder, "/", summedname, pattern), # character. Optional output filename, causes file to be written
@@ -139,9 +130,9 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
 
   # another rescaling from 0 to 1
   # Should result in a single aggregated or ‘group’ level UD
-  All_Rasters_Summed %<>% setMinMax()
-  All_Rasters_Scaled <- All_Rasters_Summed / maxValue(All_Rasters_Summed)
-  writeRaster(x = All_Rasters_Scaled, # resave individual rasters
+  All_Rasters_Summed %<>% raster::setMinMax()
+  All_Rasters_Scaled <- All_Rasters_Summed / raster::maxValue(All_Rasters_Summed)
+  raster::writeRaster(x = All_Rasters_Scaled, # resave individual rasters
               filename = paste0(path, "/", scalefolder, "/", scaledname, pattern),
               format = format,
               datatype = datatype,
@@ -150,20 +141,20 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   
   # change projection of All_Rasters_Scaled to latlon for proper plotting
   dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
-  crs(All_Rasters_Scaled) <- dataCRS
+  raster::crs(All_Rasters_Scaled) <- dataCRS
   # proj = CRS("+proj=longlat +datum=WGS84")
   
   
-  All_Rasters_Scaled_LatLon <- projectExtent(object = All_Rasters_Scaled, crs = CRS("+proj=longlat")) # crs = proj
+  All_Rasters_Scaled_LatLon <- raster::projectExtent(object = All_Rasters_Scaled, crs = sp::CRS("+proj=longlat")) # crs = proj
   # returns RasterLayer with projected extent, but no values. Can be adjusted (e.g. by setting its 
   # resolution) and used as a template 'to' in projectRaster.
   
   # change res so x & y match. Kills values
-  res(All_Rasters_Scaled_LatLon) <- rep(mean(res(All_Rasters_Scaled_LatLon)), 2)
+  raster::res(All_Rasters_Scaled_LatLon) <- rep(mean(raster::res(All_Rasters_Scaled_LatLon)), 2)
   # TODO: increase res if blocky? do further up?####
   
   
-  All_Rasters_Scaled_LatLon <- projectRaster(from = All_Rasters_Scaled,
+  All_Rasters_Scaled_LatLon <- raster::projectRaster(from = All_Rasters_Scaled,
                                              to = All_Rasters_Scaled_LatLon)
   
   # All_Rasters_Scaled_LatLon <- projectRaster(from = All_Rasters_Scaled, crs = proj) # 2958
@@ -187,7 +178,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   # names      : All_Rasters_Summed 
   # values     : 0, 0.8578524  (min, max)
   
-  writeRaster(x = All_Rasters_Scaled_LatLon, # resave individual rasters
+  raster::writeRaster(x = All_Rasters_Scaled_LatLon, # resave individual rasters
               filename = paste0(path, "/", scalefolder, "/", scaledname, "_LatLon", pattern),
               format = format,
               datatype = datatype,
@@ -195,15 +186,15 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
               overwrite = overwrite)
   
   # Calculate individual scaled ("relative") UD areas
-  area.50 <- rasterlist %>% sapply(function(x) length(which(values(x) >= 0.5))) # 50%
+  area.50 <- rasterlist %>% sapply(function(x) length(which(raster::values(x) >= 0.5))) # 50%
   area.50 <- round(area.50 * rasterres, 1) # convert from cells to metres squared area
-  area.95 <- rasterlist %>% sapply(function(x) length(which(values(x) >= 0.05))) # 95%
+  area.95 <- rasterlist %>% sapply(function(x) length(which(raster::values(x) >= 0.05))) # 95%
   area.95 <- round(area.95 * rasterres, 1)
   area.ct <- data.frame(core.use = area.50, general.use = area.95) # Combine in single df
   area.ct$ID <- row.names(area.ct) # create ID column from row.names
   row.names(area.ct) <- NULL # kill row.names, reverts to 1,2,3
-  area.ct <- rbind(area.ct, c(round(length(which(values(All_Rasters_Scaled) >= 0.5)) * rasterres, 1), # add a row for All_Rasters_Scaled
-                                    round(length(which(values(All_Rasters_Scaled) >= 0.05)) * rasterres, 1),
+  area.ct <- rbind(area.ct, c(round(length(which(raster::values(All_Rasters_Scaled) >= 0.5)) * rasterres, 1), # add a row for All_Rasters_Scaled
+                                    round(length(which(raster::values(All_Rasters_Scaled) >= 0.05)) * rasterres, 1),
                               "All_Rasters_Scaled"
                               )
                    )

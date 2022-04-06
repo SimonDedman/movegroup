@@ -1,8 +1,52 @@
+#' Succinct title 8 words max
+#'
+#' Description paragraph: Automates delta log normal boosted regression trees abundance prediction.
+#' Loops through all permutations of parameters provided (learning
+#' rate, tree complexity, bag fraction), chooses the best, then simplifies it.
+#' Generates line, dot and bar plots, and outputs these and the predictions
+#' and a report of all variables used, statistics for tests, variable
+#' interactions, predictors used and dropped, etc. If selected, generates
+#' predicted abundance maps, and Unrepresentativeness surfaces.
+#' See www.GitHub.com/SimonDedman/gbm.auto for issues, feedback, and development
+#' suggestions. See SimonDedman.com for links to walkthrough paper, and papers
+#' and thesis published using this package.
+#'
 #' @import ggplot2
+#' @importFrom stars read_stars st_raster_type st_contour
+#' @importFrom magrittr %<>%
+#' @importFrom lubridate today
 #' @importFrom ggmap get_map
+#' @importFrom sf st_set_crs st_bbox st_transform st_as_sfc
+#' @importFrom starsExtra trim2
+#' @export
+#' 
+#' @param x Path to scaled data.
+#' @param trim Remove NA & 0 values and crop to remaining date extents? Default TRUE.
+#' @param myLocation Location for extents, format c(xmin, ymin, xmax, ymax). Default NULL, extents autocreated from data.
+#' @param googlemap If pulling basemap from Google maps, this sets expansion factors since Google Maps tiling zoom setup doesn't align to myLocation extents.
+#' @param gmapsAPI Enter your google maps API here, quoted character string.
+#' @param expandfactor Extents expansion factor for basemap. 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out). 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
+#' @param mapzoom Google: 3 (continent) - 21 (building). stamen: 0-18.
+#' @param mapsource Source for ggmap::get_map; uses Stamen as fallback if no Goole Maps API present.
+#' @param maptype Type of map for ggmap::get_map.
+#' @param contour1colour Colour for contour 1, typically 95pct.
+#' @param contour2colour Colour for contour 2, typically 50pct.
+#' @param plottitle Can use the term 'home range' when an animal can be detected wherever it goes
+#' i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic receivers cover 
+#' the entire home range of the study species. This term is problematic when applied to a passive 
+#' acoustic telemetry setting where an array of non-overlapping receivers are used to assess local 
+#' space use patterns i.e. the home range is bigger than the coverage by the acoustic array; put in Details.
+#' @param plotsubtitle Plot subtitle.
+#' @param legendtitle Legend title.
+#' @param plotcaption Plot caption.
+#' @param axisxlabel Longitude.
+#' @param axisylabel Latitude.
+#' @param legend.position Vector of 2, format c(1,2), from L to R, pct dist from Bot to Top, values 0 to 1.
+#' @param filesavename File savename.
+#' @param savedir Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here.
 
-dBBMM_plot <- function(
-    x = paste0(data.dir, "Scaled/All_Rasters_Scaled.asc"), # path to scaled data
+dBBMMplot <- function(
+    x = paste0("Scaled/All_Rasters_Scaled.asc"), # path to scaled data
     # dataCRS = 2958, # one of (i) character: a string accepted by GDAL, (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs.
     trim = TRUE, # remove NA & 0 values and crop to remaining date extents? Default TRUE
     myLocation = NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
@@ -29,11 +73,11 @@ dBBMM_plot <- function(
     # i.e. the home range is bigger than the coverage by the acoustic array; put in Details
     plotsubtitle = "Scaled contours. n = 13", # data %>% distinct(ID) %>% nrow() # 13
     legendtitle = "Percent UD Contours",
-    plotcaption = paste0("dBBMM_HomeRange, ", today()),
+    plotcaption = paste0("dBBMM_HomeRange, ", lubridate::today()),
     axisxlabel = "Longitude",
     axisylabel = "Latitude",
     legend.position = c(0.16, 0.92), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top.
-    filesavename = paste0(today(), "_dBBMM-contours.png"),
+    filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
     savedir = tempdir() # file.path(work.dir, out.dir, "Scaled")
 ) {
   # ToDo
@@ -42,10 +86,6 @@ dBBMM_plot <- function(
   # gMaps API tutorial
   # trim section optional, depends magrittr
   # 50 & 95% breaks could be editable as function params but will be a bit of work
-  
-  library(stars) # read_stars
-  library(ggmap) # get_map
-  library(magrittr) # %<>%
   
   # tmp <- raster(x)
   # setMinMax(tmp)
@@ -56,10 +96,12 @@ dBBMM_plot <- function(
   
   
   # Import raster
-  x <- read_stars(x) %>% st_set_crs(4326) # 4326 2958
+  x <- stars::read_stars(x) %>% sf::st_set_crs(4326) # 4326 2958
   # read_stars doens't have most of the info that raster() has
   # class(dataCRS)
-  if (stars:::is_curvilinear(x)) stop(print("x is curvilinear; first reproject to planar"))
+  if (stars::st_raster_type(x) == "curvilinear") stop(print("x is curvilinear; first reproject to planar"))
+  # Warning message: object ‘is_curvilinear’ is not exported by 'namespace:stars'
+  # https://github.com/r-spatial/stars/issues/464
   
   y <- x # make dupe object else removing all data < 0.05 means the 0.05 contour doesn't work in ggplot
   if (trim) { # trim raster extent to data?
@@ -68,7 +110,7 @@ dBBMM_plot <- function(
   }
     y %<>% starsExtra::trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
   
-  if (is.null(myLocation)) myLocation <- st_bbox(y) %>% as.vector() # st_bbox(y %>% st_transform(4326))
+  if (is.null(myLocation)) myLocation <- sf::st_bbox(y) %>% as.vector() # st_bbox(y %>% st_transform(4326))
   
   # Create basemap with gbm.auto####
   # # Remove gbm.auto from dependency at top if not using
@@ -102,7 +144,7 @@ dBBMM_plot <- function(
     if (googlemap) myLocation <- c(mean(c(myLocation[1], myLocation[3])), mean(c(myLocation[2], myLocation[4]))) # googlemap needs a center lon lat
   }
   
-  myMap <- get_map(
+  myMap <- ggmap::get_map(
     location = myLocation, # -62.57564  28.64368  33.78889  63.68533 # stamen etc want a bounding box
     zoom = mapzoom, # 3 (continent) - 21 (building)
     # scale = "auto", # default "auto", 1, 2, 4 all the same
@@ -127,7 +169,7 @@ dBBMM_plot <- function(
     map_bbox <- setNames(unlist(attr(map, "bb")), c("ymin", "xmin", "ymax", "xmax"))
     # Convert the bbox to an sf polygon, transform it to 3857, 
     # and convert back to a bbox (convoluted, but it works)
-    bbox_3857 <- st_bbox(st_transform(st_as_sfc(st_bbox(map_bbox, crs = 4326)), 3857))
+    bbox_3857 <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(sf::st_bbox(map_bbox, crs = 4326)), 3857))
     # Overwrite the bbox of the ggmap object with the transformed coordinates 
     attr(map, "bb")$ll.lat <- bbox_3857["ymin"]
     attr(map, "bb")$ll.lon <- bbox_3857["xmin"]
@@ -144,21 +186,21 @@ dBBMM_plot <- function(
   # attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]] # latitude, y, height
   autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]]) * 1.2
   
-  ggmap(myMap) +
-    geom_sf(data = st_contour(x = x,
+  ggmap::ggmap(myMap) +
+    ggplot2::geom_sf(data = stars::st_contour(x = x,
                               contour_lines = TRUE, # makes lines not polys regardless of T or F
                               breaks = max(x[[1]], na.rm = TRUE) * 0.05
     ) %>%
       # breaks could be function param, but only allows 2 breaks. Whatevs ####
-    st_transform(3857), # Vector transform after st_contour()  4326
+    sf::st_transform(3857), # Vector transform after st_contour()  4326
     fill = NA, inherit.aes = FALSE,
-    aes(colour = "UD_95_pct")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
-    geom_sf(data = st_contour(x = x,
+    ggplot2::aes(colour = "UD_95_pct")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
+    ggplot2::geom_sf(data = stars::st_contour(x = x,
                               contour_lines = TRUE,
                               breaks = max(x[[1]], na.rm = TRUE) * 0.5
     ) %>%
-      st_transform(3857), fill = NA, inherit.aes = FALSE, aes(colour = "UD_50_pct")) +
-    scale_colour_manual(name = legendtitle, values = c(UD_95_pct = contour1colour, UD_50_pct = contour2colour)) +
+      sf::st_transform(3857), fill = NA, inherit.aes = FALSE, ggplot2::aes(colour = "UD_50_pct")) +
+    ggplot2::scale_colour_manual(name = legendtitle, values = c(UD_95_pct = contour1colour, UD_50_pct = contour2colour)) +
     # https://stackoverflow.com/questions/64425970/ggmap-in-r-keep-google-copyright-information-on-cropped-map
     # scale_x_continuous(limits = c(myLocation[1], myLocation[3]), expand = c(0, 0)) +
     # scale_y_continuous(limits = c(myLocation[2], myLocation[4]), expand = c(0, 0)) +
@@ -167,19 +209,19 @@ dBBMM_plot <- function(
     # Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
     # Warning message:
     #   Removed 1 rows containing missing values (geom_rect). 
-    ggtitle(plottitle, subtitle = plotsubtitle) +
-    labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
-    theme_minimal() +
-    theme(legend.position = legend.position, #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
-          legend.spacing.x = unit(0, 'cm'), #compress spacing between legend items, this is min
-          legend.spacing.y = unit(0, 'cm'), #compress spacing between legend items, this is min
-          legend.title = element_text(size = 8),
-          legend.text = element_text(size = 8),
-          legend.background = element_rect(fill = "white", colour = NA), # element_blank(),
-          panel.background = element_rect(fill = "white", colour = "grey50"), # white background
-          plot.background = element_rect(fill = "white", colour = "grey50"), # white background
-          legend.key = element_blank()) # removed whitespace buffer around legend boxes which is nice
-  ggsave(filename = filesavename, plot = last_plot(), device = "png", path = savedir, scale = 1,
+    ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
+    ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(legend.position = legend.position, #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
+          legend.spacing.x = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
+          legend.spacing.y = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
+          legend.title = ggplot2::element_text(size = 8),
+          legend.text = ggplot2::element_text(size = 8),
+          legend.background = ggplot2::element_rect(fill = "white", colour = NA), # element_blank(),
+          panel.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
+          plot.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
+          legend.key = ggplot2::element_blank()) # removed whitespace buffer around legend boxes which is nice
+  ggplot2::ggsave(filename = filesavename, plot = ggplot2::last_plot(), device = "png", path = savedir, scale = 1,
          #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
          width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)
 } # close function

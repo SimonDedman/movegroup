@@ -1,3 +1,20 @@
+#' Succinct title 8 words max
+#'
+#' Description paragraph: Automates delta log normal boosted regression trees abundance prediction.
+#' Loops through all permutations of parameters provided (learning
+#' rate, tree complexity, bag fraction), chooses the best, then simplifies it.
+#' Generates line, dot and bar plots, and outputs these and the predictions
+#' and a report of all variables used, statistics for tests, variable
+#' interactions, predictors used and dropped, etc. If selected, generates
+#' predicted abundance maps, and Unrepresentativeness surfaces.
+#' See www.GitHub.com/SimonDedman/gbm.auto for issues, feedback, and development
+#' suggestions. See SimonDedman.com for links to walkthrough paper, and papers
+#' and thesis published using this package.
+#' 
+#' @export
+#' @param locations No terminal slash.
+#' @param weightings No terminal slash.
+#' @param saveloc No terminal slash.
 # Mo receiver array doublescale####
 # scale to each receiver array (loop of 3) then scale those together
 # 1. run dBBMM.build.R (change this filename to dBBMMhomeRange.R ?) for each array
