@@ -12,10 +12,10 @@
 #' and thesis published using this package.
 #'
 #' @import ggplot2
+#' @import ggmap
 #' @importFrom stars read_stars st_raster_type st_contour
 #' @importFrom magrittr %<>%
 #' @importFrom lubridate today
-#' @importFrom ggmap get_map
 #' @importFrom sf st_set_crs st_bbox st_transform st_as_sfc
 #' @importFrom starsExtra trim2
 #' @export
@@ -55,12 +55,12 @@ dBBMMplot <- function(
     googlemap = FALSE, # If pulling basemap from Google maps, this sets expansion
     # factors since Google Maps tiling zoom setup doesn't align to myLocation
     # extents.
-    gmapsAPI = NULL, # enter your google maps API here, quoted character string
+    gmapsAPI = NULL, # enter your Google maps API here, quoted character string
     expandfactor = 1.6, # extents expansion factor for basemap.
     # 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out).
     # 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
     mapzoom = 5, # google: 3 (continent) - 21 (building). stamen: 0-18
-    mapsource = "google", # Source for ggmap::get_map; uses Stamen as fallback if no Goole Maps API present.
+    mapsource = "google", # Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.
     maptype = "satellite", # Type of map for ggmap::get_map.
     contour1colour = "red", # colour for contour 1, typically 95%.
     contour2colour = "orange", # colour for contour 2, typically 50%.
