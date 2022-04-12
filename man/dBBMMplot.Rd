@@ -70,7 +70,7 @@ space use patterns i.e. the home range is bigger than the coverage by the acoust
 
 \item{filesavename}{File savename.}
 
-\item{savedir}{Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here.}
+\item{savedir}{Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here. No terminal slash.}
 }
 \description{
 Description paragraph: Automates delta log normal boosted regression trees abundance prediction.

@@ -43,7 +43,7 @@
 #' @param axisylabel Latitude.
 #' @param legend.position Vector of 2, format c(1,2), from L to R, pct dist from Bot to Top, values 0 to 1.
 #' @param filesavename File savename.
-#' @param savedir Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here.
+#' @param savedir Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here. No terminal slash.
 
 dBBMMplot <- function(
     x = paste0("Scaled/All_Rasters_Scaled.asc"), # path to scaled data

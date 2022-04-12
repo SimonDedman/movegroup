@@ -59,10 +59,10 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   # library(raster)
   # If path has a terminal slash, remove it, it's added later
   if (substr(x = path, start = nchar(path), stop = nchar(path)) == "/") path = substr(x = path, start = 1, stop = nchar(path) - 1)
-
+  
   # Pull all raster names from path into a list
   filelist <- as.list(list.files(path = path, pattern = pattern))
-
+  
   # Read in rasters and add to list
   rasterlist <-
     lapply(filelist, function(x) raster::raster(paste0(path, "/", x))) %>% # read in rasters
@@ -71,27 +71,27 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   
   # get resolution from first raster in rasterlist (they all have same res), assign it object, squared
   rasterres <- (raster::res(rasterlist[[1]])[1]) ^ 2
-
+  
   # Get max of maxes
   scalemax <-
     lapply(rasterlist, function(x) raster::maxValue(x)) %>% # extract maxes
     unlist() %>% # to vector
     max(na.rm = TRUE) # get max of maxes
-
+  
   # create new folder to save to
   dir.create(paste0(path, "/", scalefolder))
-
+  
   rasterlist %<>%
     lapply(function(x) x / scalemax) %>% # scale to max of maxes
     # lapply(function(x) x / cellStats(x, stat = 'max')) %>% # scale to individual max
     lapply(function(x) raster::writeRaster(x = x, # resave individual rasters
-                                   filename = paste0(path, "/", scalefolder, "/", names(x)), # , pattern: removed ability to resave as different format
-                                   # error: adds X to start of numerical named objects####
-                                   format = format,
-                                   datatype = datatype,
-                                   if (format != "CDF") bylayer = bylayer,
-                                   overwrite = overwrite))
-
+                                           filename = paste0(path, "/", scalefolder, "/", names(x)), # , pattern: removed ability to resave as different format
+                                           # error: adds X to start of numerical named objects####
+                                           format = format,
+                                           datatype = datatype,
+                                           if (format != "CDF") bylayer = bylayer,
+                                           overwrite = overwrite))
+  
   # extentlist <- lapply(rasterlist, function(x) data.frame(xmin = as.vector(extent(x))[1],
   #                                                         xmax = as.vector(extent(x))[2],
   #                                                         ymin = as.vector(extent(x))[3],
@@ -119,25 +119,25 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   # for nc: Error in compareRaster(x) : different extent: still need to fix this in build.R####
   
   All_Rasters_Summed <- raster::stackApply(x = rasterstack, # Raster* object or list of
-                                   indices = rep(1, raster::nlayers(rasterstack)), # Vector of length nlayers(x), performs the function (sum) PER UNIQUE index, i.e. 1:5 = 5 unique sums.
-                                   fun = sum, # returns a single value, e.g. mean or min, and that takes a na.rm argument
-                                   na.rm = TRUE, # If TRUE, NA cells are removed from calculations
-                                   filename = paste0(path, "/", scalefolder, "/", summedname, pattern), # character. Optional output filename, causes file to be written
-                                   format = format,
-                                   datatype = datatype,
-                                   bylayer = bylayer,
-                                   overwrite = overwrite)
-
+                                           indices = rep(1, raster::nlayers(rasterstack)), # Vector of length nlayers(x), performs the function (sum) PER UNIQUE index, i.e. 1:5 = 5 unique sums.
+                                           fun = sum, # returns a single value, e.g. mean or min, and that takes a na.rm argument
+                                           na.rm = TRUE, # If TRUE, NA cells are removed from calculations
+                                           filename = paste0(path, "/", scalefolder, "/", summedname, pattern), # character. Optional output filename, causes file to be written
+                                           format = format,
+                                           datatype = datatype,
+                                           bylayer = bylayer,
+                                           overwrite = overwrite)
+  
   # another rescaling from 0 to 1
   # Should result in a single aggregated or ‘group’ level UD
   All_Rasters_Summed %<>% raster::setMinMax()
   All_Rasters_Scaled <- All_Rasters_Summed / raster::maxValue(All_Rasters_Summed)
   raster::writeRaster(x = All_Rasters_Scaled, # resave individual rasters
-              filename = paste0(path, "/", scalefolder, "/", scaledname, pattern),
-              format = format,
-              datatype = datatype,
-              bylayer = bylayer,
-              overwrite = overwrite)
+                      filename = paste0(path, "/", scalefolder, "/", scaledname, pattern),
+                      format = format,
+                      datatype = datatype,
+                      bylayer = bylayer,
+                      overwrite = overwrite)
   
   # change projection of All_Rasters_Scaled to latlon for proper plotting
   dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
@@ -155,7 +155,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   
   
   All_Rasters_Scaled_LatLon <- raster::projectRaster(from = All_Rasters_Scaled,
-                                             to = All_Rasters_Scaled_LatLon)
+                                                     to = All_Rasters_Scaled_LatLon)
   
   # All_Rasters_Scaled_LatLon <- projectRaster(from = All_Rasters_Scaled, crs = proj) # 2958
   # with crs 2958:
@@ -179,25 +179,35 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   # values     : 0, 0.8578524  (min, max)
   
   raster::writeRaster(x = All_Rasters_Scaled_LatLon, # resave individual rasters
-              filename = paste0(path, "/", scalefolder, "/", scaledname, "_LatLon", pattern),
-              format = format,
-              datatype = datatype,
-              bylayer = bylayer,
-              overwrite = overwrite)
+                      filename = paste0(path, "/", scalefolder, "/", scaledname, "_LatLon", pattern),
+                      format = format,
+                      datatype = datatype,
+                      bylayer = bylayer,
+                      overwrite = overwrite)
   
   # Calculate individual scaled ("relative") UD areas
   area.50 <- rasterlist %>% sapply(function(x) length(which(raster::values(x) >= 0.5))) # 50%
+  area.50.sd <- sd(area.50)
+  area.50.sd <- round(area.50.sd * rasterres, 1)
   area.50 <- round(area.50 * rasterres, 1) # convert from cells to metres squared area
   area.95 <- rasterlist %>% sapply(function(x) length(which(raster::values(x) >= 0.05))) # 95%
+  area.95.sd <- sd(area.95)
   area.95 <- round(area.95 * rasterres, 1)
-  area.ct <- data.frame(core.use = area.50, general.use = area.95) # Combine in single df
+  area.95.sd <- round(area.95.sd * rasterres, 1)
+  
+  area.ct <- data.frame(core.use = area.50, 
+                        general.use = area.95
+  ) # Combine in single df
   area.ct$ID <- row.names(area.ct) # create ID column from row.names
   row.names(area.ct) <- NULL # kill row.names, reverts to 1,2,3
-  area.ct <- rbind(area.ct, c(round(length(which(raster::values(All_Rasters_Scaled) >= 0.5)) * rasterres, 1), # add a row for All_Rasters_Scaled
-                                    round(length(which(raster::values(All_Rasters_Scaled) >= 0.05)) * rasterres, 1),
-                              "All_Rasters_Scaled"
-                              )
-                   )
+  area.ct <- rbind(area.ct, 
+                   c(round(length(which(raster::values(All_Rasters_Scaled) >= 0.5)) * rasterres, 1), # add a row for All_Rasters_Scaled
+                     round(length(which(raster::values(All_Rasters_Scaled) >= 0.05)) * rasterres, 1),
+                     "All_Rasters_Scaled_Sum"),
+                   c(round(area.50.sd * rasterres, 1),
+                     round(area.95.sd * rasterres, 1),
+                     "All_Rasters_Scaled_SD")
+  )
   
   write.csv(area.ct,
             file = paste0(path, "/", scalefolder, "/","VolumeAreas_ScaledAllFish.csv"),
