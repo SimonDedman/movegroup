@@ -54,6 +54,7 @@
 # install_git('https://gitlab.com/bartk/move.git') #Installs 'move' development version
 #' @import utils
 #' @import magrittr
+#' @importFrom lubridate is.POSIXt
 #' @importFrom sp CRS SpatialPoints spTransform proj4string
 #' @importFrom beepr beep
 #' @importFrom dplyr mutate rename group_by summarise filter semi_join distinct ungroup arrange across bind_cols pull
@@ -375,7 +376,7 @@ dBBMMhomeRange <- function(
     dplyr::arrange(Datetime) %>%
     dplyr::group_by(Datetime) %>% # remove duplicates
     dplyr::summarise(dplyr::across(where(~ is.numeric(.)), mean, na.rm = TRUE),
-                     dplyr::across(where(~ is.character(.) | is.POSIXt(.)), dplyr::first)) %>% # library(lubridate)
+                     dplyr::across(where(~ is.character(.) | lubridate::is.POSIXt(.)), dplyr::first)) %>% # library(lubridate)
     dplyr::mutate(dplyr::across(where(~ is.numeric(.)), ~ ifelse(is.nan(.), NA, .)), #convert NaN to NA. POSIX needs lubridate
                   dplyr::across(where(~ is.character(.)), ~ ifelse(is.nan(.), NA, .))) %>% # https://community.rstudio.com/t/why-does-tidyrs-fill-work-with-nas-but-not-nans/25506/5
     dplyr::ungroup()
