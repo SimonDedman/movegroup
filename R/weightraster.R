@@ -24,7 +24,7 @@
 #' @param overwrite Raster saving detail.
 #' 
 #' @importFrom raster raster setMinMax writeRaster
-#' @importFrom magrittr %<>% %>%
+#' @import magrittr
 #' 
 # Mo receiver array doublescale####
 # scale to each receiver array (loop of 3) then scale those together

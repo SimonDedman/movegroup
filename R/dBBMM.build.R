@@ -53,6 +53,7 @@
 
 # install_git('https://gitlab.com/bartk/move.git') #Installs 'move' development version
 #' @import utils
+#' @import magrittr
 #' @importFrom sp CRS SpatialPoints spTransform proj4string
 #' @importFrom beepr beep
 #' @importFrom dplyr mutate rename group_by summarise filter semi_join distinct ungroup arrange across bind_cols pull
@@ -60,7 +61,6 @@
 #' @importFrom raster raster projectExtent res ncell setValues calc values writeRaster
 #' @importFrom move move timeLag burst brownian.bridge.dyn getVolumeUD
 #' @importFrom rlang .data
-#' @importFrom magrittr %<>% %>%
 #' @importFrom grDevices graphics.off
 #' @importFrom graphics par
 #' @importFrom methods new

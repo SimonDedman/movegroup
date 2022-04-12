@@ -40,8 +40,8 @@
 #'
 #' @export
 
+#' @import magrittr
 #' @importFrom raster raster setMinMax res maxValue writeRaster stack stackApply nlayers projectExtent crs projectRaster values
-#' @importFrom magrittr %<>% %>%
 #' @importFrom stringr str_remove
 #' @importFrom sp CRS
 

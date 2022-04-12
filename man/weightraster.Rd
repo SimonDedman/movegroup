@@ -5,17 +5,42 @@
 \title{Succinct title 8 words max}
 \usage{
 weightraster(
-  locations = c("array1", "array2"),
-  weightings = c(1, 2),
-  saveloc = "location"
+ 
+    locations = c("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/H/Scaled",
+    "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/L/Scaled",
+    "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/M/Scaled"),
+  rasternames = c("H", "L", "M"),
+  pattern = "All_Rasters_Summed.asc",
+  weightings = c(1, 2, 3),
+ 
+    saveloc = "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/Weighted",
+  extension = ".asc",
+  format = "ascii",
+  datatype = "FLT4S",
+  bylayer = TRUE,
+  overwrite = TRUE
 )
 }
 \arguments{
-\item{locations}{No terminal slash.}
+\item{locations}{Character vector of locations of rasters to weight, e.g. locations of All_Rasters_Summed.asc. No terminal slash.}
 
-\item{weightings}{No terminal slash.}
+\item{rasternames}{Same length character vector of names for rasters from locations.}
 
-\item{saveloc}{No terminal slash.}
+\item{pattern}{Names of the raster files in locations, e.g. "All_Rasters_Summed.asc".}
+
+\item{weightings}{Same length numeric vector of weightings to apply to rasters.}
+
+\item{saveloc}{Where to save output rasters. No terminal slash.}
+
+\item{extension}{Extension format of output rasters.}
+
+\item{format}{Raster format for output rasters.}
+
+\item{datatype}{Data type for output rasters.}
+
+\item{bylayer}{Raster saving detail.}
+
+\item{overwrite}{Raster saving detail.}
 }
 \description{
 Description paragraph: Automates delta log normal boosted regression trees abundance prediction.

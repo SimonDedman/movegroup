@@ -13,8 +13,8 @@
 #'
 #' @import ggplot2
 #' @import ggmap
+#' @import magrittr
 #' @importFrom stars read_stars st_raster_type st_contour
-#' @importFrom magrittr %<>%
 #' @importFrom lubridate today
 #' @importFrom sf st_set_crs st_bbox st_transform st_as_sfc
 #' @importFrom starsExtra trim2
