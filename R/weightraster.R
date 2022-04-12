@@ -81,3 +81,16 @@ weightraster <- function(locations = c("/home/simon/Dropbox/PostDoc Work/Rob Bul
   # 5. run plot
   
 } # close function
+
+# weightraster(locations = c("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/H/Scaled",
+#                            "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/L/Scaled",
+#                            "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/M/Scaled"), # assumes they have subfolders called Scaled with files called All_Rasters_Scaled.asc
+#              rasternames = c("H", "L", "M"), # names of rasters
+#              pattern = "All_Rasters_Summed.asc", # 
+#              weightings = c(1, 2, 3), # respective weightings per array
+#              saveloc = "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/Weighted",
+#              extension = ".asc",
+#              format = "ascii",
+#              datatype = "FLT4S",
+#              bylayer = TRUE,
+#              overwrite = TRUE)
