@@ -15,7 +15,7 @@
 #' @param locations Character vector of locations of rasters to weight, e.g. locations of All_Rasters_Summed.asc. No terminal slash.
 #' @param rasternames Same length character vector of names for rasters from locations.
 #' @param pattern Names of the raster files in locations, e.g. "All_Rasters_Summed.asc".
-#' @param weightings Same length numeric vector of weightings to apply to rasters.
+#' @param weightings Same length numeric vector of weightings to apply to rasters. Rasters from locations are divided by their respective value from weightings e.g. raster 1 values divided by weightings 1 value.
 #' @param saveloc Where to save output rasters. No terminal slash.
 #' @param extension Extension format of output rasters.
 #' @param format Raster format for output rasters.
@@ -60,7 +60,7 @@ weightraster <- function(locations = c("/home/simon/Dropbox/PostDoc Work/Rob Bul
     lapply(filelist, function(x) raster::raster(x)) %>% # read in rasters
     lapply(function(x) raster::setMinMax(x)) # set minmax values
   
-  rasterlist <- Map("*", rasterlist, weightings) # multiply values by weightings
+  rasterlist <- Map("/", rasterlist, weightings) # divide values by weightings
   # https://stackoverflow.com/questions/53319000/multiply-columns-of-a-data-table-by-a-vector
   
   rasterlist <- Map(setNames, rasterlist, nm = rasternames)

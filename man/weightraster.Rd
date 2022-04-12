@@ -28,7 +28,7 @@ weightraster(
 
 \item{pattern}{Names of the raster files in locations, e.g. "All_Rasters_Summed.asc".}
 
-\item{weightings}{Same length numeric vector of weightings to apply to rasters.}
+\item{weightings}{Same length numeric vector of weightings to apply to rasters. Rasters from locations are divided by their respective value from weightings e.g. raster 1 values divided by weightings 1 value.}
 
 \item{saveloc}{Where to save output rasters. No terminal slash.}
 
