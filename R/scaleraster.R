@@ -16,6 +16,7 @@
 #'
 #' @param path No terminal slash.
 #' @param pattern Default ".asc".
+#' @param weighting Weighting to divide individual and summed-scaled rasters by, for unbalanced arrays. Individual, Scaled, and Scaled_Weighted rasters, and the volume areas csv, will have weightings applied, but NOT the summed raster.
 #' @param format Default "ascii".
 #' @param datatype Default "FLT4S".
 #' @param bylayer Default TRUE.
@@ -47,6 +48,7 @@
 
 scaleraster <- function(path = NULL, # Location of files created by dBBMM.build. No terminal slash.
                         pattern = ".asc",
+                        weighting = 1, # weighting to divide individual and summed-scaled rasters by, for unbalanced arrays
                         format = "ascii",
                         datatype = "FLT4S",
                         bylayer = TRUE,
@@ -83,7 +85,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   
   rasterlist %<>%
     lapply(function(x) x / scalemax) %>% # scale to max of maxes
-    # lapply(function(x) x / cellStats(x, stat = 'max')) %>% # scale to individual max
+    lapply(function(x) x / weighting) %>% # divide by weighting value
     lapply(function(x) raster::writeRaster(x = x, # resave individual rasters
                                            filename = paste0(path, "/", scalefolder, "/", names(x)), # , pattern: removed ability to resave as different format
                                            # error: adds X to start of numerical named objects####
@@ -138,6 +140,13 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
                       datatype = datatype,
                       bylayer = bylayer,
                       overwrite = overwrite)
+  All_Rasters_Scaled %<>% lapply(function(x) x / weighting) # divide by weighting value
+  raster::writeRaster(x = All_Rasters_Scaled, # resave individual rasters
+                      filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted", pattern),
+                      format = format,
+                      datatype = datatype,
+                      bylayer = bylayer,
+                      overwrite = overwrite)
   
   # change projection of All_Rasters_Scaled to latlon for proper plotting
   dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
@@ -179,7 +188,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   # values     : 0, 0.8578524  (min, max)
   
   raster::writeRaster(x = All_Rasters_Scaled_LatLon, # resave individual rasters
-                      filename = paste0(path, "/", scalefolder, "/", scaledname, "_LatLon", pattern),
+                      filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted_LatLon", pattern),
                       format = format,
                       datatype = datatype,
                       bylayer = bylayer,

@@ -28,7 +28,7 @@
 #' @param buffpct Buffer extent for raster creation, proportion of 1.
 #' @param rasterExtent If NULL, raster extent calculated from data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 for ymax. Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash.
 #' @param rasterCRS CRS for raster creation.
-#' @param rasterResolution Numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km.
+#' @param rasterResolution Single numeric value to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km.
 #' @param bbdlocationerror Location.error param in brownian.bridge.dyn. Could use the same as moveLocError?.
 #' @param bbdext Ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.
 #' @param bbdwindowsize window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
@@ -449,7 +449,9 @@ dBBMMhomeRange <- function(
   rm(x.i)
   
   # change xAEQD res so x & y match. Kills values
-  raster::res(newTemplate) <- rep(mean(raster::res(newTemplate)), 2)
+  # raster::res(newTemplate) <- rep(mean(raster::res(newTemplate)), 2)
+  # Use user res instead of average of the two####
+  raster::res(newTemplate) <- rep(rasterResolution, 2)
   
   # Give newTemplate some values. Make Rep equal to the ncell dimension
   ones <- rep(1, raster::ncell(newTemplate))

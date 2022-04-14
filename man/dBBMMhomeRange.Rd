@@ -69,7 +69,7 @@ dBBMMhomeRange(
 
 \item{rasterCRS}{CRS for raster creation.}
 
-\item{rasterResolution}{Numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km.}
+\item{rasterResolution}{Single numeric value to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km.}
 
 \item{bbdlocationerror}{Location.error param in brownian.bridge.dyn. Could use the same as moveLocError?.}
 

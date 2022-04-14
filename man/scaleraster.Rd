@@ -7,6 +7,7 @@
 scaleraster(
   path = NULL,
   pattern = ".asc",
+  weighting = 1,
   format = "ascii",
   datatype = "FLT4S",
   bylayer = TRUE,
@@ -22,6 +23,8 @@ scaleraster(
 \item{path}{No terminal slash.}
 
 \item{pattern}{Default ".asc".}
+
+\item{weighting}{Weighting to divide individual and summed-scaled rasters by, for unbalanced arrays. Individual, Scaled, and Scaled_Weighted rasters, and the volume areas csv, will have weightings applied, but NOT the summed raster.}
 
 \item{format}{Default "ascii".}
 
