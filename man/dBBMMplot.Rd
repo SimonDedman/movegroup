@@ -5,7 +5,7 @@
 \title{Succinct title 8 words max}
 \usage{
 dBBMMplot(
-  x = paste0("Scaled/All_Rasters_Scaled.asc"),
+  x = paste0("Scaled/All_Rasters_Scaled_LatLon.asc"),
   trim = TRUE,
   myLocation = NULL,
   googlemap = FALSE,

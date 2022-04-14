@@ -46,7 +46,7 @@
 #' @param savedir Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here. No terminal slash.
 
 dBBMMplot <- function(
-    x = paste0("Scaled/All_Rasters_Scaled.asc"), # path to scaled data
+    x = paste0("Scaled/All_Rasters_Scaled_LatLon.asc"), # path to scaled data
     # dataCRS = 2958, # one of (i) character: a string accepted by GDAL, (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs.
     trim = TRUE, # remove NA & 0 values and crop to remaining date extents? Default TRUE
     myLocation = NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
