@@ -139,7 +139,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
                       datatype = datatype,
                       bylayer = bylayer,
                       overwrite = overwrite)
-  All_Rasters_Scaled %<>% lapply(function(x) x / weighting) # divide by weighting value
+  All_Rasters_Scaled <- All_Rasters_Scaled / weighting # divide by weighting value
   raster::writeRaster(x = All_Rasters_Scaled, # resave individual rasters
                       filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted", pattern),
                       format = format,
