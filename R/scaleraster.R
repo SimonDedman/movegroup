@@ -85,7 +85,6 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   
   rasterlist %<>%
     lapply(function(x) x / scalemax) %>% # scale to max of maxes
-    lapply(function(x) x / weighting) %>% # divide by weighting value
     lapply(function(x) raster::writeRaster(x = x, # resave individual rasters
                                            filename = paste0(path, "/", scalefolder, "/", names(x)), # , pattern: removed ability to resave as different format
                                            # error: adds X to start of numerical named objects####
