@@ -90,16 +90,30 @@ alignraster <- function(folderroots = c("/home/simon/Dropbox/PostDoc Work/Rob Bu
                     max(sharedextent[4])) # ymax
   
   rasterlist %<>%
-    lapply(function(x) raster::extend(x, sharedextent)) %>% # align to same spatial extent
-    lapply(function(x) raster::writeRaster(x = x, # resave individual rasters
-                                           filename = paste0(savefolder, "/", names(x)), # , pattern: removed ability to resave as different format
-                                           # error: adds X to start of numerical named objects####
-                                           format = format,
-                                           datatype = datatype,
-                                           if (format != "CDF") bylayer = bylayer,
-                                           overwrite = overwrite))
+    lapply(function(x) raster::extend(x, sharedextent)) # align to same spatial extent
+  
+  # Convert to SpatRaster format to be used by {terra}
+  rasterlist %<>% lapply(function(x) as(x, "SpatRaster"))
+  
+  # Reproject all rasters simultaneously
+  rasterlist %<>% lapply(function(x) project(x, y = myrasterlist[[length(rasterlist)]]))
+  
+  # Convert back to RasterLayer to save CRS
+  rasterlist %<>% lapply(function(x) raster(x))
+  
+  # Save CRS
+  rasterlistCRS <- sp::CRS(sp::proj4string(rasterlist[[1]]))
+  class(rasterlistCRS) # CRS
+  write.csv(sp::proj4string(rasterlistCRS), paste0(savefolder, "/", "CRS.csv"), row.names = FALSE)
+  saveRDS(rasterlistCRS, file = paste0(savefolder, "/", "CRS.Rds"))
+  
+  rasterlist %<>% lapply(function(x) raster::writeRaster(x = x, # resave individual rasters
+                                                         filename = paste0(savefolder, "/", names(x)), # , pattern: removed ability to resave as different format
+                                                         # error: adds X to start of numerical named objects####
+                                                         format = format,
+                                                         datatype = datatype,
+                                                         if (format != "CDF") bylayer = bylayer,
+                                                         overwrite = overwrite))
   
   if (returnObj) return(rasterlist)
-  
-  # r1.1 <- projectRaster(r1, r2) # lapply projectraster to all
 } # close function
