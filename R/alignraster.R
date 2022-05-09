@@ -96,7 +96,7 @@ alignraster <- function(folderroots = c("/home/simon/Dropbox/PostDoc Work/Rob Bu
   rasterlist %<>% lapply(function(x) as(x, "SpatRaster"))
   
   # Reproject all rasters simultaneously
-  rasterlist %<>% lapply(function(x) project(x, y = myrasterlist[[length(rasterlist)]]))
+  rasterlist %<>% lapply(function(x) project(x, y = rasterlist[[length(rasterlist)]]))
   
   # Convert back to RasterLayer to save CRS
   rasterlist %<>% lapply(function(x) raster(x))
