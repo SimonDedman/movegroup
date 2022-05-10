@@ -44,6 +44,8 @@
 #' @importFrom sp bbox
 #' @importFrom raster crs setMinMax raster extend writeRaster
 #' @importFrom purrr map2
+#' @importFrom terra project
+
 
 
 # read in rasters & add to list####
@@ -99,7 +101,7 @@ alignraster <- function(folderroots = c("/home/simon/Dropbox/PostDoc Work/Rob Bu
   rasterlist %<>% lapply(function(x) project(x, y = rasterlist[[length(rasterlist)]]))
   
   # Convert back to RasterLayer to save CRS
-  rasterlist %<>% lapply(function(x) raster(x))
+  rasterlist %<>% lapply(function(x) raster::raster(x))
   
   # Save CRS
   rasterlistCRS <- sp::CRS(sp::proj4string(rasterlist[[1]]))
