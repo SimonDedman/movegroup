@@ -77,6 +77,8 @@ dBBMMplot <- function(
     axisxlabel = "Longitude",
     axisylabel = "Latitude",
     legend.position = c(0.16, 0.92), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top.
+    font.size = 12,
+    font.family = "Times New Roman",
     filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
     savedir = tempdir() # file.path(work.dir, out.dir, "Scaled")
 ) {
@@ -212,15 +214,18 @@ dBBMMplot <- function(
     ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
     ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
     ggplot2::theme_minimal() +
-    ggplot2::theme(legend.position = legend.position, #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
-          legend.spacing.x = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
-          legend.spacing.y = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
-          legend.title = ggplot2::element_text(size = 8),
-          legend.text = ggplot2::element_text(size = 8),
-          legend.background = ggplot2::element_rect(fill = "white", colour = NA), # element_blank(),
-          panel.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
-          plot.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
-          legend.key = ggplot2::element_blank()) # removed whitespace buffer around legend boxes which is nice
+    ggplot2::theme(
+      legend.position = legend.position, #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
+      legend.spacing.x = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
+      legend.spacing.y = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
+      legend.title = ggplot2::element_text(size = 8),
+      legend.text = ggplot2::element_text(size = 8),
+      legend.background = ggplot2::element_rect(fill = "white", colour = NA), # element_blank(),
+      panel.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
+      plot.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
+      legend.key = ggplot2::element_blank(), 
+      text = ggplot2::element_text(size=font.size,  family=font.family)
+      ) # removed whitespace buffer around legend boxes which is nice
   ggplot2::ggsave(filename = filesavename, plot = ggplot2::last_plot(), device = "png", path = savedir, scale = 1,
          #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
          width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)
