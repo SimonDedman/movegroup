@@ -194,13 +194,13 @@ dBBMMplot <- function(
       # breaks could be function param, but only allows 2 breaks. Whatevs ####
     sf::st_transform(3857), # Vector transform after st_contour()  4326
     fill = NA, inherit.aes = FALSE,
-    ggplot2::aes(colour = "UD_95_pct")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
+    ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
     ggplot2::geom_sf(data = stars::st_contour(x = x,
                               contour_lines = TRUE,
                               breaks = max(x[[1]], na.rm = TRUE) * 0.5
     ) %>%
-      sf::st_transform(3857), fill = NA, inherit.aes = FALSE, ggplot2::aes(colour = "UD_50_pct")) +
-    ggplot2::scale_colour_manual(name = legendtitle, values = c(UD_95_pct = contour1colour, UD_50_pct = contour2colour)) +
+      sf::st_transform(3857), fill = NA, inherit.aes = FALSE, ggplot2::aes(colour = "50% UD")) +
+    ggplot2::scale_colour_manual(name = legendtitle, values = c("95% UD" = contour1colour, "50% UD" = contour2colour)) +
     # https://stackoverflow.com/questions/64425970/ggmap-in-r-keep-google-copyright-information-on-cropped-map
     # scale_x_continuous(limits = c(myLocation[1], myLocation[3]), expand = c(0, 0)) +
     # scale_y_continuous(limits = c(myLocation[2], myLocation[4]), expand = c(0, 0)) +
