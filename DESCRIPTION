@@ -1,6 +1,6 @@
 Package: dBBMMhomeRange
 Title: Home Range for (marine) animals using dynamic brownian bridge movement models
-Version: 0.0.4
+Version: 0.0.5
 Authors@R: c(
     person("Simon", "Dedman", email = "simondedman@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9108-972X")),
     person("Maurits", " Zinnicq Bergmann", role = c("aut"), comment = c(ORCID = "YOUR-ORCID-ID")))
