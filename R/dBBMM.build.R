@@ -758,6 +758,9 @@ dBBMMhomeRange <- function(
   md$core.use <- rasterres * md$core.use # convert from cells/pixels to metres squared area
   md$general.use <- rasterres * md$general.use
   
+  ### FOR SIMON!!!!!!!
+  ### CONVERT TO KM^2/1,000,000 ####
+  
   write.csv(md,
             file = file.path(savedir, absVolumeAreaSaveName),
             row.names = FALSE
