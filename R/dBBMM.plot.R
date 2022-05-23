@@ -44,6 +44,10 @@
 #' @param legend.position Vector of 2, format c(1,2), from L to R, pct dist from Bot to Top, values 0 to 1.
 #' @param filesavename File savename.
 #' @param savedir Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here. No terminal slash.
+#' @param receiverlats Vector of latitudes for receivers to be plotted.
+#' @param receiverlons Vector of longitudes for receivers to be plotted.
+#' @param receivernames Vector of names for receivers to be plotted.
+#' @param receiverrange Single (will be recycled), or vector of detection ranges in metres for receivers to be plotted.
 
 dBBMMplot <- function(
     x = paste0("Scaled/All_Rasters_Scaled_LatLon.asc"), # path to scaled data
@@ -80,7 +84,11 @@ dBBMMplot <- function(
     font.size = 12,
     font.family = "Times New Roman",
     filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
-    savedir = tempdir() # file.path(work.dir, out.dir, "Scaled")
+    savedir = tempdir(), # file.path(work.dir, out.dir, "Scaled")
+    receiverlats = NULL, # vector of latitudes for receivers to be plotted
+    receiverlons = NULL, # vector of longitudes for receivers to be plotted
+    receivernames = NULL, # vector of names for receivers to be plotted
+    receiverrange = NULL # single (will be recycled), or vector of detection ranges in metres for receivers to be plotted
 ) {
   # ToDo
   # expandfactor could default to NULL and have a formula to set it based on the size of extents
@@ -89,13 +97,11 @@ dBBMMplot <- function(
   # trim section optional, depends magrittr
   # 50 & 95% breaks could be editable as function params but will be a bit of work
   
-  # tmp <- raster(x)
-  # setMinMax(tmp)
-  # plot(tmp)
-  # is.na(tmp)
-  # dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
-  # crs(tmp) <- dataCRS
   
+  # check receiver inputs are the correct lengths, if present.
+  if (!is.null(receiverlats) & !is.null(receiverlons)) if (length(receiverlats) != length(receiverlons)) stop("length of receiverlats must equal length of receiverlons")
+  if (!is.null(receiverlats) & !is.null(receivernames)) if (length(receiverlats) != length(receivernames)) stop("length of receivernames must equal length of receiverlats/lons")
+  if (!is.null(receiverlats) & !is.null(receiverrange)) if (length(receiverrange) != length(receiverlons)) if (length(receiverrange) != 1) stop("length of receiverrange must equal length of receiverlats/lons, or 1")
   
   # Import raster
   x <- stars::read_stars(x) %>% sf::st_set_crs(4326) # 4326 2958
@@ -110,7 +116,7 @@ dBBMMplot <- function(
     is.na(y[[1]]) <- y[[1]] == 0 # replace char pattern (0) in whole df/tbl with NA
     is.na(y[[1]]) <- y[[1]] < (max(y[[1]], na.rm = TRUE) * 0.05) # replace anything < 95% contour with NA since it won't be drawn
   }
-    y %<>% starsExtra::trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
+  y %<>% starsExtra::trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
   
   if (is.null(myLocation)) myLocation <- sf::st_bbox(y) %>% as.vector() # st_bbox(y %>% st_transform(4326))
   
@@ -188,18 +194,43 @@ dBBMMplot <- function(
   # attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]] # latitude, y, height
   autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]]) * 1.2
   
+  # Create receiver objects
+  receiverlats = NULL # vector of latitudes for receivers to be plotted
+  receiverlons = NULL # vector of longitudes for receivers to be plotted
+  receivernames = NULL # vector of names for receivers to be plotted
+  receiverrange = NULL # single (will be recycled), or vector of detection ranges for receivers to be plotted
+  if (!is.null(receiverlats) & !is.null(receiverlons)) if (length(receiverlats) != length(receiverlons)) stop("length of receiverlats must equal length of receiverlons")  
+  if (!is.null(receiverlats) & !is.null(receivernames)) if (length(receiverlats) != length(receivernames)) stop("length of receivernames must equal length of receiverlats/lons")
+  if (!is.null(receiverlats) & !is.null(receiverrange)) if ((length(receiverrange) != length(receiverlons)) | (length(receiverrange) != 1)) stop("length of receiverrange must equal length of receiverlats/lons, or 1")
+  
+  if (!is.null(receiverlats) & !is.null(receiverlons)) {
+    receiver <- data.frame(lon = receiverlons,
+                           lat = receiverlats)
+    receiver <- sf::st_as_sf(receiver, coords = c("lon","lat")) %>%
+      sf::st_set_crs(4326) %>%
+      sf::st_transform(3857)
+    if (!is.null(receivernames)) {
+      receiver <- cbind(receiver, receivernames)
+    }
+    if (!is.null(receiverrange)) {
+      receiver <- cbind(receiver, receiverrange)
+    }
+  }
+  
+  
+  
   ggmap::ggmap(myMap) +
     ggplot2::geom_sf(data = stars::st_contour(x = x,
-                              contour_lines = TRUE, # makes lines not polys regardless of T or F
-                              breaks = max(x[[1]], na.rm = TRUE) * 0.05
+                                              contour_lines = TRUE, # makes lines not polys regardless of T or F
+                                              breaks = max(x[[1]], na.rm = TRUE) * 0.05
     ) %>%
       # breaks could be function param, but only allows 2 breaks. Whatevs ####
     sf::st_transform(3857), # Vector transform after st_contour()  4326
     fill = NA, inherit.aes = FALSE,
     ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
     ggplot2::geom_sf(data = stars::st_contour(x = x,
-                              contour_lines = TRUE,
-                              breaks = max(x[[1]], na.rm = TRUE) * 0.5
+                                              contour_lines = TRUE,
+                                              breaks = max(x[[1]], na.rm = TRUE) * 0.5
     ) %>%
       sf::st_transform(3857), fill = NA, inherit.aes = FALSE, ggplot2::aes(colour = "50% UD")) +
     ggplot2::scale_colour_manual(name = legendtitle, values = c("95% UD" = contour1colour, "50% UD" = contour2colour)) +
@@ -209,8 +240,15 @@ dBBMMplot <- function(
     #   Coordinate system already present. Adding new coordinate system, which will replace the existing one.
     # Scale for 'x' is already present. Adding another scale for 'x', which will replace the existing scale.
     # Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
-    # Warning message:
-    #   Removed 1 rows containing missing values (geom_rect). 
+    # Warning message: Removed 1 rows containing missing values (geom_rect). 
+    
+    {if (!is.null(receiverlats) & !is.null(receiverlons)) ggplot2::geom_sf(data = receiver %>%
+                                                                             sf::st_transform(3857), # Vector transform after st_contour()  4326
+                     fill = NA,
+                     inherit.aes = FALSE,
+                     ggplot2::aes(colour = "95% UD"))
+      } +
+    
     ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
     ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
     ggplot2::theme_minimal() +
@@ -224,9 +262,9 @@ dBBMMplot <- function(
       panel.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
       plot.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
       legend.key = ggplot2::element_blank(), 
-      text = ggplot2::element_text(size=font.size,  family=font.family)
-      ) # removed whitespace buffer around legend boxes which is nice
+      text = ggplot2::element_text(size = font.size,  family = font.family)
+    ) # removed whitespace buffer around legend boxes which is nice
   ggplot2::ggsave(filename = filesavename, plot = ggplot2::last_plot(), device = "png", path = savedir, scale = 1,
-         #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
-         width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)
+                  #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
+                  width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)
 } # close function
