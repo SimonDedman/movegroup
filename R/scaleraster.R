@@ -195,20 +195,17 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   
   # Convert the rasters within rasterlist to class ".UD" by dividing raster cell values by the sum of raster cell values within that raster. That way the sum of raster values = 1, which is needed for getVolumeUD() below.
   
-  UDlist <- rasterlist %>% sapply(function (x) new(".UD", x / sum(raster::values(x))))
+  UDlist <- rasterlist %>% sapply(function(x) new(".UD", x / sum(raster::values(x))))
   
   # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: relative scale
   area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50%
+  area.50 <- round((area.50 * rasterres) / 1000000, 1) # convert from cells to kilometres squared area
   area.50.sd <- sd(area.50)
   area.50.sd <- round(area.50.sd * rasterres, 1)
-  area.50 <- round(area.50 * rasterres, 1) # convert from cells to metres squared area
   area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95%
+  area.95 <- round((area.95 * rasterres) / 1000000, 1)
   area.95.sd <- sd(area.95)
-  area.95 <- round(area.95 * rasterres, 1)
   area.95.sd <- round(area.95.sd * rasterres, 1)
-  
-  ### FOR SIMON!!!!!!!
-  ### CONVERT TO KM^2/1,000,000 ####
   
   UDScaled <- All_Rasters_Scaled / sum(raster::values(All_Rasters_Scaled))
   UDScaled <- new(".UD", UDScaled)
@@ -220,8 +217,8 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   row.names(area.ct) <- NULL # kill row.names, reverts to 1,2,3
   
   area.ct <- rbind(area.ct, 
-                   c(round(sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres, 1), # add a row for All_Rasters_Scaled
-                     round(sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres, 1),
+                   c(round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 1), # add a row for All_Rasters_Scaled
+                     round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 1),
                      "All_Rasters_Scaled_Sum"),
                    c(round(area.50.sd * rasterres, 1),
                      round(area.95.sd * rasterres, 1),
