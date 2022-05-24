@@ -308,7 +308,7 @@ dBBMMplot <- function(
     ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
     ggplot2::theme_minimal() +
     ggplot2::theme(
-      legendposition = legendposition, #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
+      legend.position = legendposition, #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
       legend.spacing.x = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
       legend.spacing.y = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
       legend.title = ggplot2::element_text(size = 8),
