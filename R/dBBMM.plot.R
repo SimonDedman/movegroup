@@ -242,27 +242,6 @@ dBBMMplot <- function(
   }
   
   ggmap::ggmap(myMap) +
-    ggplot2::geom_sf(data = stars::st_contour(x = x,
-                                              contour_lines = TRUE, # makes lines not polys regardless of T or F
-                                              breaks = max(x[[1]], na.rm = TRUE) * 0.05
-    ) %>%
-      # breaks could be function param, but only allows 2 breaks. Whatevs ####
-    sf::st_transform(3857), # Vector transform after st_contour()  4326
-    fill = NA, inherit.aes = FALSE,
-    ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
-    ggplot2::geom_sf(data = stars::st_contour(x = x,
-                                              contour_lines = TRUE,
-                                              breaks = max(x[[1]], na.rm = TRUE) * 0.5
-    ) %>%
-      sf::st_transform(3857), fill = NA, inherit.aes = FALSE, ggplot2::aes(colour = "50% UD")) +
-    ggplot2::scale_colour_manual(name = legendtitle, values = c("95% UD" = contour1colour, "50% UD" = contour2colour)) +
-    # https://stackoverflow.com/questions/64425970/ggmap-in-r-keep-google-copyright-information-on-cropped-map
-    # scale_x_continuous(limits = c(myLocation[1], myLocation[3]), expand = c(0, 0)) +
-    # scale_y_continuous(limits = c(myLocation[2], myLocation[4]), expand = c(0, 0)) +
-    #   Coordinate system already present. Adding new coordinate system, which will replace the existing one.
-    # Scale for 'x' is already present. Adding another scale for 'x', which will replace the existing scale.
-    # Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
-    # Warning message: Removed 1 rows containing missing values (geom_rect). 
     
     # receiver centrepoints
     {if (!is.null(receiverlats) & !is.null(receiverlons))
@@ -303,6 +282,28 @@ dBBMMplot <- function(
                              ggplot2::aes(label = receivernames)
       )
     } +
+    
+    ggplot2::geom_sf(data = stars::st_contour(x = x,
+                                              contour_lines = TRUE, # makes lines not polys regardless of T or F
+                                              breaks = max(x[[1]], na.rm = TRUE) * 0.05
+    ) %>%
+      # breaks could be function param, but only allows 2 breaks. Whatevs ####
+    sf::st_transform(3857), # Vector transform after st_contour()  4326
+    fill = NA, inherit.aes = FALSE,
+    ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
+    ggplot2::geom_sf(data = stars::st_contour(x = x,
+                                              contour_lines = TRUE,
+                                              breaks = max(x[[1]], na.rm = TRUE) * 0.5
+    ) %>%
+      sf::st_transform(3857), fill = NA, inherit.aes = FALSE, ggplot2::aes(colour = "50% UD")) +
+    ggplot2::scale_colour_manual(name = legendtitle, values = c("95% UD" = contour1colour, "50% UD" = contour2colour)) +
+    # https://stackoverflow.com/questions/64425970/ggmap-in-r-keep-google-copyright-information-on-cropped-map
+    # scale_x_continuous(limits = c(myLocation[1], myLocation[3]), expand = c(0, 0)) +
+    # scale_y_continuous(limits = c(myLocation[2], myLocation[4]), expand = c(0, 0)) +
+    #   Coordinate system already present. Adding new coordinate system, which will replace the existing one.
+    # Scale for 'x' is already present. Adding another scale for 'x', which will replace the existing scale.
+    # Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
+    # Warning message: Removed 1 rows containing missing values (geom_rect). 
     
     ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
     ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
