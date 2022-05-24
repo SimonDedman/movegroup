@@ -221,7 +221,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
                      round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 1),
                      "All_Rasters_Scaled_Sum"),
                    c(round(area.50.sd * rasterres / 1000000, 1),
-                     round(area.95.sd * rasterres/ 1000000, 1),
+                     round(area.95.sd * rasterres / 1000000, 1),
                      "All_Rasters_Scaled_SD")
   )
   
