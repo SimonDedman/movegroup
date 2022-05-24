@@ -193,9 +193,17 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
                       bylayer = bylayer,
                       overwrite = overwrite)
   
-  # Convert the rasters within rasterlist to class ".UD" by dividing raster cell values by the sum of raster cell values within that raster. That way the sum of raster values = 1, which is needed for getVolumeUD() below.
+  # Below we replace any occurring NAs with 0s. These may be introduced if region-specific UD areas do not have the same extent.
+  replaceNA <- function(x, na.rm, ...){ 
+    if(is.na(x[1]))
+      return(0)
+    else
+      return(x)
+  } 
+  tmp <- rasterlist %>% sapply(function(x) raster::calc(x, fun = replaceNA))
   
-  UDlist <- rasterlist %>% sapply(function(x) new(".UD", x / sum(raster::values(x))))
+  # Convert the rasters within rasterlist to class ".UD" by dividing raster cell values by the sum of raster cell values within that raster. That way the sum of raster values = 1, which is needed for getVolumeUD() below.
+  UDlist <- tmp %>% sapply(function(x) new(".UD", x / sum(raster::values(x))))
   
   # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: relative scale
   area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50%
