@@ -201,11 +201,11 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50%
   area.50 <- round((area.50 * rasterres) / 1000000, 1) # convert from cells to kilometres squared area
   area.50.sd <- sd(area.50)
-  area.50.sd <- round(area.50.sd * rasterres, 1)
+  area.50.sd <- round(area.50.sd * rasterres / 1000000, 1)
   area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95%
   area.95 <- round((area.95 * rasterres) / 1000000, 1)
   area.95.sd <- sd(area.95)
-  area.95.sd <- round(area.95.sd * rasterres, 1)
+  area.95.sd <- round(area.95.sd * rasterres  / 1000000, 1)
   
   UDScaled <- All_Rasters_Scaled / sum(raster::values(All_Rasters_Scaled))
   UDScaled <- new(".UD", UDScaled)
