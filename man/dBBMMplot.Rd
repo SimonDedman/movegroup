@@ -22,9 +22,30 @@ dBBMMplot(
   plotcaption = paste0("dBBMM_HomeRange, ", lubridate::today()),
   axisxlabel = "Longitude",
   axisylabel = "Latitude",
-  legend.position = c(0.16, 0.92),
+  legendposition = c(0.16, 0.92),
+  fontsize = 12,
+  fontfamily = "Times New Roman",
   filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
-  savedir = tempdir()
+  savedir = tempdir(),
+  receiverlats = NULL,
+  receiverlons = NULL,
+  receivernames = NULL,
+  receiverrange = NULL,
+  recpointscol = "black",
+  recpointsfill = "white",
+  recpointsalpha = 0.5,
+  recpointssize = 1,
+  recpointsshape = 21,
+  recbufcol = "black",
+  recbuffill = "red",
+  recbufalpha = 0.5,
+  reclabcol = "black",
+  reclabfill = NA,
+  reclabnudgex = 0,
+  reclabnudgey = -200,
+  reclabpad = 0,
+  reclabrad = 0.15,
+  reclabbord = 0
 )
 }
 \arguments{
@@ -66,11 +87,53 @@ space use patterns i.e. the home range is bigger than the coverage by the acoust
 
 \item{axisylabel}{Latitude.}
 
-\item{legend.position}{Vector of 2, format c(1,2), from L to R, pct dist from Bot to Top, values 0 to 1.}
+\item{legendposition}{Vector of 2, format c(1,2), Percent distance (of middle? of legend box) from L to R, percent distance from Bottom to Top, values 0 to 1.}
+
+\item{fontsize}{Font size, default 12.}
+
+\item{fontfamily}{= Font family, default "Times New Roman".}
 
 \item{filesavename}{File savename.}
 
 \item{savedir}{Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here. No terminal slash.}
+
+\item{receiverlats}{Vector of latitudes for receivers to be plotted.}
+
+\item{receiverlons}{Vector of longitudes for receivers to be plotted.}
+
+\item{receivernames}{Vector of names for receivers to be plotted.}
+
+\item{receiverrange}{Single (will be recycled), or vector of detection ranges in metres for receivers to be plotted.}
+
+\item{recpointscol}{Colour of receiver centrepoint outlines.}
+
+\item{recpointsfill}{Colour of receiver centrepoint fills.}
+
+\item{recpointsalpha}{Alpha value of receiver centrepoint fills, 0 (invisible) to 1 (fully visible).}
+
+\item{recpointssize}{Size of receiver points.}
+
+\item{recpointsshape}{Shape of receiver points, default 21, circle with outline and fill.}
+
+\item{recbufcol}{Colour of the receiver buffer circle outlines.}
+
+\item{recbuffill}{Colour of the receiver buffer circle fills.}
+
+\item{recbufalpha}{Alpha value of receiver buffer fills, 0 (invisible) to 1 (fully visible).}
+
+\item{reclabcol}{Receiver label text colour.}
+
+\item{reclabfill}{Receiver label fill colour, NA for no fill.}
+
+\item{reclabnudgex}{Receiver label offset nudge in X dimension.}
+
+\item{reclabnudgey}{Receiver label offset nudge in Y dimension.}
+
+\item{reclabpad}{Receiver label padding in lines.}
+
+\item{reclabrad}{Receiver label radius in lines.}
+
+\item{reclabbord}{Receiver label border in mm.}
 }
 \description{
 Description paragraph: Automates delta log normal boosted regression trees abundance prediction.

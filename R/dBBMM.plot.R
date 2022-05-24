@@ -41,13 +41,30 @@
 #' @param plotcaption Plot caption.
 #' @param axisxlabel Longitude.
 #' @param axisylabel Latitude.
-#' @param legend.position Vector of 2, format c(1,2), from L to R, pct dist from Bot to Top, values 0 to 1.
+#' @param legendposition Vector of 2, format c(1,2), Percent distance (of middle? of legend box) from L to R, percent distance from Bottom to Top, values 0 to 1.
+#' @param fontsize Font size, default 12.
+#' @param fontfamily = Font family, default "Times New Roman".
 #' @param filesavename File savename.
 #' @param savedir Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here. No terminal slash.
 #' @param receiverlats Vector of latitudes for receivers to be plotted.
 #' @param receiverlons Vector of longitudes for receivers to be plotted.
 #' @param receivernames Vector of names for receivers to be plotted.
 #' @param receiverrange Single (will be recycled), or vector of detection ranges in metres for receivers to be plotted.
+#' @param recpointscol Colour of receiver centrepoint outlines.
+#' @param recpointsfill Colour of receiver centrepoint fills.
+#' @param recpointsalpha Alpha value of receiver centrepoint fills, 0 (invisible) to 1 (fully visible).
+#' @param recpointssize Size of receiver points.
+#' @param recpointsshape Shape of receiver points, default 21, circle with outline and fill.
+#' @param recbufcol Colour of the receiver buffer circle outlines.
+#' @param recbuffill Colour of the receiver buffer circle fills.
+#' @param recbufalpha Alpha value of receiver buffer fills, 0 (invisible) to 1 (fully visible).
+#' @param reclabcol Receiver label text colour.
+#' @param reclabfill Receiver label fill colour, NA for no fill.
+#' @param reclabnudgex Receiver label offset nudge in X dimension.
+#' @param reclabnudgey Receiver label offset nudge in Y dimension.
+#' @param reclabpad Receiver label padding in lines.
+#' @param reclabrad Receiver label radius in lines.
+#' @param reclabbord Receiver label border in mm.
 
 dBBMMplot <- function(
     x = paste0("Scaled/All_Rasters_Scaled_LatLon.asc"), # path to scaled data
@@ -80,23 +97,38 @@ dBBMMplot <- function(
     plotcaption = paste0("dBBMM_HomeRange, ", lubridate::today()),
     axisxlabel = "Longitude",
     axisylabel = "Latitude",
-    legend.position = c(0.16, 0.92), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top.
-    font.size = 12,
-    font.family = "Times New Roman",
+    legendposition = c(0.16, 0.92), # Percent distance (of middle? of legend box) from L to R, percent distance from Bottom to Top.
+    fontsize = 12,
+    fontfamily = "Times New Roman",
     filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
     savedir = tempdir(), # file.path(work.dir, out.dir, "Scaled")
     receiverlats = NULL, # vector of latitudes for receivers to be plotted
     receiverlons = NULL, # vector of longitudes for receivers to be plotted
     receivernames = NULL, # vector of names for receivers to be plotted
-    receiverrange = NULL # single (will be recycled), or vector of detection ranges in metres for receivers to be plotted
+    receiverrange = NULL, # single (will be recycled), or vector of detection ranges in metres for receivers to be plotted
+    recpointscol = "black", # Colour of receiver centrepoint outlines.
+    recpointsfill = "white", # Colour of receiver centrepoint fills.
+    recpointsalpha = 0.5, # Alpha value of receiver centrepoint fills, 0 (invisible) to 1 (fully visible).
+    recpointssize = 1, # Size of receiver points.
+    recpointsshape = 21, # Shape of receiver points, default 21, circle with outline and fill.
+    recbufcol = "black", # Colour of the receiver buffer circle outlines.
+    recbuffill = "red", # Colour of the receiver buffer circle fills.
+    recbufalpha = 0.5,  # Alpha value of receiver buffer fills, 0 (invisible) to 1 (fully visible).
+    reclabcol = "black", # Receiver label text colour.
+    reclabfill = NA, # Receiver label fill colour, NA for no fill.
+    reclabnudgex = 0, # Receiver label offset nudge in X dimension.
+    reclabnudgey = -200, # Receiver label offset nudge in Y dimension.
+    reclabpad = 0, # Receiver label padding in lines.
+    reclabrad = 0.15, # Receiver label radius in lines.
+    reclabbord = 0 # Receiver label border in mm.
 ) {
+  
   # ToDo
   # expandfactor could default to NULL and have a formula to set it based on the size of extents
   # gbm.basemap
   # gMaps API tutorial
   # trim section optional, depends magrittr
   # 50 & 95% breaks could be editable as function params but will be a bit of work
-  
   
   # check receiver inputs are the correct lengths, if present.
   if (!is.null(receiverlats) & !is.null(receiverlons)) if (length(receiverlats) != length(receiverlons)) stop("length of receiverlats must equal length of receiverlons")
@@ -195,14 +227,6 @@ dBBMMplot <- function(
   autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]]) * 1.2
   
   # Create receiver objects
-  receiverlats = NULL # vector of latitudes for receivers to be plotted
-  receiverlons = NULL # vector of longitudes for receivers to be plotted
-  receivernames = NULL # vector of names for receivers to be plotted
-  receiverrange = NULL # single (will be recycled), or vector of detection ranges for receivers to be plotted
-  if (!is.null(receiverlats) & !is.null(receiverlons)) if (length(receiverlats) != length(receiverlons)) stop("length of receiverlats must equal length of receiverlons")  
-  if (!is.null(receiverlats) & !is.null(receivernames)) if (length(receiverlats) != length(receivernames)) stop("length of receivernames must equal length of receiverlats/lons")
-  if (!is.null(receiverlats) & !is.null(receiverrange)) if ((length(receiverrange) != length(receiverlons)) | (length(receiverrange) != 1)) stop("length of receiverrange must equal length of receiverlats/lons, or 1")
-  
   if (!is.null(receiverlats) & !is.null(receiverlons)) {
     receiver <- data.frame(lon = receiverlons,
                            lat = receiverlats)
@@ -216,8 +240,6 @@ dBBMMplot <- function(
       receiver <- cbind(receiver, receiverrange)
     }
   }
-  
-  
   
   ggmap::ggmap(myMap) +
     ggplot2::geom_sf(data = stars::st_contour(x = x,
@@ -242,12 +264,45 @@ dBBMMplot <- function(
     # Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
     # Warning message: Removed 1 rows containing missing values (geom_rect). 
     
-    {if (!is.null(receiverlats) & !is.null(receiverlons)) ggplot2::geom_sf(data = receiver %>%
-                                                                             sf::st_transform(3857), # Vector transform after st_contour()  4326
-                     fill = NA,
-                     inherit.aes = FALSE,
-                     ggplot2::aes(colour = "95% UD"))
-      } +
+    # receiver centrepoints
+    {if (!is.null(receiverlats) & !is.null(receiverlons))
+      ggplot2::geom_sf(data = receiver %>%
+                         sf::st_transform(3857), # Vector transform after st_contour()  4326
+                       colour = recpointscol,
+                       fill = recpointsfill,
+                       alpha = recpointsalpha,
+                       size = recpointssize,
+                       shape = recpointsshape,
+                       inherit.aes = FALSE,
+      )
+    } +
+    
+    # receiver buffer circles
+    {if (!is.null(receiverlats) & !is.null(receiverlons) & !is.null(receiverrange))
+      ggplot2::geom_sf(data = sf::st_buffer(receiver, dist = receiverrange) %>%
+                         sf::st_transform(3857), # Vector transform after st_contour()  4326
+                       colour = recbufcol,
+                       fill = recbuffill,
+                       alpha = recbufalpha,
+                       inherit.aes = FALSE
+      )
+    } +
+    
+    # receiver labels
+    {if (!is.null(receiverlats) & !is.null(receiverlons) & !is.null(receivernames))
+      ggplot2::geom_sf_label(data = receiver %>%
+                               sf::st_transform(3857), # Vector transform after st_contour()  4326
+                             colour = reclabcol,
+                             fill = reclabfill,
+                             inherit.aes = FALSE,
+                             nudge_x = reclabnudgex,
+                             nudge_y = reclabnudgey,
+                             label.padding = unit(reclabpad, "lines"), # 0.25
+                             label.r = unit(reclabrad, "lines"),
+                             label.size = reclabbord, # 0.25
+                             ggplot2::aes(label = receivernames)
+      )
+    } +
     
     ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
     ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
@@ -262,7 +317,7 @@ dBBMMplot <- function(
       panel.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
       plot.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
       legend.key = ggplot2::element_blank(), 
-      text = ggplot2::element_text(size = font.size,  family = font.family)
+      text = ggplot2::element_text(size = fontsize,  family = fontfamily)
     ) # removed whitespace buffer around legend boxes which is nice
   ggplot2::ggsave(filename = filesavename, plot = ggplot2::last_plot(), device = "png", path = savedir, scale = 1,
                   #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
