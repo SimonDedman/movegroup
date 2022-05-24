@@ -296,7 +296,7 @@ dBBMMplot <- function(
                                               breaks = max(x[[1]], na.rm = TRUE) * 0.5
     ) %>%
       sf::st_transform(3857), fill = NA, inherit.aes = FALSE, ggplot2::aes(colour = "50% UD")) +
-    ggplot2::scale_colour_manual(name = legendtitle, values = c("95% UD" = contour1colour, "50% UD" = contour2colour)) +
+    ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour, "95% UD" = contour1colour)) +
     # https://stackoverflow.com/questions/64425970/ggmap-in-r-keep-google-copyright-information-on-cropped-map
     # scale_x_continuous(limits = c(myLocation[1], myLocation[3]), expand = c(0, 0)) +
     # scale_y_continuous(limits = c(myLocation[2], myLocation[4]), expand = c(0, 0)) +
