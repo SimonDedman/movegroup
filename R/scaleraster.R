@@ -205,33 +205,49 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   # Convert the rasters within rasterlist to class ".UD" by dividing raster cell values by the sum of raster cell values within that raster. That way the sum of raster values = 1, which is needed for getVolumeUD() below.
   UDlist <- tmp %>% sapply(function(x) new(".UD", x / sum(raster::values(x))))
   
-  # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: relative scale
-  area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50%
-  area.50 <- round((area.50 * rasterres) / 1000000, 1) # convert from cells to kilometres squared area
-  area.50.sd <- sd(area.50)
-  area.50.sd <- round(area.50.sd * rasterres, 1)
-  area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95%
-  area.95 <- round((area.95 * rasterres) / 1000000, 1)
-  area.95.sd <- sd(area.95)
-  area.95.sd <- round(area.95.sd * rasterres, 1)
+  # Below code calculates core and home range volume areas per UD, the mean and stdev across UDs, and finally core and home range volume area sizes of the group-level UD 
+  # 1. individual core and home range volume area sizes
+  area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) #Core volume area
+  area.50 <- round((area.50 * rasterres) / 1000000, 2) # Convert from m^2 to km^2
   
+  area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) #Home range volume area
+  area.95 <- round((area.95 * rasterres) / 1000000, 2) # Convert from m^2 to km^2
+  
+  # 2. Mean and SD
+  area.50.mean <- round(mean(area.50), 2) #Core volume area mean
+  area.50.sd <- round(sd(area.50), 2) #Core volume area SD
+  
+  area.95.mean <- round(mean(area.95), 2) #Home range volume area mean
+  area.95.sd <- round(sd(area.95), 2) #Home range volume area SD
+  
+  # 3. Group-level core and home range volume areas
   UDScaled <- All_Rasters_Scaled / sum(raster::values(All_Rasters_Scaled))
   UDScaled <- new(".UD", UDScaled)
   
+  group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 1)
+  group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 1)
+  
+  # Combine in a single df
   area.ct <- data.frame(core.use = area.50, 
                         general.use = area.95
-  ) # Combine in single df
-  area.ct$ID <- row.names(area.ct) # create ID column from row.names
-  row.names(area.ct) <- NULL # kill row.names, reverts to 1,2,3
+                        ) 
   
-  area.ct <- rbind(area.ct, 
-                   c(round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 1), # add a row for All_Rasters_Scaled
-                     round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 1),
-                     "All_Rasters_Scaled_Sum"),
-                   c(round(area.50.sd * rasterres / 1000000, 1),
-                     round(area.95.sd * rasterres / 1000000, 1),
-                     "All_Rasters_Scaled_SD")
-  )
+  # Create ID column from row.names and kill row names
+  area.ct$ID <- row.names(area.ct)
+  row.names(area.ct) <- NULL
+  
+  # Add mean, sd and group-level UD values
+  area.ct <- rbind(area.ct,
+                   c(area.50.mean,
+                     area.95.mean,
+                     "mean_across_UDs"),
+                   c(area.50.sd,
+                     area.95.sd,
+                     "sd_across_UDs"),
+                   c(group_area.50,
+                     group_area.95,
+                     "Group-level_UD")
+                   )
   
   write.csv(area.ct,
             file = paste0(path, "/", scalefolder, "/","VolumeAreas_ScaledAllFish.csv"),
