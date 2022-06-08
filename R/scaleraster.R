@@ -224,8 +224,8 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
   UDScaled <- All_Rasters_Scaled / sum(raster::values(All_Rasters_Scaled))
   UDScaled <- new(".UD", UDScaled)
   
-  group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 1)
-  group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 1)
+  group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 2)
+  group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 2)
   
   # Combine in a single df
   area.ct <- data.frame(core.use = area.50, 
