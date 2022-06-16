@@ -46,9 +46,10 @@
 #' @importFrom stringr str_remove
 #' @importFrom sp CRS
 
-scaleraster <- function(path = NULL, # Location of files created by dBBMM.build. No terminal slash.
+scaleraster <- function(path = paste0(saveloc, spp.f, "/", reg), # Location of files created by dBBMM.build within a subset. No terminal slash.
+                        pathsubsets = paste0(saveloc, spp.f), # Location of files created by dBBMM.build across subset. No terminal slash.
                         pattern = ".asc",
-                        weighting = 1, # weighting to divide individual and summed-scaled rasters by, for unbalanced arrays
+                        weighting = w, # Weighting to divide individual and summed-scaled rasters by, for unbalanced arrays
                         format = "ascii",
                         datatype = "FLT4S",
                         bylayer = TRUE,
@@ -56,181 +57,185 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
                         scalefolder = "Scaled",
                         summedname = "All_Rasters_Summed",
                         scaledname = "All_Rasters_Scaled",
-                        crsloc = NULL, # location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
+                        crsloc = paste0(saveloc, spp.f, "/", reg, "/"), # Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
                         returnObj = FALSE) {
-  # library(raster)
+  
+  # 1. Scale individual-level UD rasters and aggregate into one group-level UD raster
+  
   # If path has a terminal slash, remove it, it's added later
   if (substr(x = path, start = nchar(path), stop = nchar(path)) == "/") path = substr(x = path, start = 1, stop = nchar(path) - 1)
   
   # Pull all raster names from path into a list
-  filelist <- as.list(list.files(path = path, pattern = pattern))
+  filelist <- as.list(list.files(path = path, pattern = pattern)) 
   
   # Read in rasters and add to list
   rasterlist <-
-    lapply(filelist, function(x) raster::raster(paste0(path, "/", x))) %>% # read in rasters
-    lapply(function(x) raster::setMinMax(x)) # set minmax values
+    lapply(filelist, function(x) raster::raster(paste0(path, "/", x))) %>% # Read in rasters
+    lapply(function(x) raster::setMinMax(x)) # Set minmax values
   names(rasterlist) <- stringr::str_remove(filelist, pattern = pattern) # Name the list object (raster); need to get rid of extension e.g. ".asc"
   
-  # get resolution from first raster in rasterlist (they all have same res), assign it object, squared
+  # Get resolution from first raster in rasterlist (they all have same res), assign it object, squared
   rasterres <- (raster::res(rasterlist[[1]])[1]) ^ 2
   
-  # Get max of maxes
-  scalemax <-
-    lapply(rasterlist, function(x) raster::maxValue(x)) %>% # extract maxes
-    unlist() %>% # to vector
-    max(na.rm = TRUE) # get max of maxes
+  # Now extract the max of maxes across subsets. To do this, repeat the steps from above, but now import all individual-level rasters across subsets
+  # Extract appropriate raster names i.e. do not import scaled rasters
+  if (substr(x = pathsubsets, start = nchar(pathsubsets), stop = nchar(pathsubsets)) == "/") pathsubsets = substr(x = pathsubsets, start = 1, stop = nchar(pathsubsets) - 1)
   
-  # create new folder to save to
+  filelist_subsets <- as.list(list.files(path = pathsubsets, pattern = pattern, recursive = TRUE))
+  
+  names(filelist_subsets) <-  stringr::str_remove(filelist_subsets, pattern = pattern) # Name elements of the list
+  
+  patt <- "Scaled" # Define pattern to identify which raster names to remove
+  
+  filelist_subsets <- filelist_subsets[!grepl(patt, (names(filelist_subsets)))] # Now remove list elements that have the pattern in them; return full list of no match found
+  
+  # Read in appropriate rasters and add to list
+  rasterlist_subsets <- 
+    lapply(filelist_subsets, function(x) raster::raster(paste0(pathsubsets, "/", x))) %>% # Read in only rasters that occur in the filtered list
+    lapply(function(x) raster::setMinMax(x)) # Reintroduce values
+  
+  # Get max of maxes across subsets 
+  scalemax <-
+    lapply(rasterlist_subsets, function(x) raster::maxValue(x)) %>% # extract maxes
+    unlist() %>% # to vector
+    max(na.rm = TRUE) # extract max of maxes
+  
+  # Create new folder to save to
   dir.create(paste0(path, "/", scalefolder))
   
+  # Scale to max of maxes (maximum value becomes 1)
   rasterlist %<>%
-    lapply(function(x) x / scalemax) %>% # scale to max of maxes
-    lapply(function(x) raster::writeRaster(x = x, # resave individual rasters
-                                           filename = paste0(path, "/", scalefolder, "/", names(x)), # , pattern: removed ability to resave as different format
-                                           # error: adds X to start of numerical named objects####
+    lapply(function(x) x / scalemax) %>% # scaling occurs here
+    lapply(function(x) raster::writeRaster(x = x, # save scaled individual rasters
+                                           filename = paste0(path, "/", scalefolder, "/", names(x)),
                                            format = format,
                                            datatype = datatype,
                                            if (format != "CDF") bylayer = bylayer,
                                            overwrite = overwrite))
   
-  # extentlist <- lapply(rasterlist, function(x) data.frame(xmin = as.vector(extent(x))[1],
-  #                                                         xmax = as.vector(extent(x))[2],
-  #                                                         ymin = as.vector(extent(x))[3],
-  #                                                         ymax = as.vector(extent(x))[4]))
-  # extentdf <- do.call(rbind, extentlist)
-  # fullextents <- c(min(extentdf$xmin, na.rm = TRUE),
-  #                  max(extentdf$xmax, na.rm = TRUE),
-  #                  min(extentdf$ymin, na.rm = TRUE),
-  #                  max(extentdf$ymax, na.rm = TRUE))
-  # rasterlist %<>% lapply(function(x) extent(x) <- fullextents)
-  # 
-  # extent(rasterlist[[2]]) <- fullextents
-  # rasterlist[[2]]@extent <- fullextents
-  
-  # rasterstack <- do.call(mosaic, rasterlist)
-  # tmp <- mosaic(x = rasterlist[[1]],
-  #               y = rasterlist[[2]])
-  # 
-  # st_crs(rasterlist[[1]])
-  # proj4string(rasterlist[[1]])
-  # proj4string(rasterlist[[2]])
-  
-  # sum the normalised individual UDs
+  # Create a raster stack so that rasters can be summed in the step below
   rasterstack <- raster::stack(x = rasterlist)
-  # for nc: Error in compareRaster(x) : different extent: still need to fix this in build.R####
   
+  # Sum the scaled individual UDs, which should result in a single aggregated or ‘group-level' UD
   All_Rasters_Summed <- raster::stackApply(x = rasterstack, # Raster* object or list of
                                            indices = rep(1, raster::nlayers(rasterstack)), # Vector of length nlayers(x), performs the function (sum) PER UNIQUE index, i.e. 1:5 = 5 unique sums.
                                            fun = sum, # returns a single value, e.g. mean or min, and that takes a na.rm argument
                                            na.rm = TRUE, # If TRUE, NA cells are removed from calculations
-                                           filename = paste0(path, "/", scalefolder, "/", summedname, pattern), # character. Optional output filename, causes file to be written
+                                           # filename = paste0(path, "/", scalefolder, "/", summedname, pattern), # character. Optional output filename, causes file to be written
                                            format = format,
                                            datatype = datatype,
                                            bylayer = bylayer,
                                            overwrite = overwrite)
   
-  # another rescaling from 0 to 1
-  # Should result in a single aggregated or ‘group’ level UD
+  # Put the values back in the raster object
   All_Rasters_Summed %<>% raster::setMinMax()
+  
+  # Now scale the group-level UD
   All_Rasters_Scaled <- All_Rasters_Summed / raster::maxValue(All_Rasters_Summed)
-  raster::writeRaster(x = All_Rasters_Scaled, # resave individual rasters
-                      filename = paste0(path, "/", scalefolder, "/", scaledname, pattern),
-                      format = format,
-                      datatype = datatype,
-                      bylayer = bylayer,
-                      overwrite = overwrite)
-  All_Rasters_Scaled <- All_Rasters_Scaled / weighting # divide by weighting value
-  raster::writeRaster(x = All_Rasters_Scaled, # resave individual rasters
+  
+  # Save this raster
+  # raster::writeRaster(x = All_Rasters_Scaled,
+  #                     filename = paste0(path, "/", scalefolder, "/", scaledname, pattern),
+  #                     format = format,
+  #                     datatype = datatype,
+  #                     bylayer = bylayer,
+  #                     overwrite = overwrite)
+  
+  # Now weight the group-level UD raster
+  All_Rasters_Scaled_Weighted <- All_Rasters_Scaled / weighting
+  
+  # Save this raster too
+  raster::writeRaster(x = All_Rasters_Scaled_Weighted, # resave individual rasters
                       filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted", pattern),
                       format = format,
                       datatype = datatype,
                       bylayer = bylayer,
                       overwrite = overwrite)
   
-  # change projection of All_Rasters_Scaled to latlon for proper plotting
+  # Change projection of All_Rasters_Scaled_Weighted to latlon for proper plotting
   dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
-  raster::crs(All_Rasters_Scaled) <- dataCRS
-  # proj = CRS("+proj=longlat +datum=WGS84")
+  raster::crs(All_Rasters_Scaled_Weighted) <- dataCRS
+  
+  # If any NA present, replace by 0 (safety)
+  All_Rasters_Scaled_Weighted@data@values[is.na(All_Rasters_Scaled_Weighted@data@values)] <- 0
+  # any(is.na(All_Rasters_Scaled_Weighted@data@values))
   
   
-  All_Rasters_Scaled_LatLon <- raster::projectExtent(object = All_Rasters_Scaled, crs = sp::CRS("+proj=longlat")) # crs = proj
-  # returns RasterLayer with projected extent, but no values. Can be adjusted (e.g. by setting its 
-  # resolution) and used as a template 'to' in projectRaster.
   
-  # change res so x & y match. Kills values
-  raster::res(All_Rasters_Scaled_LatLon) <- rep(mean(raster::res(All_Rasters_Scaled_LatLon)), 2)
-  # TODO: increase res if blocky? do further up?####
+  # 2. Now we will deal with the creation of a group-level UD raster for plotting purposes
   
+  # Standardize so the values within the raster sum to 1 (required to run the getVolumeUD() below)
+  All_Rasters_Scaled_Weighted <- All_Rasters_Scaled_Weighted / sum(raster::values(All_Rasters_Scaled_Weighted))    
   
-  All_Rasters_Scaled_LatLon <- raster::projectRaster(from = All_Rasters_Scaled,
-                                                     to = All_Rasters_Scaled_LatLon)
+  # Change the crs to LatLong for plotting and calculation purposes
+  All_Rasters_Scaled_Weighted_LatLon <- raster::projectExtent(object = All_Rasters_Scaled_Weighted, crs = sp::CRS("+proj=longlat")) # crs = proj
   
-  # All_Rasters_Scaled_LatLon <- projectRaster(from = All_Rasters_Scaled, crs = proj) # 2958
-  # with crs 2958:
-  # class      : RasterLayer 
-  # dimensions : 482, 284, 136888  (nrow, ncol, ncell)
-  # resolution : 84500, 84400  (x, y)
-  # extent     : -6893280, 17104720, -20266219, 20414581  (xmin, xmax, ymin, ymax)
-  # crs        : +proj=utm +zone=17 +ellps=GRS80 +units=m +no_defs 
-  # source     : memory
-  # names      : All_Rasters_Summed 
-  # values     : 0, 0.9535157  (min, max)
+  # Change res so x & y match (kills values)
+  raster::res(All_Rasters_Scaled_Weighted_LatLon) <- rep(mean(raster::res(All_Rasters_Scaled_Weighted_LatLon)), 2)
   
-  # with proj=longlat:
-  # class      : RasterLayer 
-  # dimensions : 140, 274, 38360  (nrow, ncol, ncell)
-  # resolution : 1.35, 0.855  (x, y)
-  # extent     : -186.3136, 183.5864, -24.71852, 94.98148  (xmin, xmax, ymin, ymax)
-  # crs        : +proj=longlat +datum=WGS84 +no_defs 
-  # source     : memory
-  # names      : All_Rasters_Summed 
-  # values     : 0, 0.8578524  (min, max)
+  # Now project raster
+  All_Rasters_Scaled_Weighted_LatLon <- raster::projectRaster(from = All_Rasters_Scaled_Weighted,
+                                                              to = All_Rasters_Scaled_Weighted_LatLon)
   
-  raster::writeRaster(x = All_Rasters_Scaled_LatLon, # resave individual rasters
+  # Save the raster
+  raster::writeRaster(x = All_Rasters_Scaled_Weighted_LatLon, 
                       filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted_LatLon", pattern),
                       format = format,
                       datatype = datatype,
                       bylayer = bylayer,
                       overwrite = overwrite)
   
-  # Below we replace any occurring NAs with 0s. These may be introduced if region-specific UD areas do not have the same extent.
-  replaceNA <- function(x, na.rm, ...){ 
-    if(is.na(x[1]))
+  # Ensure again that no NAs exist in the raster; replae by 0
+  All_Rasters_Scaled_Weighted_LatLon@data@values[is.na(All_Rasters_Scaled_Weighted_LatLon@data@values)] <- 0
+  
+  # Ensure again that cell values within a raster sum to 1
+  All_Rasters_Scaled_Weighted_LatLon <- All_Rasters_Scaled_Weighted_LatLon / sum(raster::values(All_Rasters_Scaled_Weighted_LatLon))
+  
+  
+  
+  # 3. Below we will deal with the calculation of volume areas.
+  # Replace any occurring NAs with 0s. These may be introduced if region-specific UD areas do not have the same extent.
+  replaceNA <- function(x, na.rm, ...){
+    if (is.na(x[1]))
       return(0)
     else
       return(x)
-  } 
+  }
   tmp <- rasterlist %>% sapply(function(x) raster::calc(x, fun = replaceNA))
   
-  # Convert the rasters within rasterlist to class ".UD" by dividing raster cell values by the sum of raster cell values within that raster. That way the sum of raster values = 1, which is needed for getVolumeUD() below.
+  # Convert the scaled individual-level rasters within rasterlist to class ".UD". Also ensure that values within a raster sum to 1 so that they can be fed into getVolumeUD()
   UDlist <- tmp %>% sapply(function(x) new(".UD", x / sum(raster::values(x))))
   
-  # Below code calculates core and home range volume areas per UD, the mean and stdev across UDs, and finally core and home range volume area sizes of the group-level UD 
-  # 1. individual core and home range volume area sizes
-  area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) #Core volume area
+  # Below code calculates 50% and 95% volume areas per UD, the mean and stdev across UDs, and finally core and home range volume area sizes of the group-level UD
+  # A. individual core and home range volume area sizes
+  area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50% volume area
   area.50 <- round((area.50 * rasterres) / 1000000, 2) # Convert from m^2 to km^2
   
-  area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) #Home range volume area
+  area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95% volume area
   area.95 <- round((area.95 * rasterres) / 1000000, 2) # Convert from m^2 to km^2
   
-  # 2. Mean and SD
-  area.50.mean <- round(mean(area.50), 2) #Core volume area mean
-  area.50.sd <- round(sd(area.50), 2) #Core volume area SD
+  # B. Mean and SD
+  area.50.mean <- round(mean(area.50), 2) # 50% volume area mean
+  area.50.sd <- round(sd(area.50), 2) # 50% volume area SD
   
-  area.95.mean <- round(mean(area.95), 2) #Home range volume area mean
-  area.95.sd <- round(sd(area.95), 2) #Home range volume area SD
+  area.95.mean <- round(mean(area.95), 2) # 95% volume area mean
+  area.95.sd <- round(sd(area.95), 2) # 95% volume area SD
   
   # 3. Group-level core and home range volume areas
-  UDScaled <- All_Rasters_Scaled / sum(raster::values(All_Rasters_Scaled))
-  UDScaled <- new(".UD", UDScaled)
+  UDScaled <- new(".UD", All_Rasters_Scaled_Weighted) # This uses the aeqd raster for calculations
+  UDScaled <- UDScaled / sum(raster::values(UDScaled)) # Safety 
+  UDScaled <- new(".UD", All_Rasters_Scaled_Weighted) # Convert back to .UD so getVolumeUD can work
   
   group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 2)
+  group_area.50
+  
   group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 2)
+  group_area.95
   
   # Combine in a single df
-  area.ct <- data.frame(core.use = area.50, 
+  area.ct <- data.frame(core.use = area.50,
                         general.use = area.95
-                        ) 
+  )
   
   # Create ID column from row.names and kill row names
   area.ct$ID <- row.names(area.ct)
@@ -247,11 +252,68 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build.
                    c(group_area.50,
                      group_area.95,
                      "Group-level_UD")
-                   )
+  )
   
   write.csv(area.ct,
             file = paste0(path, "/", scalefolder, "/","VolumeAreas_ScaledAllFish.csv"),
             row.names = FALSE)
   
-  if (returnObj) return(All_Rasters_Scaled)
+  if (returnObj) return(All_Rasters_Scaled_Weighted)
+  
+  
+  
+  # ### BELOW CODE CHUNK USES THE PROJECTED LATLON RASTER FOR GROUP-LEVEL VOLUME AREA CALCULATIONS.
+  # # 3.
+  # UDScaled.ll <- All_Rasters_Scaled_Weighted_LatLon / sum(raster::values(All_Rasters_Scaled_Weighted_LatLon))
+  # # class      : RasterLayer 
+  # # dimensions : 117, 179, 20943  (nrow, ncol, ncell)
+  # # resolution : 0.001900188, 0.001900188  (x, y)
+  # # extent     : -79.46607, -79.12593, 25.57557, 25.7979  (xmin, xmax, ymin, ymax)
+  # # crs        : +proj=longlat +datum=WGS84 +no_defs 
+  # # source     : memory
+  # # names      : All_Rasters_Summed 
+  # # values     : 0, 0.007328744  (min, max)
+  # # The dimensions and max raster value are different from the UDScaled raster..
+  # 
+  # UDScaled.ll <- new(".UD", UDScaled.ll)
+  # 
+  # group_area.50.ll <- round((sum(raster::values(move::getVolumeUD(UDScaled.ll) <= .50)) * rasterres) / 1000000, 2)
+  # group_area.50.ll
+  # group_area.95.ll <- round((sum(raster::values(move::getVolumeUD(UDScaled.ll) <= .95)) * rasterres) / 1000000, 2)
+  # group_area.95.ll
+  # 
+  # # Combine in a single df
+  # area.ct <- data.frame(core.use = area.50,
+  #                       general.use = area.95
+  # )
+  # 
+  # # Create ID column from row.names and kill row names
+  # area.ct$ID <- row.names(area.ct)
+  # row.names(area.ct) <- NULL
+  # 
+  # # Add mean, sd and group-level UD values
+  # area.ct <- rbind(area.ct,
+  #                  c(area.50.mean,
+  #                    area.95.mean,
+  #                    "mean_across_UDs"),
+  #                  c(area.50.sd,
+  #                    area.95.sd,
+  #                    "sd_across_UDs"),
+  #                  c(group_area.50.ll,
+  #                    group_area.95.ll,
+  #                    "Group-level_UD")
+  # )
+  # core.use general.use              ID
+  # 1      4.2       15.52          X19692
+  # 2      4.2       15.52 mean_across_UDs
+  # 3     <NA>        <NA>   sd_across_UDs
+  # 4     4.28       15.72  Group-level_UD
+  # Slight differences in 50% and 95% volume area size
+  # 
+  # write.csv(area.ct,
+  #           file = paste0(path, "/", scalefolder, "/","VolumeAreas_ScaledAllFish.csv"),
+  #           row.names = FALSE)
+  # 
+  # if (returnObj) return(All_Rasters_Scaled_Weighted_LatLon)
+  
 }
