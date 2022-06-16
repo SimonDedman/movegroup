@@ -46,8 +46,8 @@
 #' @importFrom stringr str_remove
 #' @importFrom sp CRS
 
-scaleraster <- function(path = paste0(saveloc, spp.f, "/", reg), # Location of files created by dBBMM.build within a subset. No terminal slash.
-                        pathsubsets = paste0(saveloc, spp.f), # Location of files created by dBBMM.build across subset. No terminal slash.
+scaleraster <- function(path = NULL, # Location of files created by dBBMM.build within a subset. No terminal slash.
+                        pathsubsets = NULL, # Location of parent folder that contains ALL files created by dBBMM.build. No terminal slash.
                         pattern = ".asc",
                         weighting = w, # Weighting to divide individual and summed-scaled rasters by, for unbalanced arrays
                         format = "ascii",
@@ -57,7 +57,7 @@ scaleraster <- function(path = paste0(saveloc, spp.f, "/", reg), # Location of f
                         scalefolder = "Scaled",
                         summedname = "All_Rasters_Summed",
                         scaledname = "All_Rasters_Scaled",
-                        crsloc = paste0(saveloc, spp.f, "/", reg, "/"), # Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
+                        crsloc = NULL, # Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
                         returnObj = FALSE) {
   
   # 1. Scale individual-level UD rasters and aggregate into one group-level UD raster
