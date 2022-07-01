@@ -15,6 +15,7 @@
 #' and thesis published using this package.
 #'
 #' @param path No terminal slash.
+#' @param pathsubsets Location of parent folder that contains ALL files created by dBBMM.build. No terminal slash.
 #' @param pattern Default ".asc".
 #' @param weighting Weighting to divide individual and summed-scaled rasters by, for unbalanced arrays. Individual, Scaled, and Scaled_Weighted rasters, and the volume areas csv, will have weightings applied, but NOT the summed raster.
 #' @param format Default "ascii".
@@ -60,7 +61,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
                         crsloc = NULL, # Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
                         returnObj = FALSE) {
   
-  # 1. Scale individual-level UD rasters and aggregate into one group-level UD raster
+  # 1. Scale individual-level UD rasters and aggregate into one group-level UD raster ####
   
   # If path has a terminal slash, remove it, it's added later
   if (substr(x = path, start = nchar(path), stop = nchar(path)) == "/") path = substr(x = path, start = 1, stop = nchar(path) - 1)
@@ -79,6 +80,8 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   # Now extract the max of maxes across subsets. To do this, repeat the steps from above, but now import all individual-level rasters across subsets
   # Extract appropriate raster names i.e. do not import scaled rasters
+  
+  # NOTE: if pathsubsets = NULL, it will crash. can avoid by setting pathsubsets = path, but may be more elegant solution.
   if (substr(x = pathsubsets, start = nchar(pathsubsets), stop = nchar(pathsubsets)) == "/") pathsubsets = substr(x = pathsubsets, start = 1, stop = nchar(pathsubsets) - 1)
   
   filelist_subsets <- as.list(list.files(path = pathsubsets, pattern = pattern, recursive = TRUE))
@@ -103,7 +106,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   # Create new folder to save to
   dir.create(paste0(path, "/", scalefolder))
   
-  # Scale to max of maxes (maximum value becomes 1)
+  # Scale all raster values to max of maxes (maximum value becomes 1)
   rasterlist %<>%
     lapply(function(x) x / scalemax) %>% # scaling occurs here
     lapply(function(x) raster::writeRaster(x = x, # save scaled individual rasters
@@ -143,6 +146,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   # Now weight the group-level UD raster
   All_Rasters_Scaled_Weighted <- All_Rasters_Scaled / weighting
+  rm(All_Rasters_Scaled) # Remove, as not used again
   
   # Save this raster too
   raster::writeRaster(x = All_Rasters_Scaled_Weighted, # resave individual rasters
@@ -162,7 +166,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   
   
-  # 2. Now we will deal with the creation of a group-level UD raster for plotting purposes
+  # 2. Now we will deal with the creation of a group-level UD raster for plotting purposes ####
   
   # Standardize so the values within the raster sum to 1 (required to run the getVolumeUD() below)
   All_Rasters_Scaled_Weighted <- All_Rasters_Scaled_Weighted / sum(raster::values(All_Rasters_Scaled_Weighted))    
@@ -185,7 +189,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
                       bylayer = bylayer,
                       overwrite = overwrite)
   
-  # Ensure again that no NAs exist in the raster; replae by 0
+  # Ensure again that no NAs exist in the raster; replace by 0
   All_Rasters_Scaled_Weighted_LatLon@data@values[is.na(All_Rasters_Scaled_Weighted_LatLon@data@values)] <- 0
   
   # Ensure again that cell values within a raster sum to 1
@@ -193,7 +197,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   
   
-  # 3. Below we will deal with the calculation of volume areas.
+  # 3. Below we will deal with the calculation of volume areas ####
   # Replace any occurring NAs with 0s. These may be introduced if region-specific UD areas do not have the same extent.
   replaceNA <- function(x, na.rm, ...){
     if (is.na(x[1]))
@@ -201,10 +205,10 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
     else
       return(x)
   }
-  tmp <- rasterlist %>% sapply(function(x) raster::calc(x, fun = replaceNA))
+  UDlist <- rasterlist %>% sapply(function(x) raster::calc(x, fun = replaceNA))
   
   # Convert the scaled individual-level rasters within rasterlist to class ".UD". Also ensure that values within a raster sum to 1 so that they can be fed into getVolumeUD()
-  UDlist <- tmp %>% sapply(function(x) new(".UD", x / sum(raster::values(x))))
+  UDlist <- UDlist %>% sapply(function(x) new(".UD", x / sum(raster::values(x))))
   
   # Below code calculates 50% and 95% volume areas per UD, the mean and stdev across UDs, and finally core and home range volume area sizes of the group-level UD
   # A. individual core and home range volume area sizes
@@ -259,61 +263,5 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
             row.names = FALSE)
   
   if (returnObj) return(All_Rasters_Scaled_Weighted)
-  
-  
-  
-  # ### BELOW CODE CHUNK USES THE PROJECTED LATLON RASTER FOR GROUP-LEVEL VOLUME AREA CALCULATIONS.
-  # # 3.
-  # UDScaled.ll <- All_Rasters_Scaled_Weighted_LatLon / sum(raster::values(All_Rasters_Scaled_Weighted_LatLon))
-  # # class      : RasterLayer 
-  # # dimensions : 117, 179, 20943  (nrow, ncol, ncell)
-  # # resolution : 0.001900188, 0.001900188  (x, y)
-  # # extent     : -79.46607, -79.12593, 25.57557, 25.7979  (xmin, xmax, ymin, ymax)
-  # # crs        : +proj=longlat +datum=WGS84 +no_defs 
-  # # source     : memory
-  # # names      : All_Rasters_Summed 
-  # # values     : 0, 0.007328744  (min, max)
-  # # The dimensions and max raster value are different from the UDScaled raster..
-  # 
-  # UDScaled.ll <- new(".UD", UDScaled.ll)
-  # 
-  # group_area.50.ll <- round((sum(raster::values(move::getVolumeUD(UDScaled.ll) <= .50)) * rasterres) / 1000000, 2)
-  # group_area.50.ll
-  # group_area.95.ll <- round((sum(raster::values(move::getVolumeUD(UDScaled.ll) <= .95)) * rasterres) / 1000000, 2)
-  # group_area.95.ll
-  # 
-  # # Combine in a single df
-  # area.ct <- data.frame(core.use = area.50,
-  #                       general.use = area.95
-  # )
-  # 
-  # # Create ID column from row.names and kill row names
-  # area.ct$ID <- row.names(area.ct)
-  # row.names(area.ct) <- NULL
-  # 
-  # # Add mean, sd and group-level UD values
-  # area.ct <- rbind(area.ct,
-  #                  c(area.50.mean,
-  #                    area.95.mean,
-  #                    "mean_across_UDs"),
-  #                  c(area.50.sd,
-  #                    area.95.sd,
-  #                    "sd_across_UDs"),
-  #                  c(group_area.50.ll,
-  #                    group_area.95.ll,
-  #                    "Group-level_UD")
-  # )
-  # core.use general.use              ID
-  # 1      4.2       15.52          X19692
-  # 2      4.2       15.52 mean_across_UDs
-  # 3     <NA>        <NA>   sd_across_UDs
-  # 4     4.28       15.72  Group-level_UD
-  # Slight differences in 50% and 95% volume area size
-  # 
-  # write.csv(area.ct,
-  #           file = paste0(path, "/", scalefolder, "/","VolumeAreas_ScaledAllFish.csv"),
-  #           row.names = FALSE)
-  # 
-  # if (returnObj) return(All_Rasters_Scaled_Weighted_LatLon)
   
 }
