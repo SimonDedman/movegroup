@@ -148,14 +148,6 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   All_Rasters_Scaled_Weighted <- All_Rasters_Scaled / weighting
   rm(All_Rasters_Scaled) # Remove, as not used again
   
-  # Save this raster too
-  raster::writeRaster(x = All_Rasters_Scaled_Weighted, # resave individual rasters
-                      filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted", pattern),
-                      format = format,
-                      datatype = datatype,
-                      bylayer = bylayer,
-                      overwrite = overwrite)
-  
   # Change projection of All_Rasters_Scaled_Weighted to latlon for proper plotting
   dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
   raster::crs(All_Rasters_Scaled_Weighted) <- dataCRS
@@ -171,15 +163,29 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   # Standardize so the values within the raster sum to 1 (required to run the getVolumeUD() below)
   All_Rasters_Scaled_Weighted <- All_Rasters_Scaled_Weighted / sum(raster::values(All_Rasters_Scaled_Weighted))    
   
+  # Save this raster too
+  raster::writeRaster(x = All_Rasters_Scaled_Weighted, # resave individual rasters
+                      filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted", pattern),
+                      format = format,
+                      datatype = datatype,
+                      bylayer = bylayer,
+                      overwrite = overwrite)
+  
   # Change the crs to LatLong for plotting and calculation purposes
   All_Rasters_Scaled_Weighted_LatLon <- raster::projectExtent(object = All_Rasters_Scaled_Weighted, crs = sp::CRS("+proj=longlat")) # crs = proj
   
   # Change res so x & y match (kills values)
   raster::res(All_Rasters_Scaled_Weighted_LatLon) <- rep(mean(raster::res(All_Rasters_Scaled_Weighted_LatLon)), 2)
   
-  # Now project raster
+  # Now project old values to new raster
   All_Rasters_Scaled_Weighted_LatLon <- raster::projectRaster(from = All_Rasters_Scaled_Weighted,
                                                               to = All_Rasters_Scaled_Weighted_LatLon)
+  
+  # Ensure again that no NAs exist in the raster; replace by 0
+  All_Rasters_Scaled_Weighted_LatLon@data@values[is.na(All_Rasters_Scaled_Weighted_LatLon@data@values)] <- 0
+  
+  # Ensure again that cell values within a raster sum to 1
+  All_Rasters_Scaled_Weighted_LatLon <- All_Rasters_Scaled_Weighted_LatLon / sum(raster::values(All_Rasters_Scaled_Weighted_LatLon))
   
   # Save the raster
   raster::writeRaster(x = All_Rasters_Scaled_Weighted_LatLon, 
@@ -188,12 +194,6 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
                       datatype = datatype,
                       bylayer = bylayer,
                       overwrite = overwrite)
-  
-  # Ensure again that no NAs exist in the raster; replace by 0
-  All_Rasters_Scaled_Weighted_LatLon@data@values[is.na(All_Rasters_Scaled_Weighted_LatLon@data@values)] <- 0
-  
-  # Ensure again that cell values within a raster sum to 1
-  All_Rasters_Scaled_Weighted_LatLon <- All_Rasters_Scaled_Weighted_LatLon / sum(raster::values(All_Rasters_Scaled_Weighted_LatLon))
   
   
   

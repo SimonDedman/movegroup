@@ -294,7 +294,7 @@ dBBMMplot <- function(
     
     ggplot2::geom_sf(data = stars::st_contour(x = x,
                                               contour_lines = TRUE,
-                                              breaks = max(x[[1]], na.rm = TRUE) * 0.5
+                                              breaks = max(x[[1]], na.rm = TRUE) * 0.2
     ) %>%
       sf::st_transform(3857), fill = NA, inherit.aes = FALSE, ggplot2::aes(colour = "50% UD")) +
     ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour, "95% UD" = contour1colour)) +

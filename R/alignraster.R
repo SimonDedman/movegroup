@@ -65,7 +65,10 @@ alignraster <- function(folderroots = c("/home/simon/Dropbox/PostDoc Work/Rob Bu
 ) {
   if (length(folderroots) != length(foldernames)) stop("length of folderroots and foldernames must be equal")
   # If folderroots or savefolder have a terminal slash, remove it, it's added later
-  if (substr(x = folderroots, start = nchar(folderroots), stop = nchar(folderroots)) == "/") folderroots = substr(x = folderroots, start = 1, stop = nchar(folderroots) - 1)
+  for (folders in folderroots) {
+    if (substr(x = folders, start = nchar(folders), stop = nchar(folders)) == "/") folderroots[which(folderroots %in% folders)] = substr(x = folders, start = 1, stop = nchar(folders) - 1)
+  }
+  
   if (substr(x = savefolder, start = nchar(savefolder), stop = nchar(savefolder)) == "/") savefolder = substr(x = savefolder, start = 1, stop = nchar(savefolder) - 1)
   
   foldernames %<>% as.list()
