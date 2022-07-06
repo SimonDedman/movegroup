@@ -146,7 +146,7 @@ dBBMMplot <- function(
   y <- x # make dupe object else removing all data < 0.05 means the 0.05 contour doesn't work in ggplot
   if (trim) { # trim raster extent to data?
     is.na(y[[1]]) <- y[[1]] == 0 # replace char pattern (0) in whole df/tbl with NA
-    is.na(y[[1]]) <- y[[1]] < (max(y[[1]], na.rm = TRUE) * 0.05) # replace anything > 95% contour with NA since it won't be drawn
+    is.na(y[[1]]) <- y[[1]] < (max(y[[1]], na.rm = TRUE) * 0.05) # replace anything < 95% contour with NA since it won't be drawn
   }
   y %<>% starsExtra::trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
   
@@ -291,10 +291,9 @@ dBBMMplot <- function(
     sf::st_transform(3857), # Vector transform after st_contour()  4326
     fill = NA, inherit.aes = FALSE,
     ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
-    
     ggplot2::geom_sf(data = stars::st_contour(x = x,
                                               contour_lines = TRUE,
-                                              breaks = max(x[[1]], na.rm = TRUE) * 0.2
+                                              breaks = max(x[[1]], na.rm = TRUE) * 0.5
     ) %>%
       sf::st_transform(3857), fill = NA, inherit.aes = FALSE, ggplot2::aes(colour = "50% UD")) +
     ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour, "95% UD" = contour1colour)) +
@@ -321,7 +320,6 @@ dBBMMplot <- function(
       legend.key = ggplot2::element_blank(), 
       text = ggplot2::element_text(size = fontsize,  family = fontfamily)
     ) # removed whitespace buffer around legend boxes which is nice
-  
   ggplot2::ggsave(filename = filesavename, plot = ggplot2::last_plot(), device = "png", path = savedir, scale = 1,
                   #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
                   width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)
