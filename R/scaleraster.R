@@ -137,12 +137,12 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   All_Rasters_Scaled <- All_Rasters_Summed / raster::maxValue(All_Rasters_Summed)
   
   # Save this raster
-  # raster::writeRaster(x = All_Rasters_Scaled,
-  #                     filename = paste0(path, "/", scalefolder, "/", scaledname, pattern),
-  #                     format = format,
-  #                     datatype = datatype,
-  #                     bylayer = bylayer,
-  #                     overwrite = overwrite)
+  raster::writeRaster(x = All_Rasters_Scaled,
+                      filename = paste0(path, "/", scalefolder, "/", scaledname, pattern),
+                      format = format,
+                      datatype = datatype,
+                      bylayer = bylayer,
+                      overwrite = overwrite)
   
   # Now weight the group-level UD raster
   All_Rasters_Scaled_Weighted <- All_Rasters_Scaled / weighting
@@ -164,12 +164,12 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   All_Rasters_Scaled_Weighted <- All_Rasters_Scaled_Weighted / sum(raster::values(All_Rasters_Scaled_Weighted))    
   
   # Save this raster too
-  raster::writeRaster(x = All_Rasters_Scaled_Weighted, # resave individual rasters
-                      filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted", pattern),
-                      format = format,
-                      datatype = datatype,
-                      bylayer = bylayer,
-                      overwrite = overwrite)
+  # raster::writeRaster(x = All_Rasters_Scaled_Weighted, # resave individual rasters
+  #                     filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted", pattern),
+  #                     format = format,
+  #                     datatype = datatype,
+  #                     bylayer = bylayer,
+  #                     overwrite = overwrite)
   
   # Change the crs to LatLong for plotting and calculation purposes
   All_Rasters_Scaled_Weighted_LatLon <- raster::projectExtent(object = All_Rasters_Scaled_Weighted, crs = sp::CRS("+proj=longlat")) # crs = proj
@@ -227,8 +227,16 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   # 3. Group-level core and home range volume areas
   UDScaled <- new(".UD", All_Rasters_Scaled_Weighted) # This uses the aeqd raster for calculations
-  UDScaled <- UDScaled / sum(raster::values(UDScaled)) # Safety 
-  UDScaled <- new(".UD", All_Rasters_Scaled_Weighted) # Convert back to .UD so getVolumeUD can work
+  # UDScaled <- UDScaled / sum(raster::values(UDScaled)) # Safety: ensures raster values sum to 1
+  # UDScaled <- new(".UD", UDScaled) # Convert back to .UD so getVolumeUD can work
+  
+  # Save the raster
+  raster::writeRaster(x = UDScaled, 
+                      filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted_UDScaled", pattern),
+                      format = format,
+                      datatype = datatype,
+                      bylayer = bylayer,
+                      overwrite = overwrite)
   
   group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 2)
   group_area.50
