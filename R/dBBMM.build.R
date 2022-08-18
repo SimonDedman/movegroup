@@ -76,7 +76,7 @@ dBBMMhomeRange <- function(
     Group = NULL, # name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?
     dat.TZ = "US/Eastern", # timezone for as.POSIXct.
     proj = sp::CRS("+proj=longlat +datum=WGS84"), # CRS for move function.
-    projectedCRS = "+init=epsg:32617", # EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone
+    projectedCRS = "+init=epsg:32617", # EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone. This is around Bimini, Bahamas.
     sensor = "VR2W", # sensor for move function. Single character or vector with length of the number of coordinates. Optional.
     moveLocError = 1, # location error in metres for move function. Numeric. Either single or a vector of lenth nrow data.
     timeDiffLong = 2, # threshold length of time in timeDiffUnits designating long breaks in relocations.
@@ -85,7 +85,7 @@ dBBMMhomeRange <- function(
     buffpct = 0.3, # buffer extent for raster creation, proportion of 1.
     rasterExtent = NULL, # if NULL, raster extent calculated from data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 for ymax
     # Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash
-    rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation.
+    rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. This is around Bimini, Bahamas.
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
     bbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
     bbdext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
