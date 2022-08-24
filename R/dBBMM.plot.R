@@ -138,21 +138,28 @@ dBBMMplot <- function(
   if (!is.null(receiverlats) & !is.null(receivernames)) if (length(receiverlats) != length(receivernames)) stop("length of receivernames must equal length of receiverlats/lons")
   if (!is.null(receiverlats) & !is.null(receiverrange)) if (length(receiverrange) != length(receiverlons)) if (length(receiverrange) != 1) stop("length of receiverrange must equal length of receiverlats/lons, or 1")
   
-  x <- raster(x)
-  dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
+  x <- raster::raster(x) # raster not in imports####
+  # x min max +- 29000
+  dataCRS <- readRDS(paste0(crsloc, "CRS.Rds")) # should be 3857
+  # dataCRS@projargs: "+proj=aeqd +lat_0=25.6871 +lon_0=-79.29617 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
   raster::crs(x) <- dataCRS
   
   # for plotting the surface UD on the map:
   surfaceUD <- stars::st_as_stars(x) %>%
-    sf::st_set_crs(4326)
+    sf::st_set_crs(4326) # 4326 = WGS84. Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: degree
+  # %>% sf::st_transform(3857)
   
   # use fishtrack3d function to convert to volumeUD raster
   x <- fishtrack3d::volumeUD(x)
+  # Warning in install.packages : package ‘fishtrack3d’ is not available for this version of R (4.2)####
+  # need this until Edzer fix. Needed for MyLocation & contours
   
   # create 50% and 95% contour spdf
   spdf.50 <- fishtrack3d::contourPoly(x, levels = c(0.5))
   sf_50 <- sf::st_as_sf(spdf.50) %>%  # convert to sf
-    sf::st_transform(3857) # set CRS
+    sf::st_transform(3857) # set CRS.
+  # 3857 = WGS 84 / Pseudo-Mercator, Google Maps, OpenStreetMap, Bing, ArcGIS, ESRI, World between 85.06°S and 85.06°N.
+  # Cartesian 2D CS. Axes: easting, northing (X,Y). Orientations: east, north. UoM: m.
   
   spdf.95 <- fishtrack3d::contourPoly(x, levels = c(0.95))
   sf_95 <- sf::st_as_sf(spdf.95) %>%  # convert to sf
@@ -241,7 +248,7 @@ dBBMMplot <- function(
     attr(map, "bb")$ur.lon <- bbox_3857["xmax"]
     map
   }
-  myMap <- ggmap_bbox(myMap) # Use the function
+  myMap <- ggmap_bbox(myMap) # Use the function. Resulting map is CRS 3857
   
   # Automate width * height adjustments for different map extent / ratio
   # 6 (manually chosen width, below), divided by width range times by height range
@@ -265,7 +272,7 @@ dBBMMplot <- function(
     }
   }
   
-  ggmap::ggmap(myMap) +
+  ggmap::ggmap(myMap) + # basemap CRS = 3857
     
     ### NOTE: Removed 79110 rows containing missing values (geom_raster): UD SURFACE DID NOT PLOT!
     stars::geom_stars(data = surfaceUD) +
@@ -273,7 +280,8 @@ dBBMMplot <- function(
     # receiver centrepoints
     {if (!is.null(receiverlats) & !is.null(receiverlons))
       ggplot2::geom_sf(data = receiver %>%
-                         sf::st_transform(3857), # Vector transform after st_contour()  4326
+                         sf::st_transform(3857), # Vector transform after st_contour
+                       # already 3857 above so converting twice but it ain't broke
                        colour = recpointscol,
                        fill = recpointsfill,
                        alpha = recpointsalpha,
@@ -286,7 +294,8 @@ dBBMMplot <- function(
     # receiver buffer circles
     {if (!is.null(receiverlats) & !is.null(receiverlons) & !is.null(receiverrange))
       ggplot2::geom_sf(data = sf::st_buffer(receiver, dist = receiverrange) %>%
-                         sf::st_transform(3857), # Vector transform after st_contour()  4326
+                         sf::st_transform(3857), # Vector transform after st_contour
+                       # already 3857 above so converting twice but it ain't broke
                        colour = recbufcol,
                        fill = recbuffill,
                        alpha = recbufalpha,
@@ -297,7 +306,8 @@ dBBMMplot <- function(
     # receiver labels
     {if (!is.null(receiverlats) & !is.null(receiverlons) & !is.null(receivernames))
       ggplot2::geom_sf_label(data = receiver %>%
-                               sf::st_transform(3857), # Vector transform after st_contour()  4326
+                               sf::st_transform(3857), # Vector transform after st_contour
+                             # already 3857 above so converting twice but it ain't broke
                              colour = reclabcol,
                              fill = reclabfill,
                              inherit.aes = FALSE,
@@ -311,12 +321,14 @@ dBBMMplot <- function(
     } +
     
     ggplot2::geom_sf(data = sf_95 %>%
-                     sf::st_transform(3857), # Vector transform after st_contour()  4326
+                     sf::st_transform(3857), # Vector transform after st_contour
+                     # already 3857 above so converting twice but it ain't broke
                      fill = NA, inherit.aes = FALSE,
                      ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
     
     ggplot2::geom_sf(data = sf_50 %>%
-                       sf::st_transform(3857), 
+                     sf::st_transform(3857),
+                     # already 3857 above so converting twice but it ain't broke
                      fill = NA, inherit.aes = FALSE, 
                      ggplot2::aes(colour = "50% UD")) +
     
