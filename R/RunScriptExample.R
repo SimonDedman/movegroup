@@ -1,5 +1,7 @@
-# dBBMM ####
-# by month? season? region?
+#' Run Script Example
+#'
+#' Description paragraph:
+
 
 saveloc <- "/home/simon/Dropbox/Blocklab Monterey/Data/IrishTags/dBBMM/"
 
