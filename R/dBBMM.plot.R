@@ -146,7 +146,7 @@ dBBMMplot <- function(
   
   # for plotting the surface UD on the map:
   surfaceUD <- stars::st_as_stars(x) %>%
-    sf::st_set_crs(4326) # 4326 = WGS84. Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: degree
+    sf::st_set_crs(3857) # 4326 = WGS84. Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: degree
   # %>% sf::st_transform(3857)
   
   # use fishtrack3d function to convert to volumeUD raster
