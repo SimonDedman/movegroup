@@ -1,0 +1,892 @@
+---
+title: "Script 4 - run dBBMMs"
+author: "Maurits van Zinnicq Bergmann"
+date: "12 Apr 2022"
+output: html_document
+  html_document: default
+  pdf_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+## Clear memory
+
+```{r clear memory}
+rm(list = ls())
+```
+
+## Data loading
+
+Load libraries
+
+```{r load_library,result='hide',message=F}
+library(magrittr)
+library(lubridate)
+library(sp)
+library(dplyr)
+library(tidylog)
+library(remotes)
+# remotes::install_github("SimonDedman/dBBMMhomeRange", force = TRUE)
+library(dBBMMhomeRange)
+library(beepr)
+library(raster)
+library(terra)
+
+# Specify saveloc
+saveloc <- "~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/" #Mo
+```
+
+Load data set
+
+```{r read files,warning=F}
+DET <- readRDS(file.path("Data files/detsvtrack.rds"))                                             #Acoustic detections
+tagsvtrack <- readRDS(file.path("Data files/tagsvtrack.rds"))                                      #Tag metadata
+RSF_final <- get(load(file.path("Output files/RSF_final.RData")))                           #Used to filter for tags
+```
+
+Housekeeping and tidy up
+
+```{r housekeeping}
+# Filter for only those tags that were used in the RF/RSF analysis
+# tagsvtrack <- as.data.frame(RSF_final) %>%
+#   as.data.frame() %>%
+#   dplyr::select(Tag.ID) %>%
+#   distinct() %>%
+#   inner_join(., tagsvtrack,
+#              by = c("Tag.ID" = "transmitter_id")
+#              ) %>%
+#   mutate(Elasmo = make.names(Tag.ID))
+# rm(RSF_final)
+# 
+# DET %<>%
+#   mutate(
+#     Elasmo = make.names(Transmitter), #Prefixes "X" to numerical-named sharks to avoid issues later
+#     Station.Name = as.character(Station.Name)
+#   ) %>%
+#   inner_join(.,tagsvtrack, by = "Elasmo") %>%
+#   rename(
+#     Lat = Latitude,
+#     Lon = Longitude,
+#     Datetime = Date.and.Time..UTC. #Is actually already in the correct time zone
+#   ) %>%
+#   dplyr::select(
+#     Datetime,
+#     Elasmo,
+#     scientific_name,
+#     Station.Name,
+#     Lat,
+#     Lon
+#   ) %>%
+#   arrange(
+#     Elasmo,
+#     Datetime
+#   ) %>%
+#   filter( # locations that fall outsidet he spatial extent of habitat map
+#     !(Station.Name %in% c("mini wall", "north rock", "mozel bank", "longline b east", "longline c east", "south west south turtle",
+#                           "south west turtle", "Tigtanic", "Nurse Wing", "west turtle", "west west turtle", "Triangle Rocks"))
+#   )
+# 
+# # Add season
+# #first create a new df that lists the seasons per year
+# length <- 12*1000 # nbr months * nbr years to run the sequence
+# time.seq <- seq(from = as.POSIXct("1900-12-01 00:00", format = "%Y-%m-%d %H:%M", tz="US/Eastern"), length.out = length, by = "month")
+# season <- rep(c(rep(c("winter","summer"), each = 6)), times=length/12)
+# dat <- data.frame(time.seq,season)
+# 
+# # Transform df$DayDate to from Date to POSIXct, via character
+# DET$DayDate <- as.character(DET$Datetime)
+# DET$DayDate <- as.POSIXct(DET$DayDate, format = "%Y-%m-%d")
+# 
+# # Now link the right season to each data row
+# DET$Season <- dat$season[findInterval(DET$DayDate, dat$time.seq)]
+# 
+# # Remove DayDate
+# DET <- DET %>%
+#   dplyr::select(-DayDate)
+# 
+# rm(length, time.seq, season, dat)
+
+# save(DET, file = "~/github/Bimini-multi-elasmo-species-movement-analysis/Data files/DET_dBBMM.RData") ### USE THIS DATA OBJECT FOR CREATING AN ACOUSTIC SUMMARY FOR THE MS
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Data files/DET_dBBMM.RData") #Already ran
+
+# Create also a receiver file that contains the coordinates. Needed for plotting later on
+rec <- DET %>% group_by(Station.Name, Lat, Lon) %>%
+  summarise(n = n()) %>%
+  dplyr::select(Station.Name,
+                Lat,
+                Lon)
+```
+
+Now we need to pre-filter for species, region and season (see van Zinnicq Bergmann et al. 2022) for weighting purposes
+
+```{r filtering data}
+# CHANGE THIS ONLY:
+i = 4 #Select species
+j = 3 #Select region: central = 1, north = 2, south = 3
+k = 2 #Select season: summer = 1, winter = 2
+l = 2 #Select life stage: adult = 1, juv = 2
+
+spp <- sort(unique(DET$scientific_name))
+# [1] "Carcharhinus leucas"    "Carcharhinus limbatus"  "Carcharhinus perezi"   
+# [4] "Galeocerdo cuvier"      "Ginglymostoma cirratum" "Hypanus americanus"    
+# [7] "Negaprion brevirostris" "Sphyrna mokarran"
+
+# Select species
+spp.f <- spp[i]
+
+# Filter for species
+DET.i <- filter(DET, scientific_name == spp.f)
+
+if(spp.f == "Negaprion brevirostris"){
+  # Select and filter for life stage
+  juvenile <- c("X23163", "X23159", "X25602", "X14754", "X19684", "X14767", "X16956", "X27548")
+  adult <- c("X14755", "X27550")
+  
+  ls <- list(adult, juvenile)
+  
+  DET.i <- DET.i %>%
+    filter(Elasmo %in% ls[[l]])
+}
+
+# Filter for season
+seas <- c("summer", "winter")
+seas.f <- seas[k]
+
+DET.i <- filter(DET.i, Season == seas.f)
+
+# Filter for region
+# sort(unique(DET$Station.Name))
+#  [1] "bimini barge"               "bonefish hole"             
+#  [3] "bonefish hole channel flag" "Duck Pond"                 
+#  [5] "East Round Rock"            "east wells north east"     
+#  [7] "grate west"                 "longline a"                
+#  [9] "longline a east"            "longline a south"          
+# [11] "longline b"                 "longline c"                
+# [13] "longline d"                 "mini barge west"           
+# [15] "new barge"                  "north finger 1"            
+# [17] "north finger 2"             "north pier"                
+# [19] "north sound 1"              "north sound 2"             
+# [21] "northwest turtle rock"      "pier"                      
+# [23] "pigeon cay"                 "Plane Wreck"               
+# [25] "radio channel 1"            "radio channel 2"           
+# [27] "radio channel 3"            "radio channel 4"           
+# [29] "sharkland marsh"            "south bimini 1"            
+# [31] "south bimini 1 south"       "south bimini 2"            
+# [33] "south bimini 2 south"       "south bimini 3"            
+# [35] "south bimini 3 south"       "south bimini 4"            
+# [37] "south bimini 4 south"       "south bimini north east"   
+# [39] "south longline a east"      "Turtle Honey Hole"         
+# [41] "west north west turtle"     "west round rock"           
+# [43] "west west round rock"             
+# length(unique(DET$Station.Name)) #43
+
+# A. South & southwest
+south <- c("East Round Rock", "Duck Pond", "Plane Wreck", "Turtle Honey Hole",
+           "south bimini 1", "south bimini 2", "south bimini 3", "south bimini 4",
+           "south bimini 1 south", "south bimini 2 south", "south bimini 3 south", "south bimini 4 south",
+           "bimini barge","grate west",
+           "west west round rock", "west round rock", "west north west turtle", "northwest turtle rock")
+# length(south) #18
+DET.i.s <- filter(DET.i, Station.Name %in% south)
+  
+# B. Central: lagoon & bank
+central <- c("north sound 1", "north sound 2", "sharkland marsh", "pigeon cay",
+             "radio channel 1", "radio channel 2", "radio channel 3", "radio channel 4",
+             "bonefish hole", "bonefish hole channel flag",
+             "south bimini north east", "longline a south", "longline a", "longline b", "longline c", "longline d",
+             "longline a east","south longline a east")
+# length(central) #18
+DET.i.c <- filter(DET.i, Station.Name %in% central)
+
+# C. North
+north <- c("mini barge west", "new barge", "pier", "north pier",
+           "east wells north east", "north finger 1", "north finger 2")
+# length(north) #7
+DET.i.n <- filter(DET.i, Station.Name %in% north)
+
+# Select region and data set
+regions <- c("Central", "North", "South")
+ds <- list(DET.i.c, DET.i.n, DET.i.s)
+
+ds.j <- ds[[j]]
+table(ds.j$Elasmo)
+length(unique(ds.j$Elasmo))
+reg <- regions[j]
+
+# Select weight
+weight <- c(length(central), length(north), length(south)) #Number of receivers per grid cell per region.
+w <- weight[j]
+```
+
+Now that we have done the preparations, it's time to use the dBBMMhomeRange package:
+1. run dBBMM.build.R (change this filename to dBBMMhomeRange.R ?) for each species & region
+2. run scaleraster on each array
+new script: # 3. Pull All_Rasters_Scaled.asc from each array/scaled subfolder
+And weight each (of 3) scaleraster outputs by number of cells containing any receiver (a number the user calculates).
+Save to a single folder.
+
+```{r dBBMMhomeRange}
+# Construct individual-level dBBMMs.
+
+dBBMMhomeRange(
+  data = ds.j, # data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping columns.
+  ID = "Elasmo", # column name of IDs of individuals.
+  Datetime = "Datetime", # name of Datetime column. Must be in POSIXct format.
+  Lat = "Lat", # name of Lat & Lon columns in data.
+  Lon = "Lon",
+  Group = NULL, # name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?
+  dat.TZ = "US/Eastern", # timezone for as.POSIXct.
+  
+  proj = sp::CRS("+proj=longlat +datum=WGS84"), # CRS for move function. 
+  projectedCRS = "+init=epsg:32617", # 32617 EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone
+  sensor = "VR2W", # sensor for move function. Single character or vector with length of the number of coordinates. Optional.
+  moveLocError = 500, # location error in metres for move function. Numeric. Either single or a vector of lenth nrow data.
+  timeDiffLong = 2, # threshold length of time in timeDiffUnits designating long breaks in relocations.
+  timeDiffUnits = "hours", # units for time difference for move function.
+  center = TRUE, # center move object within extent? See spTransform.
+  buffpct = 3, # buffer extent for raster creation, proportion of 1.
+  rasterExtent = NULL, # if NULL, raster extent calculated from data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 for ymax
+  # Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash
+  rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. 17
+  rasterResolution = 200, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
+  bbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
+  bbdext = 0.3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
+  bbdwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
+  writeRasterFormat = "ascii",
+  writeRasterExtension = ".asc",
+  writeRasterDatatype = "FLT4S",
+  absVolumeAreaSaveName = "VolumeArea_AbsoluteScale.csv",
+  savedir = paste0(saveloc, spp.f, "/", reg, "/"),  # save outputs to a temporary directory (default) else.
+  alerts = TRUE # audio warning for failures
+) 
+beep(4)
+
+
+
+# Scale rasters from 0 to 1. WARNING: MAKE SURE ALL INDIVIDUAL-LEVEL UDs OF INTEREST HAVE BEEN CREATED FIRST BEFORE RUNNING SCALERASTER()
+scaleraster(
+  path = paste0(saveloc, spp.f, "/", reg, "/"),
+  pathsubsets = paste0(saveloc, spp.f), # Location of files created by dBBMM.build. No terminal slash.
+  pattern = ".asc",
+  weighting = w,
+  # weighting to divide individual and summed-scaled rasters by, for unbalanced arrays
+  format = "ascii",
+  datatype = "FLT4S",
+  bylayer = TRUE,
+  overwrite = TRUE,
+  scalefolder = "Scaled",
+  summedname = "All_Rasters_Summed",
+  scaledname = "All_Rasters_Scaled",
+  crsloc = paste0(saveloc, spp.f, "/", reg, "/"),
+  # location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
+  returnObj = FALSE
+)
+beep(4)
+
+
+
+# The region-level rasters have different extents. Fix this with the next code.
+alignraster(folderroots = c(paste0(saveloc, spp.f, "/", "North/"), # character vector of locations of folder roots output by dBBMMhomeRange. Function expects CRS.Rds file and a subfolder with the scaled raster.
+                                        #paste0(saveloc, spp.f, "/", "Central/"),
+                                        paste0(saveloc, spp.f, "/", "South/")),
+                        foldernames = c("North", 
+                                        #"Central", 
+                                        "South"), # character vector names of folders corresponding to files in folderroots, i.e. the names of the objects, arrays, regions, etc.
+                        pattern = ".asc", # for input rasters from scaleraster
+                        scalefolder = "Scaled", # for input rasters from scaleraster
+                        scaledname = "All_Rasters_Scaled_Weighted", # for input rasters from scaleraster
+                        savefolder = paste0(saveloc, spp.f, "/", "Aligned/"), # single character entry, no trailing slash
+                        format = "ascii", # save format
+                        datatype = "FLT4S", # save format
+                        bylayer = TRUE, # save format
+                        overwrite = TRUE, # save format
+                        returnObj = FALSE # return rasterlist object?
+)
+beep(4)
+
+
+# Now we need to scale and combine rasters again. But no weighting this time.
+scaleraster(
+  path = paste0(saveloc, spp.f, "/Aligned/"), # Location of files created by dBBMM.build. No terminal slash.
+  pathsubsets = paste0(saveloc, spp.f, "/Aligned/"), # This should be the same as path
+  pattern = ".asc",
+  weighting = 1,
+  # weighting to divide individual and summed-scaled rasters by, for unbalanced arrays
+  format = "ascii",
+  datatype = "FLT4S",
+  bylayer = TRUE,
+  overwrite = TRUE,
+  scalefolder = "Scaled",
+  summedname = "All_Rasters_Summed",
+  scaledname = "All_Rasters_Scaled",
+  crsloc = paste0(saveloc, spp.f, "/", "Aligned/"),
+  # location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
+  returnObj = FALSE
+)
+beep(4)
+
+
+
+# Not plot the data
+dBBMMplot(
+  x = paste0(saveloc, spp.f, "/", "Aligned/Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"), # path to scaled data
+  # dataCRS = 2958, # one of (i) character: a string accepted by GDAL, (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs.
+  crsloc = paste0(saveloc, spp.f, "/", "Aligned/"), # Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
+  trim = TRUE, # remove NA & 0 values and crop to remaining date extents? Default TRUE
+  myLocation = c(-79.31, 25.69, -79.23, 25.78), # NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
+  # Default NULL, extents autocreated from data.
+  # c(-79.31, 25.69, -79.23, 25.78)
+  googlemap = FALSE, # If pulling basemap from Google maps, this sets expansion
+  # factors since Google Maps tiling zoom setup doesn't align to myLocation
+  # extents.
+  gmapsAPI = NULL, # enter your Google maps API here, quoted character string
+  expandfactor = 1.6, # extents expansion factor for basemap.
+  # 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out).
+  # 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
+  mapzoom = 12, # google: 3 (continent) - 21 (building). stamen: 0-18
+  mapsource = "stamen", # Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.
+  maptype = "terrain", # Type of map for ggmap::get_map.
+  contour1colour = "blue", # colour for contour 1, typically 95%.
+  contour2colour = "red", # colour for contour 2, typically 50%.
+  plottitle = "Tiger sharks (winter)",
+  # Can use the term 'home range' when an animal can be detected wherever it goes
+  # i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic
+  # receivers cover the entire home range of the study species. 
+  # This term is problematic when applied to a passive acoustic telemetry setting
+  # where an array of non-overlapping receivers are used to assess local space use patterns
+  # i.e. the home range is bigger than the coverage by the acoustic array; put in Details
+  plotsubtitle = "", # paste0("Scaled contours. n = "), # DET %>% dplyr::distinct(ID) %>% nrow() # 13
+  legendtitle = "",
+  plotcaption = "", # paste0("dBBMM_HomeRange, ", lubridate::today()),
+  axisxlabel = "Longitude",
+  axisylabel = "Latitude",
+  legendposition = c(0.12, 0.92), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top.
+  fontsize = 12,
+  fontfamily = "Times New Roman",
+  filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
+  savedir = paste0(saveloc, spp.f, "/", "Aligned/Plot/"), # file.path(work.dir, out.dir, "Scaled")
+  receiverlats = rec$Lat, # vector of latitudes for receivers to be plotted
+  receiverlons = rec$Lon, # vector of longitudes for receivers to be plotted
+  receivernames = NULL, # vector of names for receivers to be plotted
+  receiverrange = 500, # single (will be recycled), or vector of detection ranges in metres for receivers to be plotted
+  recpointscol = "black", # Colour of receiver centrepoint outlines.
+  recpointsfill = "white", # Colour of receiver centrepoint fills.
+  recpointsalpha = 0.5, # Alpha value of receiver centrepoint fills, 0 (invisible) to 1 (fully visible).
+  recpointssize = 1, # Size of receiver points.
+  recpointsshape = 21, # Shape of receiver points, default 21, circle with outline and fill.
+  recbufcol = "grey75", # Colour of the receiver buffer circle outlines.
+  recbuffill = "grey", # Colour of the receiver buffer circle fills.
+  recbufalpha = 0,  # Alpha value of receiver buffer fills, 0 (invisible) to 1 (fully visible).
+  reclabcol = "black", # Receiver label text colour.
+  reclabfill = NA, # Receiver label fill colour, NA for no fill.
+  reclabnudgex = 0, # Receiver label offset nudge in X dimension.
+  reclabnudgey = -200, # Receiver label offset nudge in Y dimension.
+  reclabpad = 0, # Receiver label padding in lines.
+  reclabrad = 0.15, # Receiver label radius in lines.
+  reclabbord = 0 # Receiver label border in mm.
+)
+beep(4)
+```
+
+Save plots to disk so they can be fed to {cowplot}
+
+```{r save to disk}
+x = paste0(saveloc, spp.f, "/", "Aligned/Scaled/All_Rasters_Scaled_Weighted_LatLon.asc") # path to scaled data
+  # dataCRS = 2958, # one of (i) character: a string accepted by GDAL, (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs.
+  trim = TRUE # remove NA & 0 values and crop to remaining date extents? Default TRUE
+  myLocation = c(-79.31, 25.69, -79.23, 25.78) # NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
+  # Default NULL, extents autocreated from data.
+  # c(-79.31, 25.69, -79.23, 25.78)
+  googlemap = FALSE # If pulling basemap from Google maps, this sets expansion
+  # factors since Google Maps tiling zoom setup doesn't align to myLocation
+  # extents.
+  gmapsAPI = NULL # enter your Google maps API here, quoted character string
+  expandfactor = 1.6 # extents expansion factor for basemap.
+  # 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out).
+  # 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
+  mapzoom = 12 # google: 3 (continent) - 21 (building). stamen: 0-18
+  mapsource = "stamen" # Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.
+  maptype = "terrain" # Type of map for ggmap::get_map.
+  contour1colour = "blue" # colour for contour 1, typically 95%.
+  contour2colour = "red" # colour for contour 2, typically 50%.
+  plottitle = ""
+  # Can use the term 'home range' when an animal can be detected wherever it goes
+  # i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic
+  # receivers cover the entire home range of the study species. 
+  # This term is problematic when applied to a passive acoustic telemetry setting
+  # where an array of non-overlapping receivers are used to assess local space use patterns
+  # i.e. the home range is bigger than the coverage by the acoustic array; put in Details
+  plotsubtitle = "" # paste0("Scaled contours. n = "), # DET %>% dplyr::distinct(ID) %>% nrow() # 13
+  legendtitle = ""
+  plotcaption = "" # paste0("dBBMM_HomeRange, ", lubridate::today()),
+  axisxlabel = "Longitude"
+  axisylabel = "Latitude"
+  legendposition = c(0.12, 0.92) #%dist (of middle? of legend box) from L to R, %dist from Bot to Top.
+  fontsize = 12
+  fontfamily = "Times New Roman"
+  filesavename = paste0(lubridate::today(), "_dBBMM-contours.png")
+  savedir = paste0(saveloc, spp.f, "/", "Aligned/Plot/") # file.path(work.dir, out.dir, "Scaled")
+  receiverlats = rec$Lat # vector of latitudes for receivers to be plotted
+  receiverlons = rec$Lon # vector of longitudes for receivers to be plotted
+  receivernames = NULL # vector of names for receivers to be plotted
+  receiverrange = 500 # single (will be recycled), or vector of detection ranges in metres for receivers to be plotted
+  recpointscol = "black" # Colour of receiver centrepoint outlines.
+  recpointsfill = "white" # Colour of receiver centrepoint fills.
+  recpointsalpha = 0.5 # Alpha value of receiver centrepoint fills, 0 (invisible) to 1 (fully visible).
+  recpointssize = 1 # Size of receiver points.
+  recpointsshape = 21 # Shape of receiver points, default 21, circle with outline and fill.
+  recbufcol = "grey75" # Colour of the receiver buffer circle outlines.
+  recbuffill = "grey" # Colour of the receiver buffer circle fills.
+  recbufalpha = 0 # Alpha value of receiver buffer fills, 0 (invisible) to 1 (fully visible).
+  reclabcol = "black" # Receiver label text colour.
+  reclabfill = NA # Receiver label fill colour, NA for no fill.
+  reclabnudgex = 0 # Receiver label offset nudge in X dimension.
+  reclabnudgey = -200 # Receiver label offset nudge in Y dimension.
+  reclabpad = 0 # Receiver label padding in lines.
+  reclabrad = 0.15 # Receiver label radius in lines.
+  reclabbord = 0 # Receiver label border in mm.
+
+# Import raster
+  x <- stars::read_stars(x) %>% sf::st_set_crs(4326) # 4326 2958
+  # read_stars doens't have most of the info that raster() has
+  # class(dataCRS)
+  if (stars::st_raster_type(x) == "curvilinear") stop(print("x is curvilinear; first reproject to planar"))
+  # Warning message: object ‘is_curvilinear’ is not exported by 'namespace:stars'
+  # https://github.com/r-spatial/stars/issues/464
+  
+  y <- x # make dupe object else removing all data < 0.05 means the 0.05 contour doesn't work in ggplot
+  if (trim) { # trim raster extent to data?
+    is.na(y[[1]]) <- y[[1]] == 0 # replace char pattern (0) in whole df/tbl with NA
+    is.na(y[[1]]) <- y[[1]] < (max(y[[1]], na.rm = TRUE) * 0.05) # replace anything < 95% contour with NA since it won't be drawn
+  }
+  y %<>% starsExtra::trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
+  
+  if (is.null(myLocation)) myLocation <- sf::st_bbox(y) %>% as.vector() # st_bbox(y %>% st_transform(4326))
+  
+  # Create basemap with gbm.auto####
+  # # Remove gbm.auto from dependency at top if not using
+  # dir.create(paste0(out.dir, "basemap"))
+  # bounds <- myLocation[c(1, 3, 2, 4)] # c(xmin,xmax,ymin,ymax)
+  # # run to generate basemap:
+  # crop_map <- gbm.basemap(bounds = bounds,
+  #                         res = "f",
+  #                         # getzip = paste0(work.dir, out.dir, "basemap/GSHHS_shp"), # comment out first time, uncomment subsequent
+  #                         savedir = paste0(work.dir, out.dir, "basemap"),
+  #                         returnsf = TRUE)
+  # # run to use generated basemap later:
+  # crop_map <- st_read(dsn = paste0(work.dir, out.dir, "basemap/CroppedMap/Crop_Map.shp"),
+  #                     layer = paste0("Crop_Map"),
+  #                     quiet = TRUE) # read in worldmap
+  
+  # if (is.null(gmapsAPI)) register_google(key = gmapsAPI, # an api key
+  #                                        account_type = "standard",
+  #                                        write = TRUE)
+  
+  if (mapsource != "google") googlemap <- FALSE # in case user forgot to set both
+  
+  if (expandfactor != 0) { # grow bounds extents if requested
+    xmid <- mean(myLocation[c(1,3)])
+    ymid <- mean(myLocation[c(2,4)])
+    xmax <- ((myLocation[3] - xmid) * expandfactor) + xmid #updated for sf/st
+    xmin <- xmid - ((xmid - myLocation[1]) * expandfactor)
+    ymax <- ((myLocation[4] - ymid) * expandfactor) + ymid
+    ymin <- ymid - ((ymid - myLocation[2]) * expandfactor)
+    myLocation <- c(xmin, ymin, xmax, ymax)
+    if (googlemap) myLocation <- c(mean(c(myLocation[1], myLocation[3])), mean(c(myLocation[2], myLocation[4]))) # googlemap needs a center lon lat
+  }
+  
+  myMap <- ggmap::get_map(
+    location = myLocation, # -62.57564  28.64368  33.78889  63.68533 # stamen etc want a bounding box
+    zoom = mapzoom, # 3 (continent) - 21 (building)
+    # scale = "auto", # default "auto", 1, 2, 4 all the same
+    source = mapsource, # "google" # using stamen as fallback
+    maptype = maptype, # "satellite"
+    messaging = TRUE,
+    crop = TRUE # google maps crs = 4326
+  ) 
+  
+  # class(myMap) # "ggmap"  "raster"
+  # tmp <- raster::crop(x = myMap, y = myLocation)
+  # Error in (function (classes, fdef, mtable): unable to find an inherited method for function ‘crop’ for signature ‘"ggmap"’
+  
+  # Define a function to fix the bbox to be in EPSG:3857
+  # https://stackoverflow.com/a/50844502/1736291
+  # Fixes "error no lon value" in ggmap below
+  # Move this to separate script & source it####
+  ggmap_bbox <- function(map) {
+    if (!inherits(map, "ggmap")) stop("map must be a ggmap object")
+    # Extract the bounding box (in lat/lon) from the ggmap to a numeric vector, 
+    # and set the names to what sf::st_bbox expects:
+    map_bbox <- setNames(unlist(attr(map, "bb")), c("ymin", "xmin", "ymax", "xmax"))
+    # Convert the bbox to an sf polygon, transform it to 3857, 
+    # and convert back to a bbox (convoluted, but it works)
+    bbox_3857 <- sf::st_bbox(sf::st_transform(sf::st_as_sfc(sf::st_bbox(map_bbox, crs = 4326)), 3857))
+    # Overwrite the bbox of the ggmap object with the transformed coordinates 
+    attr(map, "bb")$ll.lat <- bbox_3857["ymin"]
+    attr(map, "bb")$ll.lon <- bbox_3857["xmin"]
+    attr(map, "bb")$ur.lat <- bbox_3857["ymax"]
+    attr(map, "bb")$ur.lon <- bbox_3857["xmax"]
+    map
+  }
+  myMap <- ggmap_bbox(myMap) # Use the function
+  
+  # Automate width * height adjustments for different map extent / ratio
+  # 6 (manually chosen width, below), divided by width range times by height range
+  # Maintains ratio by scales height to width(6). Then *1.2 because it still wasn't perfect.
+  # attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]] # longitude, x, width, bind as 6
+  # attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]] # latitude, y, height
+  autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]]) * 1.2
+  
+  # Create receiver objects
+  if (!is.null(receiverlats) & !is.null(receiverlons)) {
+    receiver <- data.frame(lon = receiverlons,
+                           lat = receiverlats)
+    receiver <- sf::st_as_sf(receiver, coords = c("lon","lat")) %>%
+      sf::st_set_crs(4326) %>%
+      sf::st_transform(3857)
+    if (!is.null(receivernames)) {
+      receiver <- cbind(receiver, receivernames)
+    }
+    if (!is.null(receiverrange)) {
+      receiver <- cbind(receiver, receiverrange)
+    }
+  }
+  
+  reef_w <- ggmap::ggmap(myMap) +
+    
+    # receiver centrepoints
+    {if (!is.null(receiverlats) & !is.null(receiverlons))
+      ggplot2::geom_sf(data = receiver %>%
+                         sf::st_transform(3857), # Vector transform after st_contour()  4326
+                       colour = recpointscol,
+                       fill = recpointsfill,
+                       alpha = recpointsalpha,
+                       size = recpointssize,
+                       shape = recpointsshape,
+                       inherit.aes = FALSE,
+      )
+    } +
+    
+    # receiver buffer circles
+    {if (!is.null(receiverlats) & !is.null(receiverlons) & !is.null(receiverrange))
+      ggplot2::geom_sf(data = sf::st_buffer(receiver, dist = receiverrange) %>%
+                         sf::st_transform(3857), # Vector transform after st_contour()  4326
+                       colour = recbufcol,
+                       fill = recbuffill,
+                       alpha = recbufalpha,
+                       inherit.aes = FALSE
+      )
+    } +
+    
+    # receiver labels
+    {if (!is.null(receiverlats) & !is.null(receiverlons) & !is.null(receivernames))
+      ggplot2::geom_sf_label(data = receiver %>%
+                               sf::st_transform(3857), # Vector transform after st_contour()  4326
+                             colour = reclabcol,
+                             fill = reclabfill,
+                             inherit.aes = FALSE,
+                             nudge_x = reclabnudgex,
+                             nudge_y = reclabnudgey,
+                             label.padding = unit(reclabpad, "lines"), # 0.25
+                             label.r = unit(reclabrad, "lines"),
+                             label.size = reclabbord, # 0.25
+                             ggplot2::aes(label = receivernames)
+      )
+    } +
+    
+    ggplot2::geom_sf(data = stars::st_contour(x = x,
+                                              contour_lines = TRUE, # makes lines not polys regardless of T or F
+                                              breaks = max(x[[1]], na.rm = TRUE) * 0.05
+    ) %>%
+      # breaks could be function param, but only allows 2 breaks. Whatevs ####
+    sf::st_transform(3857), # Vector transform after st_contour()  4326
+    fill = NA, inherit.aes = FALSE,
+    ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
+    ggplot2::geom_sf(data = stars::st_contour(x = x,
+                                              contour_lines = TRUE,
+                                              breaks = max(x[[1]], na.rm = TRUE) * 0.5
+    ) %>%
+      sf::st_transform(3857), fill = NA, inherit.aes = FALSE, ggplot2::aes(colour = "50% UD")) +
+    ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour, "95% UD" = contour1colour)) +
+    # https://stackoverflow.com/questions/64425970/ggmap-in-r-keep-google-copyright-information-on-cropped-map
+    # scale_x_continuous(limits = c(myLocation[1], myLocation[3]), expand = c(0, 0)) +
+    # scale_y_continuous(limits = c(myLocation[2], myLocation[4]), expand = c(0, 0)) +
+    #   Coordinate system already present. Adding new coordinate system, which will replace the existing one.
+    # Scale for 'x' is already present. Adding another scale for 'x', which will replace the existing scale.
+    # Scale for 'y' is already present. Adding another scale for 'y', which will replace the existing scale.
+    # Warning message: Removed 1 rows containing missing values (geom_rect). 
+    
+    ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
+    ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      legend.position = legendposition, #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
+      legend.spacing.x = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
+      legend.spacing.y = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
+      legend.title = ggplot2::element_text(size = 8),
+      legend.text = ggplot2::element_text(size = 8),
+      legend.background = ggplot2::element_rect(fill = "white", colour = NA), # element_blank(),
+      panel.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
+      plot.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
+      legend.key = ggplot2::element_blank(), 
+      text = ggplot2::element_text(size = fontsize,  family = fontfamily)
+    ) # removed whitespace buffer around legend boxes which is nice
+
+save(reef_w, file = "~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/reef_w.RData")
+
+```
+
+Create the cowplot
+
+```{r cowplot}
+library(tidyverse)
+library(cowplot)
+# if(!require(devtools)) install.packages("devtools")
+# devtools::install_github("kassambara/ggpubr")
+library(ggpubr)
+
+
+# Load summer maps
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/blacktip_s.RData") #Blacktip
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/bull_s.RData") #Bull
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/reef_s.RData") #C.reef
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/hammer_s.RData") #Great hammerhead
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/lemon_a_s.RData") #Lemon adult
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/lemon_j_s.RData") #Lemon juv
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/nurse_s.RData") #Nurse
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/ray_s.RData") #Southern stingray
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/tiger_s.RData") #Tiger
+
+# Prepare plots
+bt <- blacktip_s + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0), colour = "black"),
+    axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"))
+  #scale_x_continuous(labels = function(breaks) {rep_along(breaks, "")})
+
+bu <- bull_s + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    #axis.text.y = element_text(colour = "white"), 
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"),
+    axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"))
+  #scale_x_continuous(labels = function(breaks) {rep_along(breaks, "")})
+
+rf <- reef_s + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    #axis.text.y = element_text(colour = "white"),
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"),
+    axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"))
+  #scale_x_continuous(labels = function(breaks) {rep_along(breaks, "")})
+
+hm <- hammer_s + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0), colour = "black"),
+    axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"))
+  #scale_x_continuous(labels = function(breaks) {rep_along(breaks, "")})
+
+lm.a <- lemon_a_s + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    #axis.text.y = element_text(colour = "white"),
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"),
+    axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"))
+  #scale_x_continuous(labels = function(breaks) {rep_along(breaks, "")})
+
+lm.j <- lemon_j_s + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    #axis.text.y = element_text(colour = "white"),
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"),
+    axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"))
+  #scale_x_continuous(labels = function(breaks) {rep_along(breaks, "")})
+
+nu <- nurse_s + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0), colour = "black"),
+    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0), colour = "black"))
+
+ra <- ray_s + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    #axis.text.y = element_text(colour = "white"),
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"),
+    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0), colour = "black"))
+
+ti <- tiger_s + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    #axis.text.y = element_text(colour = "white"),
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"),
+    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0), colour = "black"))
+
+# Combine plots
+UD_plots <- cowplot ::plot_grid(
+  bt, bu, rf, hm, lm.a, lm.j, nu, ra, ti,
+  ncol = 3,
+  labels = "AUTO",
+  label_fontfamily = "Times",
+  label_size = 14,
+  align = "hv"
+  #hjust = -6, #Default = -.5
+  #vjust = 6 #Default = 1.5
+)
+
+# Save to disk
+cowplot::save_plot(filename = "~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/UD_plots_summer.png", 
+                   UD_plots, base_height = 20, base_width = 15)
+
+
+
+# Load winter maps
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/blacktip_w.RData") #Blacktip
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/bull_w.RData") #Bull
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/reef_w.RData") #C.reef
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/hammer_w.RData") #Great hammerhead
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/lemon_a_w.RData") #Lemon adult
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/lemon_j_w.RData") #Lemon juv
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/nurse_w.RData") #Nurse
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/ray_w.RData") #Southern stingray
+load("~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/tiger_w.RData") #Tiger
+
+# Prepare plots
+bt <- blacktip_w + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0), colour = "black"),
+    axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"))
+  #scale_x_continuous(labels = function(breaks) {rep_along(breaks, "")})
+
+bu <- bull_w + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    #axis.text.y = element_text(colour = "white"), 
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"),
+    axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"))
+  #scale_x_continuous(labels = function(breaks) {rep_along(breaks, "")})
+
+rf <- reef_w + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    #axis.text.y = element_text(colour = "white"),
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"),
+    axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"))
+  #scale_x_continuous(labels = function(breaks) {rep_along(breaks, "")})
+
+hm <- hammer_w + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0), colour = "black"),
+    axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"))
+  #scale_x_continuous(labels = function(breaks) {rep_along(breaks, "")})
+
+lm.a <- lemon_a_w + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    #axis.text.y = element_text(colour = "white"),
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"),
+    axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"))
+  #scale_x_continuous(labels = function(breaks) {rep_along(breaks, "")})
+
+lm.j <- lemon_j_w + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    #axis.text.y = element_text(colour = "white"),
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"),
+    axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"))
+  #scale_x_continuous(labels = function(breaks) {rep_along(breaks, "")})
+
+nu <- nurse_w + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0), colour = "black"),
+    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0), colour = "black"))
+
+ra <- ray_w + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    #axis.text.y = element_text(colour = "white"),
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"),
+    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0), colour = "black"))
+
+ti <- tiger_w + 
+  theme_set(theme_cowplot(font_size=12, font_family = "Times")) + 
+  theme(
+    legend.position="none", 
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+    #axis.text.y = element_text(colour = "white"),
+    plot.margin = unit(c(1, 0, .5, 1), "cm"),
+    axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0), colour = "white"),
+    axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0), colour = "black"))
+
+# Combine plots
+UD_plots <- cowplot ::plot_grid(
+  bt, bu, rf, hm, lm.a, lm.j, nu, ra, ti,
+  ncol = 3,
+  labels = "AUTO",
+  label_fontfamily = "Times",
+  label_size = 14,
+  align = "hv"
+  #hjust = -6, #Default = -.5
+  #vjust = 6 #Default = 1.5
+)
+
+# Save to disk
+cowplot::save_plot(filename = "~/github/Bimini-multi-elasmo-species-movement-analysis/Output files (dBBMM)/UD_plots_winter.png", 
+                   UD_plots, base_height = 20, base_width = 15)
+```
