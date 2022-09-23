@@ -67,6 +67,7 @@
 #' @param reclabpad Receiver label padding in lines.
 #' @param reclabrad Receiver label radius in lines.
 #' @param reclabbord Receiver label border in mm.
+#' @param surface Plot complete UD surface as well as contours.
 
 dBBMMplot <- function(
     x = paste0("Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"), # path to scaled data
@@ -100,7 +101,7 @@ dBBMMplot <- function(
     plotcaption = paste0("dBBMM_HomeRange, ", lubridate::today()),
     axisxlabel = "Longitude",
     axisylabel = "Latitude",
-    legendposition = c(0.16, 0.92), # Percent distance (of middle? of legend box) from L to R, percent distance from Bottom to Top.
+    legendposition = c(0.11, 0.85), # Percent distance (of middle? of legend box) from L to R, percent distance from Bottom to Top.
     fontsize = 12,
     fontfamily = "Times New Roman",
     filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
@@ -123,7 +124,8 @@ dBBMMplot <- function(
     reclabnudgey = -200, # Receiver label offset nudge in Y dimension.
     reclabpad = 0, # Receiver label padding in lines.
     reclabrad = 0.15, # Receiver label radius in lines.
-    reclabbord = 0 # Receiver label border in mm.
+    reclabbord = 0, # Receiver label border in mm.
+    surface = TRUE # Plot complete UD surface as well as contours
 ) {
   
   # ToDo
@@ -138,50 +140,60 @@ dBBMMplot <- function(
   if (!is.null(receiverlats) & !is.null(receivernames)) if (length(receiverlats) != length(receivernames)) stop("length of receivernames must equal length of receiverlats/lons")
   if (!is.null(receiverlats) & !is.null(receiverrange)) if (length(receiverrange) != length(receiverlons)) if (length(receiverrange) != 1) stop("length of receiverrange must equal length of receiverlats/lons, or 1")
   
-  x <- raster::raster(x) # raster not in imports####
-  # x min max +- 29000
-  dataCRS <- readRDS(paste0(crsloc, "CRS.Rds")) # should be 3857
-  # dataCRS@projargs: "+proj=aeqd +lat_0=25.6871 +lon_0=-79.29617 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
-  raster::crs(x) <- dataCRS
+  # raster version####
+  # x <- raster::raster(x) # raster not in imports####
+  # # x min max +- 29000
+  # dataCRS <- readRDS(paste0(crsloc, "CRS.Rds")) # should be 3857
+  # # dataCRS@projargs: "+proj=aeqd +lat_0=25.6871 +lon_0=-79.29617 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+  # raster::crs(x) <- dataCRS
+  
+  # fishtrack3d version####
+  # # use fishtrack3d function to convert to volumeUD raster
+  # x <- fishtrack3d::volumeUD(x)
+  # # Warning in install.packages : package ‘fishtrack3d’ is not available for this version of R (4.2)####
+  # # need this until Edzer fix. Needed for MyLocation & contours
+  # 
+  # # create 50% and 95% contour spdf
+  # spdf.50 <- fishtrack3d::contourPoly(x, levels = c(0.5))
+  # sf_50 <- sf::st_as_sf(spdf.50) %>%  # convert to sf
+  #   sf::st_transform(3857) # set CRS.
+  # # 3857 = WGS 84 / Pseudo-Mercator, Google Maps, OpenStreetMap, Bing, ArcGIS, ESRI, World between 85.06°S and 85.06°N.
+  # # Cartesian 2D CS. Axes: easting, northing (X,Y). Orientations: east, north. UoM: m.
+  # 
+  # spdf.95 <- fishtrack3d::contourPoly(x, levels = c(0.95))
+  # sf_95 <- sf::st_as_sf(spdf.95) %>%  # convert to sf
+  #   sf::st_transform(3857) # set CRS
+  
+  # stars version ####
+  # Import raster
+  x <- stars::read_stars(x)
+  # %>% sf::st_set_crs(4326) # 4326 2958
+  st_crs(x) <- proj4string(dataCRS) # set CRS
   
   # for plotting the surface UD on the map:
-  surfaceUD <- stars::st_as_stars(x) %>%
-    sf::st_set_crs(3857) # 4326 = WGS84. Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: degree
+  # surfaceUD <- x %>% sf::st_set_crs(3857) # 4326 = WGS84. Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: degree
   # %>% sf::st_transform(3857)
   
-  # use fishtrack3d function to convert to volumeUD raster
-  x <- fishtrack3d::volumeUD(x)
-  # Warning in install.packages : package ‘fishtrack3d’ is not available for this version of R (4.2)####
-  # need this until Edzer fix. Needed for MyLocation & contours
   
-  # create 50% and 95% contour spdf
-  spdf.50 <- fishtrack3d::contourPoly(x, levels = c(0.5))
-  sf_50 <- sf::st_as_sf(spdf.50) %>%  # convert to sf
-    sf::st_transform(3857) # set CRS.
-  # 3857 = WGS 84 / Pseudo-Mercator, Google Maps, OpenStreetMap, Bing, ArcGIS, ESRI, World between 85.06°S and 85.06°N.
-  # Cartesian 2D CS. Axes: easting, northing (X,Y). Orientations: east, north. UoM: m.
-  
-  spdf.95 <- fishtrack3d::contourPoly(x, levels = c(0.95))
-  sf_95 <- sf::st_as_sf(spdf.95) %>%  # convert to sf
-    sf::st_transform(3857) # set CRS
-  
-  # # Import raster
-  # # x <- stars::read_stars(x) %>% sf::st_set_crs(4326) # 4326 2958
-  # # read_stars doens't have most of the info that raster() has
-  # # class(dataCRS)
   # if (stars::st_raster_type(x) == "curvilinear") stop(print("x is curvilinear; first reproject to planar"))
-  # # Warning message: object ‘is_curvilinear’ is not exported by 'namespace:stars'
-  # # https://github.com/r-spatial/stars/issues/464
-  # 
-  # y <- x # make dupe object else removing all data < 0.05 means the 0.05 contour doesn't work in ggplot
-  # if (trim) { # trim raster extent to data?
-  #   is.na(y[[1]]) <- y[[1]] == 0 # replace char pattern (0) in whole df/tbl with NA
-  #   is.na(y[[1]]) <- y[[1]] < (max(y[[1]], na.rm = TRUE) * 0.05) # replace anything < 95% contour with NA since it won't be drawn
-  # }
-  # y %<>% starsExtra::trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
+  # Warning message: object ‘is_curvilinear’ is not exported by 'namespace:stars'
+  # https://github.com/r-spatial/stars/issues/464
   
-  # if (is.null(myLocation)) myLocation <- sf::st_bbox(y) %>% as.vector() # st_bbox(y %>% st_transform(4326))
-  if (is.null(myLocation)) myLocation <- sf_95 %>% sf::st_transform(4326) %>% sf::st_bbox() %>% as.vector()
+  
+  # Trim data to plot surface
+  y <- x # make dupe object else removing all data < 0.05 means the 0.05 contour doesn't work in ggplot
+  if (trim) { # trim raster extent to data?
+    is.na(y[[1]]) <- y[[1]] == 0 # replace char pattern (0) in whole df/tbl with NA
+    is.na(y[[1]]) <- y[[1]] < (max(y[[1]], na.rm = TRUE) * 0.05) # replace anything < 95% contour with NA since it won't be drawn
+  }
+  y %<>% starsExtra::trim2() # remove NA columns, which were all zero columns. This changes the bbox accordingly
+  y[[1]] <- (y[[1]] / max(y[[1]], na.rm = TRUE)) * 100 # convert from raw values to 0:100 scale so legend is 0:100%
+  
+  # if (is.null(myLocation)) myLocation <- y %>% sf::st_transform(4326) %>% sf::st_bbox() %>% as.vector() # trimmer raster extents are smaller than UD95 contours
+  # if (is.null(myLocation)) myLocation <- sf_95 %>% sf::st_transform(4326) %>% sf::st_bbox() %>% as.vector() # not using sf_95 any more
+  if (is.null(myLocation)) myLocation <- stars::st_contour(x = x, contour_lines = TRUE, breaks = max(x[[1]], na.rm = TRUE) * 0.05) %>%
+    sf::st_transform(4326) %>% sf::st_bbox() %>% as.vector()
+  
   
   # Create basemap with gbm.auto####
   # # Remove gbm.auto from dependency at top if not using
@@ -217,17 +229,13 @@ dBBMMplot <- function(
   
   myMap <- ggmap::get_map(
     location = myLocation, # -62.57564  28.64368  33.78889  63.68533 # stamen etc want a bounding box
-    zoom = mapzoom, # 3 (continent) - 21 (building)
+    zoom = mapzoom, # 3 (continent) - 21 (building). Stamen: 0-18
     # scale = "auto", # default "auto", 1, 2, 4 all the same
     source = mapsource, # "google" # using stamen as fallback
     maptype = maptype, # "satellite"
     messaging = TRUE,
     crop = TRUE # google maps crs = 4326
   ) 
-  
-  # class(myMap) # "ggmap"  "raster"
-  # tmp <- raster::crop(x = myMap, y = myLocation)
-  # Error in (function (classes, fdef, mtable): unable to find an inherited method for function ‘crop’ for signature ‘"ggmap"’
   
   # Define a function to fix the bbox to be in EPSG:3857
   # https://stackoverflow.com/a/50844502/1736291
@@ -272,10 +280,13 @@ dBBMMplot <- function(
     }
   }
   
+  # plot map ####
   ggmap::ggmap(myMap) + # basemap CRS = 3857
     
-    ### NOTE: Removed 79110 rows containing missing values (geom_raster): UD SURFACE DID NOT PLOT!
-    stars::geom_stars(data = surfaceUD) +
+    # UD surface 
+    {if (surface)
+      stars::geom_stars(data = y %>% sf::st_transform(3857), inherit.aes = FALSE)
+    } +
     
     # receiver centrepoints
     {if (!is.null(receiverlats) & !is.null(receiverlons))
@@ -320,19 +331,57 @@ dBBMMplot <- function(
       )
     } +
     
-    ggplot2::geom_sf(data = sf_95 %>%
-                     sf::st_transform(3857), # Vector transform after st_contour
-                     # already 3857 above so converting twice but it ain't broke
-                     fill = NA, inherit.aes = FALSE,
-                     ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
+    # 95% UD
+    # ggplot2::geom_sf(data = sf_95 %>%
+    #                    sf::st_transform(3857), # Vector transform after st_contour
+    #                  # already 3857 above so converting twice but it ain't broke
+    #                  fill = NA, inherit.aes = FALSE,
+    #                  ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
     
-    ggplot2::geom_sf(data = sf_50 %>%
-                     sf::st_transform(3857),
-                     # already 3857 above so converting twice but it ain't broke
-                     fill = NA, inherit.aes = FALSE, 
+    ggplot2::geom_sf(data = stars::st_contour(x = x,
+                                              contour_lines = TRUE,
+                                              breaks = max(x[[1]],
+                                                           na.rm = TRUE) * 0.05),
+                     fill = NA,
+                     inherit.aes = FALSE,
+                     ggplot2::aes(colour = "95% UD")) +
+    
+    # 50% UD
+    # ggplot2::geom_sf(data = sf_50 %>%
+    #                    sf::st_transform(3857),
+    #                  # already 3857 above so converting twice but it ain't broke
+    #                  fill = NA, inherit.aes = FALSE,
+    #                  ggplot2::aes(colour = "50% UD")) +
+    
+    ggplot2::geom_sf(data = stars::st_contour(x = x,
+                                              contour_lines = TRUE,
+                                              breaks = max(x[[1]],
+                                                           na.rm = TRUE) * 0.5),
+                     fill = NA,
+                     inherit.aes = FALSE,
                      ggplot2::aes(colour = "50% UD")) +
     
-    ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour, "95% UD" = contour1colour)) +
+    # UD surface colours
+  viridis::scale_fill_viridis(
+    alpha = 1, # 0:1
+    begin = 0, # hue
+    end = 1, # hue
+    direction = 1, # colour order, 1 or -1
+    discrete = FALSE, # false = continuous
+    option = "D", # A magma B inferno C plasma D viridis E cividis F rocket G mako H turbo
+    space = "Lab",
+    na.value = "grey50",
+    guide = "colourbar",
+    aesthetics = "fill",
+    # name = waiver(),
+    name = "UD%",
+    # limits = NA,
+    # position = "left"
+    position = "right"
+  ) +
+  
+  # UD contour colours
+  ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour, "95% UD" = contour1colour)) +
     # https://stackoverflow.com/questions/64425970/ggmap-in-r-keep-google-copyright-information-on-cropped-map
     # scale_x_continuous(limits = c(myLocation[1], myLocation[3]), expand = c(0, 0)) +
     # scale_y_continuous(limits = c(myLocation[2], myLocation[4]), expand = c(0, 0)) +
@@ -351,7 +400,7 @@ dBBMMplot <- function(
       legend.title = ggplot2::element_text(size = 8),
       legend.text = ggplot2::element_text(size = 8),
       legend.background = ggplot2::element_rect(fill = "white", colour = NA), # element_blank(),
-      panel.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
+      panel.background = ggplot2::element_rect(fill = "#99b3cc", colour = "grey50"), # Stamen ocean blue background
       plot.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
       legend.key = ggplot2::element_blank(), 
       text = ggplot2::element_text(size = fontsize,  family = fontfamily)

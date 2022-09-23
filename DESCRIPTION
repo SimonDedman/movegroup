@@ -29,4 +29,4 @@ Imports:
     starsExtra (>= 0.2.7),
     stringr (>= 1.4.0),
     tidyr (>= 1.2.0)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
