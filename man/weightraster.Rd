@@ -5,15 +5,15 @@
 \title{Succinct title 8 words max}
 \usage{
 weightraster(
- 
-    locations = c("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/H/Scaled",
+  locations =
+    c("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/H/Scaled",
     "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/L/Scaled",
     "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/M/Scaled"),
   rasternames = c("H", "L", "M"),
   pattern = "All_Rasters_Summed.asc",
   weightings = c(1, 2, 3),
- 
-    saveloc = "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/Weighted",
+  saveloc =
+    "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/Weighted",
   extension = ".asc",
   format = "ascii",
   datatype = "FLT4S",

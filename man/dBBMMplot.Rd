@@ -5,7 +5,8 @@
 \title{Succinct title 8 words max}
 \usage{
 dBBMMplot(
-  x = paste0("Scaled/All_Rasters_Scaled_LatLon.asc"),
+  x = paste0("Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"),
+  crsloc = NULL,
   trim = TRUE,
   myLocation = NULL,
   googlemap = FALSE,
@@ -22,7 +23,7 @@ dBBMMplot(
   plotcaption = paste0("dBBMM_HomeRange, ", lubridate::today()),
   axisxlabel = "Longitude",
   axisylabel = "Latitude",
-  legendposition = c(0.16, 0.92),
+  legendposition = c(0.11, 0.85),
   fontsize = 12,
   fontfamily = "Times New Roman",
   filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
@@ -45,11 +46,14 @@ dBBMMplot(
   reclabnudgey = -200,
   reclabpad = 0,
   reclabrad = 0.15,
-  reclabbord = 0
+  reclabbord = 0,
+  surface = TRUE
 )
 }
 \arguments{
 \item{x}{Path to scaled data.}
+
+\item{crsloc}{Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.}
 
 \item{trim}{Remove NA & 0 values and crop to remaining date extents? Default TRUE.}
 
@@ -134,6 +138,8 @@ space use patterns i.e. the home range is bigger than the coverage by the acoust
 \item{reclabrad}{Receiver label radius in lines.}
 
 \item{reclabbord}{Receiver label border in mm.}
+
+\item{surface}{Plot complete UD surface as well as contours.}
 }
 \description{
 Description paragraph: Automates delta log normal boosted regression trees abundance prediction.

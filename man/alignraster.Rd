@@ -5,16 +5,16 @@
 \title{Automated Boosted Regression Tree modelling and mapping suite}
 \usage{
 alignraster(
- 
-    folderroots = c("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/H",
+  folderroots =
+    c("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/H",
     "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/L",
     "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/M"),
   foldernames = c("H", "L", "M"),
   pattern = ".asc",
   scalefolder = "Scaled",
   scaledname = "All_Rasters_Scaled",
- 
-    savefolder = "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/Aligned",
+  savefolder =
+    "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/Aligned",
   format = "ascii",
   datatype = "FLT4S",
   bylayer = TRUE,

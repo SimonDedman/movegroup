@@ -6,8 +6,9 @@
 \usage{
 scaleraster(
   path = NULL,
+  pathsubsets = NULL,
   pattern = ".asc",
-  weighting = 1,
+  weighting = w,
   format = "ascii",
   datatype = "FLT4S",
   bylayer = TRUE,
@@ -21,6 +22,8 @@ scaleraster(
 }
 \arguments{
 \item{path}{No terminal slash.}
+
+\item{pathsubsets}{Location of parent folder that contains ALL files created by dBBMM.build. No terminal slash.}
 
 \item{pattern}{Default ".asc".}
 
