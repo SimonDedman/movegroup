@@ -168,7 +168,8 @@ dBBMMplot <- function(
   # Import raster
   x <- stars::read_stars(x)
   # %>% sf::st_set_crs(4326) # 4326 2958
-  st_crs(x) <- proj4string(dataCRS) # set CRS
+  dataCRS <- readRDS(paste0(crsloc, "CRS.Rds")) # load CRS from file
+  sf::st_crs(x) <- proj4string(dataCRS) # set CRS
   
   # for plotting the surface UD on the map:
   # surfaceUD <- x %>% sf::st_set_crs(3857) # 4326 = WGS84. Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: degree
