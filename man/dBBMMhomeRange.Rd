@@ -2,7 +2,7 @@
 % Please edit documentation in R/dBBMM.build.R
 \name{dBBMMhomeRange}
 \alias{dBBMMhomeRange}
-\title{Succinct title 8 words max}
+\title{Automates dynamic Brownian bridge construction}
 \usage{
 dBBMMhomeRange(
   data = NULL,
@@ -35,7 +35,7 @@ dBBMMhomeRange(
 )
 }
 \arguments{
-\item{data}{Data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping columns.}
+\item{data}{Data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping column.}
 
 \item{ID}{Column name of IDs of individuals.}
 
@@ -90,19 +90,16 @@ dBBMMhomeRange(
 \item{alerts}{Audio warning for failures.}
 }
 \value{
-what are the outputs?
+Individual-level utilization distributions, saved as rasters, as well as volume area estimates for 50% and 95% contours, saved in a .csv file
+
+saved to disk.
 }
 \description{
-Description paragraph: Automates delta log normal boosted regression trees abundance prediction.
-Loops through all permutations of parameters provided (learning
-rate, tree complexity, bag fraction), chooses the best, then simplifies it.
-Generates line, dot and bar plots, and outputs these and the predictions
-and a report of all variables used, statistics for tests, variable
-interactions, predictors used and dropped, etc. If selected, generates
-predicted abundance maps, and Unrepresentativeness surfaces.
-See www.GitHub.com/SimonDedman/gbm.auto for issues, feedback, and development
-suggestions. See SimonDedman.com for links to walkthrough paper, and papers
-and thesis published using this package.
+This function automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple 
+individuals simultaneously, via the brownian.bridge.dyn() {move}. It first removes those individuals for which there is insufficient data 
+i.e. number of re-locations is smaller than the window size parameter value (default = 31). Second, based on all remaining data, a universal 
+raster is generated where the calculated UDs are plotted into. Finally, remaining individuals are looped through to construct individual-level 
+movement models (on an absolute scale). See www.GitHub.com/SimonDedman/dBBMMhomeRange for issues, feedback, and development suggestions.
 }
 \details{
 Errors and their origins:

@@ -1,23 +1,41 @@
-# Raster Scaling function
-# Simon Dedman simondedman@gmail.com 2021-10-19
-
-#' Automated Boosted Regression Tree modelling and mapping suite
-#'
-#' Automates delta log normal boosted regression trees abundance prediction.
-#' Loops through all permutations of parameters provided (learning
-#' rate, tree complexity, bag fraction), chooses the best, then simplifies it.
-#' Generates line, dot and bar plots, and outputs these and the predictions
-#' and a report of all variables used, statistics for tests, variable
-#' interactions, predictors used and dropped, etc. If selected, generates
-#' predicted abundance maps, and Unrepresentativeness surfaces.
-#' See www.GitHub.com/SimonDedman/gbm.auto for issues, feedback, and development
-#' suggestions. See SimonDedman.com for links to walkthrough paper, and papers
-#' and thesis published using this package.
-#'
+#' Scales individual utilization distribution rasters and volume area estimates
+#' 
+#' Scales individual-level utilization distribution (UD) rasters from 0 to 1 to facilitate interpretation as relative 
+#' intensity of utilization (as opposed to absolute). Subsequently, scaled individual-level rasters are aggregated to 
+#' create a single group-level UD raster. See www.GitHub.com/SimonDedman/dBBMMhomeRange for issues, feedback, and 
+#' development suggestions. 
+#' 
+#' # Step 1 - Scale rasters
+#' Individual-level UD rasters are scaled from 0 to 1 by dividing each raster by the maximum probability density value
+#' occurring within the raster set.
+#' 
+#' # Step 2 - Aggregate into a group-level raster
+#' Scaled individual-level rasters are summed to create a single group-level UD raster. 
+#' 
+#' 
+#' # Step 3 - Re-scale from 0 to 1
+#' The group-level raster is divided by its own maximum value.
+#' 
+#' # Step 4 - Weight raster (optional)
+#' The scaled group-level UD raster is divided by the specified weighting factor(s). Note that this is only useful if you 
+#' want to account for an unbalanced receiver array and have split up the study site and receivers in clusters, and have 
+#' run the dBBMMhomeRange() for each cluster data set separately. See van Zinnicq Bergmann et al. 2022 
+#' (https://doi.org/10.1016/j.biocon.2022.109469) for example. If not applicable, choose a value of "1".
+#' 
+#' # Step 5 - Standardize raster 
+#' Standardize the potentially weighted and scaled group-level UD raster so that its values sum to 1.  (creates UDScaled, but is in .UD extension)
+#' 
+#' Step 6 - Change crs
+#' Change its crs to latlon for plotting and calculation purposes (DO WE WANT TO INCLUDE THIS? CURRENTLY DOES NOTHING)
+#' 
+#' Step 7 - Estimate 50% and 95% contour volume areas
+#' For each scaled individual-level UD raster, estimate 50% and 95% contour volume areas, as well as their mean and standard
+#' deviation. Additionally, th 50% and 95% volume area is estimated for the group-level UD raster.
+#' 
 #' @param path No terminal slash.
 #' @param pathsubsets Location of parent folder that contains ALL files created by dBBMM.build. No terminal slash.
 #' @param pattern Default ".asc".
-#' @param weighting Weighting to divide individual and summed-scaled rasters by, for unbalanced arrays. Individual, Scaled, and Scaled_Weighted rasters, and the volume areas csv, will have weightings applied, but NOT the summed raster.
+#' @param weighting Weighting to divide scaled group-level raster by, for unbalanced arrays. Scaled_Weighted rasters, and its volume areas csv, will have weightings applied, but NOT the summed raster.  MO NEED TO EDIT THIS
 #' @param format Default "ascii".
 #' @param datatype Default "FLT4S".
 #' @param bylayer Default TRUE.
@@ -28,9 +46,8 @@
 #' @param crsloc Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
 #' @param returnObj Logical. Return the scaled object to the parent environment? Default FALSE.
 #' 
-#' @return Line, dot and bar plots, a report of all variables used, statistics
-#' for tests, variable interactions, predictors used and dropped, etc. If
-#' selected generates predicted abundance maps, and Unrepresentativeness surface
+#' @return scaled individual-level and group-level utilization distributions saved as rasters. Additionally, scaled 50% and 95% 
+#' contour volume area estimates for individuals and the group, saved in .csv format.
 #'
 #' @details Errors and their origins:
 #' @examples
@@ -50,7 +67,7 @@
 scaleraster <- function(path = NULL, # Location of files created by dBBMM.build within a subset. No terminal slash.
                         pathsubsets = NULL, # Location of parent folder that contains ALL files created by dBBMM.build. No terminal slash.
                         pattern = ".asc",
-                        weighting = w, # Weighting to divide individual and summed-scaled rasters by, for unbalanced arrays
+                        weighting = w, # Weighting to divide summed-scaled rasters by, for unbalanced arrays
                         format = "ascii",
                         datatype = "FLT4S",
                         bylayer = TRUE,
