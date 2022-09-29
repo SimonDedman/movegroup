@@ -78,10 +78,10 @@ run the dBBMMhomeRange() for each cluster data set separately. See van Zinnicq B
 # Step 5 - Standardize raster 
 Standardize the potentially weighted and scaled group-level UD raster so that its values sum to 1.  (creates UDScaled, but is in .UD extension)
 
-Step 6 - Change crs
+# Step 6 - Change crs
 Change its crs to latlon for plotting and calculation purposes (DO WE WANT TO INCLUDE THIS? CURRENTLY DOES NOTHING)
 
-Step 7 - Estimate 50% and 95% contour volume areas
+# Step 7 - Estimate 50% and 95% contour volume areas
 For each scaled individual-level UD raster, estimate 50% and 95% contour volume areas, as well as their mean and standard
 deviation. Additionally, th 50% and 95% volume area is estimated for the group-level UD raster.
 
