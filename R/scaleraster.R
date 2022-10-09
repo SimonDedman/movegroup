@@ -28,9 +28,11 @@
 #' # Step 6 - Change crs
 #' Change its crs to latlon for plotting and calculation purposes (DO WE WANT TO INCLUDE THIS? CURRENTLY DOES NOTHING)
 #' 
-#' # Step 7 - Estimate 50% and 95% contour volume areas
-#' For each scaled individual-level UD raster, estimate 50% and 95% contour volume areas, as well as their mean and standard
-#' deviation. Additionally, th 50% and 95% volume area is estimated for the group-level UD raster.
+#' # Step 7 - Estimate 50 and 95pct contour volume areas
+#' For each scaled individual-level UD raster, estimate 50 and 95pct contour volume areas, as well as their mean and standard
+#' deviation. Additionally, the 50 and 95pct volume area is estimated for the group-level UD raster.
+#' 
+#' Errors and their origins.
 #' 
 #' @param path No terminal slash.
 #' @param pathsubsets Location of parent folder that contains ALL files created by dBBMM.build. No terminal slash.
@@ -49,7 +51,6 @@
 #' @return scaled individual-level and group-level utilization distributions saved as rasters. Additionally, scaled 50% and 95% 
 #' contour volume area estimates for individuals and the group, saved in .csv format.
 #'
-#' @details Errors and their origins:
 #' @examples
 #' \donttest{
 #' # Not run

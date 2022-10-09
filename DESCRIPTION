@@ -1,10 +1,12 @@
 Package: dBBMMhomeRange
-Title: Home Range for (marine) animals using dynamic brownian bridge movement models
+Title: Visualizing and Quantifying Animal Space Use Data
 Version: 0.0.9
 Authors@R: c(
     person("Simon", "Dedman", email = "simondedman@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9108-972X")),
-    person("Maurits", " Zinnicq Bergmann", role = c("aut"), comment = c(ORCID = "YOUR-ORCID-ID")))
-Description: What the package does (one paragraph).
+    person("Maurits", "van Zinnicq Bergmann", email = "mauritsvzb@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0002-8414-5025")))
+Description: Builds on the {move} package. Contains a function from this package to calculate a dynamic Brownian bridge movement model
+from movement data for individual animals, as well as functions to visualize and quantify space use for individuals aggregated in groups. 
+This package offers an easy and automated way to scale up individual-level space use analysis to that of groups.
 Depends:
     R (>= 4.1.0)
 License: MIT + file LICENSE

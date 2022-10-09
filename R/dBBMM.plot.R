@@ -29,7 +29,7 @@
 #' @param gmapsAPI Enter your google maps API here, quoted character string.
 #' @param expandfactor Extents expansion factor for basemap. 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out). 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
 #' @param mapzoom Google: 3 (continent) - 21 (building). stamen: 0-18.
-#' @param mapsource Source for ggmap::get_map; uses Stamen as fallback if no Goole Maps API present.
+#' @param mapsource Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.
 #' @param maptype Type of map for ggmap::get_map.
 #' @param contour1colour Colour for contour 1, typically 95pct.
 #' @param contour2colour Colour for contour 2, typically 50pct.

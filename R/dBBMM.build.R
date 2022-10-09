@@ -19,7 +19,7 @@
 #' @param moveLocError Location error in metres for move function. Numeric. Either single or a vector of lenth nrow data.
 #' @param timeDiffLong Threshold length of time in timeDiffUnits designating long breaks in relocations.
 #' @param timeDiffUnits Units for time difference for move function.
-#' @param center Centre move object within extent? See spTransform.
+#' @param center Center move object within extent? See spTransform.
 #' @param buffpct Buffer extent for raster creation, proportion of 1.
 #' @param rasterExtent If NULL, raster extent calculated from data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 for ymax. Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash.
 #' @param rasterCRS CRS for raster creation.
