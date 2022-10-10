@@ -4,32 +4,31 @@
 #' intensity of utilization (as opposed to absolute), making comparisons across individuals and interpretations at 
 #' the group level more straightforward. Subsequently, scaled individual-level rasters are aggregated to create a 
 #' single group-level UD raster. See www.GitHub.com/SimonDedman/dBBMMhomeRange for issues, feedback, and development 
-#' suggestions. See van Zinnicq Bergmann et al. 2022 (https://doi.org/10.1016/j.biocon.2022.109469) for an example.
+#' suggestions. There is an option to account for bias in acoustic receiver array spatial representation (see Details). 
 #' 
-#' # Step 1. Scale rasters.
+#' Step 1. Scale rasters.
 #' Individual-level UD rasters are scaled from 0 to 1 by dividing each raster by the maximum probability density value
 #' occurring within the raster set.
 #' 
-#' # Step 2. Aggregate into a group-level raster.
+#' Step 2. Aggregate into a group-level raster.
 #' Scaled individual-level rasters are summed to create a single group-level UD raster. 
 #' 
-#' 
-#' # Step 3. Re-scale from 0 to 1.
+#' Step 3. Re-scale from 0 to 1.
 #' The group-level raster is divided by its own maximum value.
 #' 
-#' # Step 4. Weight raster (optional).
+#' Step 4. Weight raster (optional).
 #' The scaled group-level UD raster is divided by the specified weighting factor(s). Note that this is only useful if you 
-#' want to account for an unbalanced receiver array and have split up the study site and receivers in clusters, and have 
-#' run the dBBMMhomeRange() for each cluster data set separately. See van Zinnicq Bergmann et al. 2022 
+#' want to account for an unbalanced receiver array and have split up the study site and receivers in regions, and have 
+#' run the dBBMMhomeRange() for each regional data set separately. See van Zinnicq Bergmann et al. 2022 
 #' (https://doi.org/10.1016/j.biocon.2022.109469) for example. If not applicable, choose a value of "1".
 #' 
-#' # Step 5. Standardize raster.
+#' Step 5. Standardize raster.
 #' Standardize the potentially weighted and scaled group-level UD raster so that its values sum to 1.  (creates UDScaled, but is in .UD extension)
 #' 
-#' # Step 6. Change crs.
+#' Step 6. Change crs.
 #' Change its crs to latlon for plotting and calculation purposes (DO WE WANT TO INCLUDE THIS? CURRENTLY DOES NOTHING)
 #' 
-#' # Step 7. Estimate 50 and 95pct contour volume areas.
+#' Step 7. Estimate 50 and 95pct contour volume areas.
 #' For each scaled individual-level UD raster, estimate 50 and 95pct contour volume areas, as well as their mean and standard
 #' deviation. Additionally, the 50 and 95pct volume area is estimated for the group-level UD raster.
 #' 
@@ -51,7 +50,7 @@
 #' @param crsloc Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
 #' @param returnObj Logical. Return the scaled object to the parent environment? Default FALSE.
 #' 
-#' @return scaled and weighted individual-level and group-level utilization distributions saved as rasters. Additionally, scaled 50 and 95pct 
+#' @return Scaled and weighted individual-level and group-level utilization distributions saved as rasters. Additionally, scaled 50 and 95pct 
 #' contour volume area estimates for individuals and the group, saved in .csv format.
 #'
 #' @examples

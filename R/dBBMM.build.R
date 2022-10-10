@@ -3,13 +3,13 @@
 #' Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple 
 #' individuals simultaneously, via the 'brownian.bridge.dyn()' function in the 'move' package. 
 #' 
-#' # Step 1. Filter individuals. 
+#' Step 1. Filter individuals. 
 #' Remove those individuals for which there is insufficient data i.e. number of re-locations is smaller than the window size parameter value (default = 31). 
 #' 
-#' # Step 2. Generate universal raster. 
+#' Step 2. Generate universal raster. 
 #' Based on all remaining data, a universal raster is generated where the calculated UDs are plotted into. 
 #' 
-#' # Step 3. Loop through individuals.
+#' Step 3. Loop through individuals.
 #' Individuals are looped through to construct individual-level movement models (on an absolute scale). See www.GitHub.com/SimonDedman/dBBMMhomeRange for issues, feedback, and development suggestions. 
 #'
 #' @param data Data frame object containing the data. Requires columns Lat Lon DateTime ID and optionally a grouping column.

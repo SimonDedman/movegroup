@@ -2,7 +2,7 @@
 % Please edit documentation in R/alignraster.R
 \name{alignraster}
 \alias{alignraster}
-\title{Automated Boosted Regression Tree modelling and mapping suite}
+\title{Combines region-specific group-level UD rasters into a single raster.}
 \usage{
 alignraster(
   folderroots =
@@ -12,7 +12,7 @@ alignraster(
   foldernames = c("H", "L", "M"),
   pattern = ".asc",
   scalefolder = "Scaled",
-  scaledname = "All_Rasters_Scaled",
+  scaledweightedname = "All_Rasters_Scaled",
   savefolder =
     "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/Aligned",
   format = "ascii",
@@ -31,13 +31,13 @@ alignraster(
 
 \item{scalefolder}{For input rasters from scaleraster. Default "Scaled".}
 
-\item{scaledname}{For input rasters from scaleraster. Default "All_Rasters_Scaled".}
+\item{scaledweightedname}{For input rasters from scaleraster. Default "All_Rasters_Scaled".}
 
 \item{savefolder}{Single character entry, no trailing slash.}
 
-\item{format}{Default "ascii".}
+\item{format}{Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).}
 
-\item{datatype}{Default "FLT4S".}
+\item{datatype}{Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).}
 
 \item{bylayer}{Default TRUE.}
 
@@ -46,21 +46,10 @@ alignraster(
 \item{returnObj}{Logical. Return the scaled object to the parent environment? Default FALSE.}
 }
 \value{
-Line, dot and bar plots, a report of all variables used, statistics
-for tests, variable interactions, predictors used and dropped, etc. If
-selected generates predicted abundance maps, and Unrepresentativeness surface
+Region-specific group-level UD rasters that share the same spatial extent.
 }
 \description{
-Automates delta log normal boosted regression trees abundance prediction.
-Loops through all permutations of parameters provided (learning
-rate, tree complexity, bag fraction), chooses the best, then simplifies it.
-Generates line, dot and bar plots, and outputs these and the predictions
-and a report of all variables used, statistics for tests, variable
-interactions, predictors used and dropped, etc. If selected, generates
-predicted abundance maps, and Unrepresentativeness surfaces.
-See www.GitHub.com/SimonDedman/gbm.auto for issues, feedback, and development
-suggestions. See SimonDedman.com for links to walkthrough paper, and papers
-and thesis published using this package.
+Extends the spatial extent of each area-specific group-level raster to the spatial extent shared by all rasters.
 }
 \details{
 Errors and their origins:

@@ -2,7 +2,7 @@
 % Please edit documentation in R/dBBMM.plot.R
 \name{dBBMMplot}
 \alias{dBBMMplot}
-\title{Succinct title 8 words max}
+\title{Plots a group-level utilization distribution on a map background}
 \usage{
 dBBMMplot(
   x = paste0("Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"),
@@ -51,7 +51,7 @@ dBBMMplot(
 )
 }
 \arguments{
-\item{x}{Path to scaled data.}
+\item{x}{Path to scaled raster.}
 
 \item{crsloc}{Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.}
 
@@ -139,9 +139,12 @@ space use patterns i.e. the home range is bigger than the coverage by the acoust
 
 \item{reclabbord}{Receiver label border in mm.}
 
-\item{surface}{Plot complete UD surface as well as contours.}
+\item{surface}{Plot complete UD surface along with contours.}
 }
 \description{
+Plots a group-level utilization distribution on a map background
+}
+\details{
 Description paragraph: Automates delta log normal boosted regression trees abundance prediction.
 Loops through all permutations of parameters provided (learning
 rate, tree complexity, bag fraction), chooses the best, then simplifies it.

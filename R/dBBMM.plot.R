@@ -1,5 +1,7 @@
-#' Succinct title 8 words max
-#'
+#' Plots a group-level utilization distribution on a map background
+#' 
+#' 
+#' 
 #' Description paragraph: Automates delta log normal boosted regression trees abundance prediction.
 #' Loops through all permutations of parameters provided (learning
 #' rate, tree complexity, bag fraction), chooses the best, then simplifies it.
@@ -24,7 +26,7 @@
 #' @importFrom fishtrack3d volumeUD contourPoly
 #' @export
 #' 
-#' @param x Path to scaled data.
+#' @param x Path to scaled raster.
 #' @param crsloc Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
 #' @param trim Remove NA & 0 values and crop to remaining date extents? Default TRUE.
 #' @param myLocation Location for extents, format c(xmin, ymin, xmax, ymax). Default NULL, extents autocreated from data.
@@ -70,7 +72,7 @@
 #' @param reclabpad Receiver label padding in lines.
 #' @param reclabrad Receiver label radius in lines.
 #' @param reclabbord Receiver label border in mm.
-#' @param surface Plot complete UD surface as well as contours.
+#' @param surface Plot complete UD surface along with contours.
 
 dBBMMplot <- function(
     x = paste0("Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"), # path to scaled data
