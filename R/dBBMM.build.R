@@ -27,7 +27,7 @@
 #' @param rasterResolution Single numeric value to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km.
 #' @param dbblocationerror Location.error param in 'brownian.bridge.dyn' function in the 'move' package. Could use the same as moveLocError?.
 #' @param dbbext Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.
-#' @param dbbdwindowsize window.size param in the 'brownian.bridge.dyn' function in the 'move' package. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
+#' @param dbbwindowsize window.size param in the 'brownian.bridge.dyn' function in the 'move' package. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
 #' @param writeRasterFormat Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).
 #' @param writeRasterExtension Character. Output file extension. Should match character writeRasterFormat.
 #' @param writeRasterDatatype Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).
@@ -295,14 +295,14 @@ dBBMMhomeRange <- function(
   check1 <- data %>%
     dplyr::group_by(.data$ID) %>%
     dplyr::summarise(relocations = length(.data$Datetime))
-  check2 <- dplyr::filter(check1, .data$relocations >= dbbdwindowsize) # filter: removed 2 rows (14%), 12 rows remaining
+  check2 <- dplyr::filter(check1, .data$relocations >= dbbwindowsize) # filter: removed 2 rows (14%), 12 rows remaining
   
   if (length(check1$ID) != length(check2$ID)) {
     data <- dplyr::semi_join(data, check2) # Joining, by = "ID". semi_join: added no columns
     check1 <- data %>%
       dplyr::group_by(.data$ID) %>%
       dplyr::summarise(relocations = length(.data$Datetime))
-    check2 <- dplyr::filter(check1, .data$relocations >= dbbdwindowsize) # filter: no rows removed
+    check2 <- dplyr::filter(check1, .data$relocations >= dbbwindowsize) # filter: no rows removed
     length(check1$ID) == length(check2$ID)
   } # data: 1253 x 7
   # TODO: improve this####
@@ -589,7 +589,7 @@ dBBMMhomeRange <- function(
                                                # Need bursted, r.i, to be the same projection as xAEQD
                                                location.error = dbblocationerror.i, # dbblocationerror.i
                                                ext = dbbext, # dbbext
-                                               window.size = dbbdwindowsize #  must be >=2*margin which is 11 so >=22, but odd so >=23
+                                               window.size = dbbwindowsize #  must be >=2*margin which is 11 so >=22, but odd so >=23
     )
     
     # data.i$NewEastingUTMmin <- data.i$NewEastingUTM - data.i$dbblocationerror
@@ -658,7 +658,7 @@ dBBMMhomeRange <- function(
     # calculate the dynamic brownian motion variance of the gappy track
     # dbbv <- brownian.motion.variance.dyn(bursted,
     #                                      location.error=dbblocationerror.i,
-    #                                      window.size=dbbdwindowsize,
+    #                                      window.size=dbbwindowsize,
     #                                      margin=11
     #                                      )
     # 
