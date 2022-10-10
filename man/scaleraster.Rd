@@ -14,8 +14,8 @@ scaleraster(
   bylayer = TRUE,
   overwrite = TRUE,
   scalefolder = "Scaled",
-  summedname = "All_Rasters_Summed",
-  scaledname = "All_Rasters_Scaled",
+  weightedsummedname = "All_Rasters_Weighted_Summed",
+  scaledweightedname = "All_Rasters_Scaled_Weighted",
   crsloc = NULL,
   returnObj = FALSE
 )
@@ -29,13 +29,11 @@ scaleraster(
 
 \item{weighting}{Addresses unbalanced receiver array design after receivers have first been partitioned into regions and group-level UDs estimated per region. Numeric. 
 Weights area-specific scaled group-level UD raster by value. This then means that estimated scaled individual-level volume areas also become weighted. 
-Default is 1 for no weighting. 
+Default is 1 for no weighting.}
 
-but NOT the summed raster.  MO NEED TO EDIT THIS}
+\item{format}{Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).}
 
-\item{format}{Default "ascii".}
-
-\item{datatype}{Default "FLT4S".}
+\item{datatype}{Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).}
 
 \item{bylayer}{Default TRUE.}
 
@@ -43,16 +41,16 @@ but NOT the summed raster.  MO NEED TO EDIT THIS}
 
 \item{scalefolder}{Default "Scaled".}
 
-\item{summedname}{Default "All_Rasters_Summed".}
+\item{weightedsummedname}{Default "All_Rasters_Weighted_Summed".}
 
-\item{scaledname}{Default "All_Rasters_Scaled".}
+\item{scaledweightedname}{Default "All_Rasters_Scaled_Weighted".}
 
 \item{crsloc}{Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.}
 
 \item{returnObj}{Logical. Return the scaled object to the parent environment? Default FALSE.}
 }
 \value{
-scaled individual-level and group-level utilization distributions saved as rasters. Additionally, scaled 50% and 95% 
+scaled and weighted individual-level and group-level utilization distributions saved as rasters. Additionally, scaled 50 and 95pct 
 contour volume area estimates for individuals and the group, saved in .csv format.
 }
 \description{
