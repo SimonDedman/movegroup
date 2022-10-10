@@ -2,7 +2,7 @@
 % Please edit documentation in R/dBBMM.build.R
 \name{dBBMMhomeRange}
 \alias{dBBMMhomeRange}
-\title{Automates dynamic Brownian bridge construction}
+\title{Automates dynamic Brownian bridge construction across individuals}
 \usage{
 dBBMMhomeRange(
   data = NULL,
@@ -35,19 +35,19 @@ dBBMMhomeRange(
 )
 }
 \arguments{
-\item{data}{Data frame of data needs columns Lat Lon DateTime ID and optionally a grouping column.}
+\item{data}{Data frame object containing the data. Requires columns Lat Lon DateTime ID and optionally a grouping column.}
 
-\item{ID}{Column name of IDs of individuals.}
+\item{ID}{Name of animal tag ID column in data.}
 
-\item{Datetime}{Name of Datetime column. Must be in POSIXct format.}
+\item{Datetime}{Column name in data that contains date/time stamps for each recorded detection. Must be in POSIXct format.}
 
-\item{Lat}{Name of Lat column in data.}
+\item{Lat}{Name of latitude column in data.}
 
-\item{Lon}{Name of Lon column in data.}
+\item{Lon}{Name of longitude column in data.}
 
 \item{Group}{Name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?.}
 
-\item{dat.TZ}{Timezone for as.POSIXct.}
+\item{dat.TZ}{Timezone of data for as.POSIXct.}
 
 \item{proj}{CRS for move function.}
 
@@ -55,11 +55,11 @@ dBBMMhomeRange(
 
 \item{sensor}{Sensor for move function. Single character or vector with length of the number of coordinates. Optional.}
 
-\item{moveLocError}{Location error in metres for move function. Numeric. Either single or a vector of length nrow data.}
+\item{moveLocError}{Location error (m) in the 'brownian.bridge.dyn' function in the 'move' package. Numeric. Either single or a vector of length nrow data.}
 
-\item{timeDiffLong}{Threshold length of time in timeDiffUnits designating long breaks in re-locations.}
+\item{timeDiffLong}{Single numeric value. Threshold value in timeDiffUnits designating the length of long breaks in re-locations. Used for bursting a movement track into segments, thereby removing long breaks from the movement track. See ?move::bursted for details.}
 
-\item{timeDiffUnits}{Units for time difference for move function.}
+\item{timeDiffUnits}{Character. Unit for timeDiffLong.}
 
 \item{center}{Center move object within extent? See spTransform.}
 
@@ -71,35 +71,36 @@ dBBMMhomeRange(
 
 \item{rasterResolution}{Single numeric value to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km.}
 
-\item{bbdlocationerror}{Location.error param in brownian.bridge.dyn. Could use the same as moveLocError?.}
+\item{bbdlocationerror}{Location.error param in 'brownian.bridge.dyn' function in the 'move' package. Could use the same as moveLocError?.}
 
-\item{bbdext}{Ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.}
+\item{bbdext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.}
 
-\item{bbdwindowsize}{window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).}
+\item{bbdwindowsize}{window.size param in the 'brownian.bridge.dyn' function in the 'move' package. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).}
 
-\item{writeRasterFormat}{Character. Output file type. ascii. (Mo: i think we need to list options. what is default?).}
+\item{writeRasterFormat}{Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).}
 
 \item{writeRasterExtension}{Character. Output file extension. Should match character writeRasterFormat.}
 
 \item{writeRasterDatatype}{Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).}
 
-\item{absVolumeAreaSaveName}{File name volume areas. (Mo: make VolumeArea_AbsoluteScale.csv. name default?).}
+\item{absVolumeAreaSaveName}{File name plus extension where UD estimates are saved (Mo: make VolumeArea_AbsoluteScale.csv. name default?).}
 
 \item{savedir}{Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here.}
 
 \item{alerts}{Audio warning for failures.}
 }
 \value{
-Individual-level utilization distributions, saved as rasters, as well as volume area estimates for 50% and 95% contours, saved in a .csv file
+Individual-level utilization distributions, saved as rasters, as well as calculated volume area estimates for 50 and 95pct contours, saved in a .csv file
 
 saved to disk.
 }
 \description{
-This function automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple 
-individuals simultaneously, via the brownian.bridge.dyn() {move}. It first removes those individuals for which there is insufficient data 
-i.e. number of re-locations is smaller than the window size parameter value (default = 31). Second, based on all remaining data, a universal 
-raster is generated where the calculated UDs are plotted into. Finally, remaining individuals are looped through to construct individual-level 
-movement models (on an absolute scale). See www.GitHub.com/SimonDedman/dBBMMhomeRange for issues, feedback, and development suggestions.
+Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple 
+individuals simultaneously, via the 'brownian.bridge.dyn()' function in the 'move'. It first removes those individuals 
+for which there is insufficient data i.e. number of re-locations is smaller than the window size parameter value (default = 31). 
+Second, based on all remaining data, a universal raster is generated where the calculated UDs are plotted into. Finally, remaining 
+individuals are looped through to construct individual-level movement models (on an absolute scale). See 
+www.GitHub.com/SimonDedman/dBBMMhomeRange for issues, feedback, and development suggestions.
 }
 \details{
 Errors and their origins:
