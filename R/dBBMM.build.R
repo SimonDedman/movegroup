@@ -85,9 +85,9 @@ dBBMMhomeRange <- function(
     # Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash
     rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. This is around Bimini, Bahamas.
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
-    dbbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
+    dbblocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
     dbbext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
-    dbbdwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
+    dbbwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
     writeRasterFormat = "ascii",
     writeRasterExtension = ".asc",
     writeRasterDatatype = "FLT4S",
