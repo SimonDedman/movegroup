@@ -23,9 +23,9 @@ dBBMMhomeRange(
   rasterExtent = NULL,
   rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"),
   rasterResolution = 50,
-  dbbdlocationerror = "LocationError",
+  dbblocationerror = "LocationError",
   dbbext = 3,
-  dbbdwindowsize = 23,
+  dbbwindowsize = 23,
   writeRasterFormat = "ascii",
   writeRasterExtension = ".asc",
   writeRasterDatatype = "FLT4S",
@@ -71,11 +71,11 @@ dBBMMhomeRange(
 
 \item{rasterResolution}{Single numeric value to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km.}
 
-\item{dbbdlocationerror}{Location.error param in 'brownian.bridge.dyn' function in the 'move' package. Could use the same as moveLocError?.}
+\item{dbblocationerror}{Location.error param in 'brownian.bridge.dyn' function in the 'move' package. Could use the same as moveLocError?.}
 
 \item{dbbext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.}
 
-\item{dbbdwindowsize}{window.size param in the 'brownian.bridge.dyn' function in the 'move' package. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).}
+\item{dbbwindowsize}{window.size param in the 'brownian.bridge.dyn' function in the 'move' package. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).}
 
 \item{writeRasterFormat}{Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).}
 
