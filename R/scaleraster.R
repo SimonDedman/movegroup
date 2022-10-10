@@ -161,7 +161,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   # Save this raster
   raster::writeRaster(x = All_Rasters_Scaled_Weighted,
-                      filename = paste0(path, "/", scalefolder, "/", scaledname, pattern),
+                      filename = paste0(path, "/", scalefolder, "/", scaledweightedname, pattern),
                       format = format,
                       datatype = datatype,
                       bylayer = bylayer,
@@ -188,7 +188,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   # Save this raster too
   # raster::writeRaster(x = All_Rasters_Scaled_Weighted, # resave individual rasters
-  #                     filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted", pattern),
+  #                     filename = paste0(path, "/", scalefolder, "/", scaledweightedname, "_Weighted", pattern),
   #                     format = format,
   #                     datatype = datatype,
   #                     bylayer = bylayer,
@@ -212,7 +212,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   # Save the raster
   raster::writeRaster(x = All_Rasters_Scaled_Weighted_LatLon, 
-                      filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted_LatLon", pattern),
+                      filename = paste0(path, "/", scalefolder, "/", scaledweightedname, "_LatLon", pattern),
                       format = format,
                       datatype = datatype,
                       bylayer = bylayer,
@@ -255,7 +255,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   # Save the raster
   raster::writeRaster(x = UDScaled, 
-                      filename = paste0(path, "/", scalefolder, "/", scaledname, "_Weighted_UDScaled", pattern),
+                      filename = paste0(path, "/", scalefolder, "/", scaledweightedname, "_UDScaled", pattern),
                       format = format,
                       datatype = datatype,
                       bylayer = bylayer,
