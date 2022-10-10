@@ -9,7 +9,7 @@ Description: Offers an easy and automated way to scale up individual-level space
     calculate a dynamic Brownian bridge movement model from movement data for
     individual animals, as well as functions to visualize and quantify space use
     for individuals aggregated in groups. Originally written with passive acoustic
-    telemetry in mind, this package provides functionality to account for
+    telemetry in mind, this package also provides functionality to account for
     unbalanced acroustic receiver array designs.
 Depends:
     R (>= 4.1.0)
