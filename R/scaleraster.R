@@ -1,43 +1,50 @@
 #' Scales individual utilization distribution rasters and volume area estimates
 #' 
 #' Scales individual-level utilization distribution (UD) rasters from 0 to 1 to facilitate interpretation as relative 
-#' intensity of utilization (as opposed to absolute). Subsequently, scaled individual-level rasters are aggregated to 
-#' create a single group-level UD raster. See www.GitHub.com/SimonDedman/dBBMMhomeRange for issues, feedback, and 
-#' development suggestions. 
+#' intensity of utilization (as opposed to absolute), making comparisons across individuals and interpretations at 
+#' the group level more straightforward. Subsequently, scaled individual-level rasters are aggregated to create a 
+#' single group-level UD raster. See www.GitHub.com/SimonDedman/dBBMMhomeRange for issues, feedback, and development 
+#' suggestions. See van Zinnicq Bergmann et al. 2022 (https://doi.org/10.1016/j.biocon.2022.109469) for an example.
 #' 
-#' # Step 1 - Scale rasters
+#' # Step 1 - Scale rasters.
 #' Individual-level UD rasters are scaled from 0 to 1 by dividing each raster by the maximum probability density value
 #' occurring within the raster set.
 #' 
-#' # Step 2 - Aggregate into a group-level raster
+#' # Step 2 - Aggregate into a group-level raster.
 #' Scaled individual-level rasters are summed to create a single group-level UD raster. 
 #' 
 #' 
-#' # Step 3 - Re-scale from 0 to 1
+#' # Step 3 - Re-scale from 0 to 1.
 #' The group-level raster is divided by its own maximum value.
 #' 
-#' # Step 4 - Weight raster (optional)
+#' # Step 4 - Weight raster (optional).
 #' The scaled group-level UD raster is divided by the specified weighting factor(s). Note that this is only useful if you 
 #' want to account for an unbalanced receiver array and have split up the study site and receivers in clusters, and have 
 #' run the dBBMMhomeRange() for each cluster data set separately. See van Zinnicq Bergmann et al. 2022 
 #' (https://doi.org/10.1016/j.biocon.2022.109469) for example. If not applicable, choose a value of "1".
 #' 
-#' # Step 5 - Standardize raster 
+#' # Step 5 - Standardize raster.
 #' Standardize the potentially weighted and scaled group-level UD raster so that its values sum to 1.  (creates UDScaled, but is in .UD extension)
 #' 
-#' # Step 6 - Change crs
+#' # Step 6 - Change crs.
 #' Change its crs to latlon for plotting and calculation purposes (DO WE WANT TO INCLUDE THIS? CURRENTLY DOES NOTHING)
 #' 
-#' # Step 7 - Estimate 50 and 95pct contour volume areas
+#' # Step 7 - Estimate 50 and 95pct contour volume areas.
 #' For each scaled individual-level UD raster, estimate 50 and 95pct contour volume areas, as well as their mean and standard
 #' deviation. Additionally, the 50 and 95pct volume area is estimated for the group-level UD raster.
 #' 
 #' Errors and their origins.
 #' 
-#' @param path No terminal slash.
-#' @param pathsubsets Location of parent folder that contains ALL files created by dBBMM.build. No terminal slash.
-#' @param pattern Default ".asc".
-#' @param weighting Weighting to divide scaled group-level raster by, for unbalanced arrays. Scaled_Weighted rasters, and its volume areas csv, will have weightings applied, but NOT the summed raster.  MO NEED TO EDIT THIS
+#' @param path Path to directory where the individual-level UDs are saved. No terminal slash.
+#' @param pathsubsets Path to parent directory that contains all UDs across spatial groups or subsets If none are used, make same as path. No terminal slash.
+#' @param pattern Extension pattern used to read in all UDs in directory and pathsubsets directory. Default ".asc".
+#' @param weighting Addresses unbalanced receiver array design after receivers have first been partitioned into regions and group-level UDs estimated per region. Numeric. 
+#' Weights area-specific scaled group-level UD raster by value. This then means that estimated scaled individual-level volume areas also become weighted. 
+#' Default is 1 for no weighting. 
+#'
+#'but NOT the summed raster.  MO NEED TO EDIT THIS
+#'
+#'
 #' @param format Default "ascii".
 #' @param datatype Default "FLT4S".
 #' @param bylayer Default TRUE.
@@ -69,7 +76,7 @@
 scaleraster <- function(path = NULL, # Location of files created by dBBMM.build within a subset. No terminal slash.
                         pathsubsets = NULL, # Location of parent folder that contains ALL files created by dBBMM.build. No terminal slash.
                         pattern = ".asc",
-                        weighting = w, # Weighting to divide summed-scaled rasters by, for unbalanced arrays
+                        weighting = 1, # Weighting to divide summed-scaled rasters by, for unbalanced arrays
                         format = "ascii",
                         datatype = "FLT4S",
                         bylayer = TRUE,

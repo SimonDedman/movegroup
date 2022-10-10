@@ -25,9 +25,9 @@
 #' @param rasterExtent If NULL, raster extent calculated from data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 for ymax. Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash.
 #' @param rasterCRS CRS for raster creation.
 #' @param rasterResolution Single numeric value to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km.
-#' @param bbdlocationerror Location.error param in 'brownian.bridge.dyn' function in the 'move' package. Could use the same as moveLocError?.
-#' @param bbdext Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.
-#' @param bbdwindowsize window.size param in the 'brownian.bridge.dyn' function in the 'move' package. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
+#' @param dbbdlocationerror Location.error param in 'brownian.bridge.dyn' function in the 'move' package. Could use the same as moveLocError?.
+#' @param dbbext Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.
+#' @param dbbdwindowsize window.size param in the 'brownian.bridge.dyn' function in the 'move' package. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
 #' @param writeRasterFormat Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).
 #' @param writeRasterExtension Character. Output file extension. Should match character writeRasterFormat.
 #' @param writeRasterDatatype Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).
@@ -66,9 +66,9 @@
 #' @importFrom stats setNames
 
 dBBMMhomeRange <- function(
-    data = NULL, # data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping columns.
-    ID = NULL, # column name of IDs of individuals.
-    Datetime = NULL, # name of Datetime column. Must be in POSIXct format.
+    data = NULL, # Data frame object containing the data. Requires columns Lat Lon DateTime ID and optionally a grouping column.
+    ID = NULL, # Name of animal tag ID column in data.
+    Datetime = NULL, # Column name in data that contains date/time stamps for each recorded detection. Must be in POSIXct format.
     Lat = NULL, # name of Lat & Lon columns in data.
     Lon = NULL,
     Group = NULL, # name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?
@@ -85,9 +85,9 @@ dBBMMhomeRange <- function(
     # Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash
     rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. This is around Bimini, Bahamas.
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
-    bbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
-    bbdext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
-    bbdwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
+    dbbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
+    dbbext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
+    dbbdwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
     writeRasterFormat = "ascii",
     writeRasterExtension = ".asc",
     writeRasterDatatype = "FLT4S",
@@ -177,10 +177,10 @@ dBBMMhomeRange <- function(
   
   if (!any(class(data$Datetime) == "POSIXct")) stop("Datetime column must be POSIXct")
   
-  # Add movelocationerror and bbdlocationerror as columns if they're vectors, else their length
+  # Add movelocationerror and dbbdlocationerror as columns if they're vectors, else their length
   # desyncs from nrow(data) if any IDs < windowsize
   if (nrow(data) == length(moveLocError)) data$moveLocError <- moveLocError
-  if (nrow(data) == length(bbdlocationerror)) data$bbdlocationerror <- bbdlocationerror
+  if (nrow(data) == length(dbbdlocationerror)) data$dbbdlocationerror <- dbbdlocationerror
   
   
   
@@ -295,14 +295,14 @@ dBBMMhomeRange <- function(
   check1 <- data %>%
     dplyr::group_by(.data$ID) %>%
     dplyr::summarise(relocations = length(.data$Datetime))
-  check2 <- dplyr::filter(check1, .data$relocations >= bbdwindowsize) # filter: removed 2 rows (14%), 12 rows remaining
+  check2 <- dplyr::filter(check1, .data$relocations >= dbbdwindowsize) # filter: removed 2 rows (14%), 12 rows remaining
   
   if (length(check1$ID) != length(check2$ID)) {
     data <- dplyr::semi_join(data, check2) # Joining, by = "ID". semi_join: added no columns
     check1 <- data %>%
       dplyr::group_by(.data$ID) %>%
       dplyr::summarise(relocations = length(.data$Datetime))
-    check2 <- dplyr::filter(check1, .data$relocations >= bbdwindowsize) # filter: no rows removed
+    check2 <- dplyr::filter(check1, .data$relocations >= dbbdwindowsize) # filter: no rows removed
     length(check1$ID) == length(check2$ID)
   } # data: 1253 x 7
   # TODO: improve this####
@@ -558,28 +558,28 @@ dBBMMhomeRange <- function(
     rm(r.i)
     # There are 2 types of burst: "normal" and "long". You can select for these in the dbbmm by selecting the factor level in the burstType command.
     
-    if ("bbdlocationerror" %in% colnames(data.i)) {
-      bbdlocationerror.i <- data.i$bbdlocationerror
+    if ("dbbdlocationerror" %in% colnames(data.i)) {
+      dbbdlocationerror.i <- data.i$dbbdlocationerror
     } else {
-      if (exists("bbdlocationerror")) {
-        if (length(bbdlocationerror) == 1) {
-          bbdlocationerror.i <- bbdlocationerror # single value, replicated down for each relocation
+      if (exists("dbbdlocationerror")) {
+        if (length(dbbdlocationerror) == 1) {
+          dbbdlocationerror.i <- dbbdlocationerror # single value, replicated down for each relocation
           # Robs: 1 m: gps loc of shark inferred from boat coord + bearing + distance estimate
         } else { # else if multiple values
-          if (length(bbdlocationerror) == nrow(data)) { # should be same length as full dataset
-            bbdlocationerror.i <- data %>% # take the full dataset,
-              dplyr::bind_cols(bbdlocationerror = bbdlocationerror) %>% # cbind the full movelocerror
+          if (length(dbbdlocationerror) == nrow(data)) { # should be same length as full dataset
+            dbbdlocationerror.i <- data %>% # take the full dataset,
+              dplyr::bind_cols(dbbdlocationerror = dbbdlocationerror) %>% # cbind the full movelocerror
               dplyr::filter(ID == i) %>% # filter for just this ID
-              dplyr::pull(bbdlocationerror) # and pull just the movelocerror for this ID
+              dplyr::pull(dbbdlocationerror) # and pull just the movelocerror for this ID
           } else { # if not length 1 and not length of nrow(data)
-            stop(print("bbdlocationerror must be either length 1 or length(nrow(data))")) # if not stop and tell user
+            stop(print("dbbdlocationerror must be either length 1 or length(nrow(data))")) # if not stop and tell user
           } # close not length1 not same length as full dataset else
         } # close length1 or else
-      } # close if exists bbdlocationerror
+      } # close if exists dbbdlocationerror
     }
     
     # location error needs to be a postive number. Replace zeroes with 0.00001
-    bbdlocationerror.i[which(bbdlocationerror.i == 0)] <- 0.00001
+    dbbdlocationerror.i[which(dbbdlocationerror.i == 0)] <- 0.00001
     
     # Construct the model. The time.step should reflect the ping frequency of the tag (in minutes)
     bursted_dbbmm <- move::brownian.bridge.dyn(bursted,
@@ -587,15 +587,15 @@ dBBMMhomeRange <- function(
                                                raster = xAEQD, # has to be AEQD for metre-based calculations, presuambly?
                                                # Error:The projection of the raster and the Move object are not equal.
                                                # Need bursted, r.i, to be the same projection as xAEQD
-                                               location.error = bbdlocationerror.i, # bbdlocationerror.i
-                                               ext = bbdext, # bbdext
-                                               window.size = bbdwindowsize #  must be >=2*margin which is 11 so >=22, but odd so >=23
+                                               location.error = dbbdlocationerror.i, # dbbdlocationerror.i
+                                               ext = dbbext, # dbbext
+                                               window.size = dbbdwindowsize #  must be >=2*margin which is 11 so >=22, but odd so >=23
     )
     
-    # data.i$NewEastingUTMmin <- data.i$NewEastingUTM - data.i$bbdlocationerror
-    # data.i$NewEastingUTMmax <- data.i$NewEastingUTM + data.i$bbdlocationerror
-    # data.i$NewNorthingUTMmin <- data.i$NewNorthingUTM - data.i$bbdlocationerror
-    # data.i$NewNorthingUTMmax <- data.i$NewNorthingUTM + data.i$bbdlocationerror
+    # data.i$NewEastingUTMmin <- data.i$NewEastingUTM - data.i$dbbdlocationerror
+    # data.i$NewEastingUTMmax <- data.i$NewEastingUTM + data.i$dbbdlocationerror
+    # data.i$NewNorthingUTMmin <- data.i$NewNorthingUTM - data.i$dbbdlocationerror
+    # data.i$NewNorthingUTMmax <- data.i$NewNorthingUTM + data.i$dbbdlocationerror
     # 
     # data.i$EastRastExtentMin <- extent(xAEQD)[1]
     # data.i$EastRastExtentMax <- extent(xAEQD)[2]
@@ -623,7 +623,7 @@ dBBMMhomeRange <- function(
     # extent      : 1286895, 1910646, -1295349, 317435  (xmin, xmax, ymin, ymax)
     # crs         : +proj=aeqd +lat_0=42.43218337 +lon_0=-30.08680803 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs
     # variables   : 9
-    # names       :         Lat,          Lon,   Datetime,    MarineZone,     moveLocError, bbdlocationerror,     NewEastingUTM,  NewNorthingUTM, TimeDiff
+    # names       :         Lat,          Lon,   Datetime,    MarineZone,     moveLocError, dbbdlocationerror,     NewEastingUTM,  NewNorthingUTM, TimeDiff
     # min values  : 29.16504378, -15.05470771, 1480550400, Bay_of_Biscay, 15963.1149120894, 15963.1149120894, -1675882.39631877, 3396669.2275379,        0
     # max values  : 44.09076622, -9.703392913, 1488240000,         Other, 317635.883473968, 317635.883473968, -1080176.75804222, 5479499.2258687,        1
     # timestamps  : 2016-11-30 16:00:00 ... 2017-02-27 16:00:00 Time difference of 89 days  (start ... end, duration)
@@ -644,21 +644,21 @@ dBBMMhomeRange <- function(
     # points(x = c(extent(bursted)[1], extent(bursted)[1], extent(bursted)[2], extent(bursted)[2]),
     #      y = c(extent(bursted)[4], extent(bursted)[3], extent(bursted)[4], extent(bursted)[3]),
     #      col = "green")
-    # points(x = c(extent(bursted)[1] - max(data.i$bbdlocationerror),
-    #              extent(bursted)[1] - max(data.i$bbdlocationerror),
-    #              extent(bursted)[2] + max(data.i$bbdlocationerror),
-    #              extent(bursted)[2] + max(data.i$bbdlocationerror)),
-    #        y = c(extent(bursted)[4] + max(data.i$bbdlocationerror),
-    #              extent(bursted)[3] - max(data.i$bbdlocationerror),
-    #              extent(bursted)[4] + max(data.i$bbdlocationerror),
-    #              extent(bursted)[3] - max(data.i$bbdlocationerror)),
+    # points(x = c(extent(bursted)[1] - max(data.i$dbbdlocationerror),
+    #              extent(bursted)[1] - max(data.i$dbbdlocationerror),
+    #              extent(bursted)[2] + max(data.i$dbbdlocationerror),
+    #              extent(bursted)[2] + max(data.i$dbbdlocationerror)),
+    #        y = c(extent(bursted)[4] + max(data.i$dbbdlocationerror),
+    #              extent(bursted)[3] - max(data.i$dbbdlocationerror),
+    #              extent(bursted)[4] + max(data.i$dbbdlocationerror),
+    #              extent(bursted)[3] - max(data.i$dbbdlocationerror)),
     #        col = "blue")
     # # Bursted + max location error still isn't outside xAEQD extents
     
     # calculate the dynamic brownian motion variance of the gappy track
     # dbbv <- brownian.motion.variance.dyn(bursted,
-    #                                      location.error=bbdlocationerror.i,
-    #                                      window.size=bbdwindowsize,
+    #                                      location.error=dbbdlocationerror.i,
+    #                                      window.size=dbbdwindowsize,
     #                                      margin=11
     #                                      )
     # 

@@ -23,9 +23,9 @@ dBBMMhomeRange(
   rasterExtent = NULL,
   rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"),
   rasterResolution = 50,
-  bbdlocationerror = "LocationError",
-  bbdext = 3,
-  bbdwindowsize = 23,
+  dbbdlocationerror = "LocationError",
+  dbbext = 3,
+  dbbdwindowsize = 23,
   writeRasterFormat = "ascii",
   writeRasterExtension = ".asc",
   writeRasterDatatype = "FLT4S",
@@ -71,11 +71,11 @@ dBBMMhomeRange(
 
 \item{rasterResolution}{Single numeric value to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km.}
 
-\item{bbdlocationerror}{Location.error param in 'brownian.bridge.dyn' function in the 'move' package. Could use the same as moveLocError?.}
+\item{dbbdlocationerror}{Location.error param in 'brownian.bridge.dyn' function in the 'move' package. Could use the same as moveLocError?.}
 
-\item{bbdext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.}
+\item{dbbext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.}
 
-\item{bbdwindowsize}{window.size param in the 'brownian.bridge.dyn' function in the 'move' package. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).}
+\item{dbbdwindowsize}{window.size param in the 'brownian.bridge.dyn' function in the 'move' package. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).}
 
 \item{writeRasterFormat}{Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).}
 
@@ -96,7 +96,7 @@ saved to disk.
 }
 \description{
 Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple 
-individuals simultaneously, via the 'brownian.bridge.dyn()' function in the 'move'. It first removes those individuals 
+individuals simultaneously, via the 'brownian.bridge.dyn()' function in the 'move' package. It first removes those individuals 
 for which there is insufficient data i.e. number of re-locations is smaller than the window size parameter value (default = 31). 
 Second, based on all remaining data, a universal raster is generated where the calculated UDs are plotted into. Finally, remaining 
 individuals are looped through to construct individual-level movement models (on an absolute scale). See 
