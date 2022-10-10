@@ -41,21 +41,17 @@
 #' @param weighting Addresses unbalanced receiver array design after receivers have first been partitioned into regions and group-level UDs estimated per region. Numeric. 
 #' Weights area-specific scaled group-level UD raster by value. This then means that estimated scaled individual-level volume areas also become weighted. 
 #' Default is 1 for no weighting. 
-#'
-#'but NOT the summed raster.  MO NEED TO EDIT THIS
-#'
-#'
-#' @param format Default "ascii".
-#' @param datatype Default "FLT4S".
+#' @param format Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).
+#' @param datatype Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).
 #' @param bylayer Default TRUE.
 #' @param overwrite Default TRUE.
 #' @param scalefolder Default "Scaled".
-#' @param summedname Default "All_Rasters_Summed".
-#' @param scaledname Default "All_Rasters_Scaled".
+#' @param weightedsummedname Default "All_Rasters_Weighted_Summed".
+#' @param scaledweightedname Default "All_Rasters_Scaled_Weighted".
 #' @param crsloc Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
 #' @param returnObj Logical. Return the scaled object to the parent environment? Default FALSE.
 #' 
-#' @return scaled individual-level and group-level utilization distributions saved as rasters. Additionally, scaled 50% and 95% 
+#' @return scaled and weighted individual-level and group-level utilization distributions saved as rasters. Additionally, scaled 50 and 95pct 
 #' contour volume area estimates for individuals and the group, saved in .csv format.
 #'
 #' @examples
@@ -82,8 +78,8 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
                         bylayer = TRUE,
                         overwrite = TRUE,
                         scalefolder = "Scaled",
-                        summedname = "All_Rasters_Summed",
-                        scaledname = "All_Rasters_Scaled",
+                        weightedsummedname = "All_Rasters_Weighted_Summed",
+                        scaledweightedname = "All_Rasters_Scaled_Weighted",
                         crsloc = NULL, # Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
                         returnObj = FALSE) {
   
@@ -135,6 +131,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   # Scale all raster values to max of maxes (maximum value becomes 1)
   rasterlist %<>%
     lapply(function(x) x / scalemax) %>% # scaling occurs here
+    lapply(function(x) x / weighting) %>% # Weighting occurs here
     lapply(function(x) raster::writeRaster(x = x, # save scaled individual rasters
                                            filename = paste0(path, "/", scalefolder, "/", names(x)),
                                            format = format,
@@ -146,7 +143,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   rasterstack <- raster::stack(x = rasterlist)
   
   # Sum the scaled individual UDs, which should result in a single aggregated or ‘group-level' UD
-  All_Rasters_Summed <- raster::stackApply(x = rasterstack, # Raster* object or list of
+  All_Rasters_Weighted_Summed <- raster::stackApply(x = rasterstack, # Raster* object or list of
                                            indices = rep(1, raster::nlayers(rasterstack)), # Vector of length nlayers(x), performs the function (sum) PER UNIQUE index, i.e. 1:5 = 5 unique sums.
                                            fun = sum, # returns a single value, e.g. mean or min, and that takes a na.rm argument
                                            na.rm = TRUE, # If TRUE, NA cells are removed from calculations
@@ -157,13 +154,13 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
                                            overwrite = overwrite)
   
   # Put the values back in the raster object
-  All_Rasters_Summed %<>% raster::setMinMax()
+  All_Rasters_Weighted_Summed %<>% raster::setMinMax()
   
-  # Now scale the group-level UD
-  All_Rasters_Scaled <- All_Rasters_Summed / raster::maxValue(All_Rasters_Summed)
+  # Scale the group-level UD
+  All_Rasters_Scaled_Weighted <- All_Rasters_Weighted_Summed / raster::maxValue(All_Rasters_Weighted_Summed)
   
   # Save this raster
-  raster::writeRaster(x = All_Rasters_Scaled,
+  raster::writeRaster(x = All_Rasters_Scaled_Weighted,
                       filename = paste0(path, "/", scalefolder, "/", scaledname, pattern),
                       format = format,
                       datatype = datatype,
@@ -171,8 +168,8 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
                       overwrite = overwrite)
   
   # Now weight the group-level UD raster
-  All_Rasters_Scaled_Weighted <- All_Rasters_Scaled / weighting
-  rm(All_Rasters_Scaled) # Remove, as not used again
+  # All_Rasters_Scaled_Weighted <- All_Rasters_Scaled / weighting    # This line no longer needed as we moved it up to weight individual-level rasters
+ # rm(All_Rasters_Scaled) # Remove, as not used again
   
   # Change projection of All_Rasters_Scaled_Weighted to latlon for proper plotting
   dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
@@ -184,7 +181,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   
   
-  # 2. Now we will deal with the creation of a group-level UD raster for plotting purposes ####
+  # 2. Deal with the creation of a group-level UD raster for plotting purposes ####
   
   # Standardize so the values within the raster sum to 1 (required to run the getVolumeUD() below)
   All_Rasters_Scaled_Weighted <- All_Rasters_Scaled_Weighted / sum(raster::values(All_Rasters_Scaled_Weighted))    
@@ -203,7 +200,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   # Change res so x & y match (kills values)
   raster::res(All_Rasters_Scaled_Weighted_LatLon) <- rep(mean(raster::res(All_Rasters_Scaled_Weighted_LatLon)), 2)
   
-  # Now project old values to new raster
+  # Project old values to new raster
   All_Rasters_Scaled_Weighted_LatLon <- raster::projectRaster(from = All_Rasters_Scaled_Weighted,
                                                               to = All_Rasters_Scaled_Weighted_LatLon)
   
@@ -236,7 +233,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   # Convert the scaled individual-level rasters within rasterlist to class ".UD". Also ensure that values within a raster sum to 1 so that they can be fed into getVolumeUD()
   UDlist <- UDlist %>% sapply(function(x) new(".UD", x / sum(raster::values(x))))
   
-  # Below code calculates 50% and 95% volume areas per UD, the mean and stdev across UDs, and finally core and home range volume area sizes of the group-level UD
+  # Calculate 50% and 95% volume areas per UD, the mean and stdev across UDs, and finally core and home range volume area sizes of the group-level UD
   # A. individual core and home range volume area sizes
   area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50% volume area
   area.50 <- round((area.50 * rasterres) / 1000000, 2) # Convert from m^2 to km^2
