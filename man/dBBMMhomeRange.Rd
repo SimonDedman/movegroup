@@ -35,15 +35,15 @@ dBBMMhomeRange(
 )
 }
 \arguments{
-\item{data}{Data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping column.}
+\item{data}{Data frame of data needs columns Lat Lon DateTime ID and optionally a grouping column.}
 
 \item{ID}{Column name of IDs of individuals.}
 
 \item{Datetime}{Name of Datetime column. Must be in POSIXct format.}
 
-\item{Lat}{Name of Lat & Lon columns in data.}
+\item{Lat}{Name of Lat column in data.}
 
-\item{Lon}{Name of Lat & Lon columns in data.}
+\item{Lon}{Name of Lon column in data.}
 
 \item{Group}{Name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?.}
 
@@ -55,13 +55,13 @@ dBBMMhomeRange(
 
 \item{sensor}{Sensor for move function. Single character or vector with length of the number of coordinates. Optional.}
 
-\item{moveLocError}{Location error in metres for move function. Numeric. Either single or a vector of lenth nrow data.}
+\item{moveLocError}{Location error in metres for move function. Numeric. Either single or a vector of length nrow data.}
 
-\item{timeDiffLong}{Threshold length of time in timeDiffUnits designating long breaks in relocations.}
+\item{timeDiffLong}{Threshold length of time in timeDiffUnits designating long breaks in re-locations.}
 
 \item{timeDiffUnits}{Units for time difference for move function.}
 
-\item{center}{Centre move object within extent? See spTransform.}
+\item{center}{Center move object within extent? See spTransform.}
 
 \item{buffpct}{Buffer extent for raster creation, proportion of 1.}
 
@@ -77,13 +77,13 @@ dBBMMhomeRange(
 
 \item{bbdwindowsize}{window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).}
 
-\item{writeRasterFormat}{ascii.}
+\item{writeRasterFormat}{Character. Output file type. ascii. (Mo: i think we need to list options. what is default?).}
 
-\item{writeRasterExtension}{.asc.}
+\item{writeRasterExtension}{Character. Output file extension. Should match character writeRasterFormat.}
 
-\item{writeRasterDatatype}{FLT4S.}
+\item{writeRasterDatatype}{Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).}
 
-\item{absVolumeAreaSaveName}{VolumeArea_AbsoluteScale.csv.}
+\item{absVolumeAreaSaveName}{File name volume areas. (Mo: make VolumeArea_AbsoluteScale.csv. name default?).}
 
 \item{savedir}{Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here.}
 
@@ -112,4 +112,6 @@ Errors and their origins:
 }
 \author{
 Simon Dedman, \email{simondedman@gmail.com}
+
+Maurits van Zinnicq Bergmann, \email{mauritsvzb@gmail.com}
 }

@@ -1,4 +1,4 @@
-#' Automates dynamic Brownian bridge construction
+#' Automates dynamic Brownian bridge construction for multiple individuals simultaneously
 #'
 #' This function automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple 
 #' individuals simultaneously, via the brownian.bridge.dyn() {move}. It first removes those individuals for which there is insufficient data 
@@ -6,18 +6,18 @@
 #' raster is generated where the calculated UDs are plotted into. Finally, remaining individuals are looped through to construct individual-level 
 #' movement models (on an absolute scale). See www.GitHub.com/SimonDedman/dBBMMhomeRange for issues, feedback, and development suggestions. 
 #'
-#' @param data Data frame of data needs columns Lat Lon DateTime and optionally an ID and grouping column.
+#' @param data Data frame of data needs columns Lat Lon DateTime ID and optionally a grouping column.
 #' @param ID Column name of IDs of individuals.
 #' @param Datetime Name of Datetime column. Must be in POSIXct format.
-#' @param Lat Name of Lat & Lon columns in data.
-#' @param Lon Name of Lat & Lon columns in data.
+#' @param Lat Name of Lat column in data.
+#' @param Lon Name of Lon column in data.
 #' @param Group Name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?.
 #' @param dat.TZ Timezone for as.POSIXct.
 #' @param proj CRS for move function.
 #' @param projectedCRS EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone.
 #' @param sensor Sensor for move function. Single character or vector with length of the number of coordinates. Optional.
-#' @param moveLocError Location error in metres for move function. Numeric. Either single or a vector of lenth nrow data.
-#' @param timeDiffLong Threshold length of time in timeDiffUnits designating long breaks in relocations.
+#' @param moveLocError Location error in metres for move function. Numeric. Either single or a vector of length nrow data.
+#' @param timeDiffLong Threshold length of time in timeDiffUnits designating long breaks in re-locations.
 #' @param timeDiffUnits Units for time difference for move function.
 #' @param center Center move object within extent? See spTransform.
 #' @param buffpct Buffer extent for raster creation, proportion of 1.
@@ -27,10 +27,10 @@
 #' @param bbdlocationerror Location.error param in brownian.bridge.dyn. Could use the same as moveLocError?.
 #' @param bbdext Ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.
 #' @param bbdwindowsize window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
-#' @param writeRasterFormat ascii.
-#' @param writeRasterExtension .asc.
-#' @param writeRasterDatatype FLT4S.
-#' @param absVolumeAreaSaveName VolumeArea_AbsoluteScale.csv.
+#' @param writeRasterFormat Character. Output file type. ascii. (Mo: i think we need to list options. what is default?).
+#' @param writeRasterExtension Character. Output file extension. Should match character writeRasterFormat.
+#' @param writeRasterDatatype Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).
+#' @param absVolumeAreaSaveName File name volume areas. (Mo: make VolumeArea_AbsoluteScale.csv. name default?).
 #' @param savedir Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here.
 #' @param alerts Audio warning for failures.
 #' 
@@ -44,6 +44,7 @@
 #' }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
+#' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
 #'
 #' @export
 

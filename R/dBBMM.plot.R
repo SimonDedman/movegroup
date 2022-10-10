@@ -11,6 +11,9 @@
 #' suggestions. See SimonDedman.com for links to walkthrough paper, and papers
 #' and thesis published using this package.
 #'
+#' @author Simon Dedman, \email{simondedman@@gmail.com}
+#' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
+#' 
 #' @import ggplot2
 #' @import ggmap
 #' @import magrittr

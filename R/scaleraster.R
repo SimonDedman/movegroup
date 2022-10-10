@@ -57,6 +57,7 @@
 #' }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
+#' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
 #'
 #' @export
 

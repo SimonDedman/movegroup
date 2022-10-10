@@ -1,12 +1,16 @@
 Package: dBBMMhomeRange
-Title: Visualizing and Quantifying Animal Space Use Data
+Title: Visualizing and Quantifying Space Use Data for groups of animals
 Version: 0.0.9
 Authors@R: c(
     person("Simon", "Dedman", email = "simondedman@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9108-972X")),
     person("Maurits", "van Zinnicq Bergmann", email = "mauritsvzb@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0002-8414-5025")))
-Description: Builds on the {move} package. Contains a function from this package to calculate a dynamic Brownian bridge movement model
-from movement data for individual animals, as well as functions to visualize and quantify space use for individuals aggregated in groups. 
-This package offers an easy and automated way to scale up individual-level space use analysis to that of groups.
+Description: Offers an easy and automated way to scale up individual-level space use
+    analysis to that of groups. Contains a function from the 'move' package to
+    calculate a dynamic Brownian bridge movement model from movement data for
+    individual animals, as well as functions to visualize and quantify space use
+    for individuals aggregated in groups. Originally written with passive acoustic
+    telemetry in mind, this package provides functionality in accounting for
+    unbalanced receiver array designs.
 Depends:
     R (>= 4.1.0)
 License: MIT + file LICENSE

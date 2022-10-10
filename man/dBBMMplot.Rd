@@ -67,7 +67,7 @@ dBBMMplot(
 
 \item{mapzoom}{Google: 3 (continent) - 21 (building). stamen: 0-18.}
 
-\item{mapsource}{Source for ggmap::get_map; uses Stamen as fallback if no Goole Maps API present.}
+\item{mapsource}{Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.}
 
 \item{maptype}{Type of map for ggmap::get_map.}
 
@@ -152,4 +152,9 @@ predicted abundance maps, and Unrepresentativeness surfaces.
 See www.GitHub.com/SimonDedman/gbm.auto for issues, feedback, and development
 suggestions. See SimonDedman.com for links to walkthrough paper, and papers
 and thesis published using this package.
+}
+\author{
+Simon Dedman, \email{simondedman@gmail.com}
+
+Maurits van Zinnicq Bergmann, \email{mauritsvzb@gmail.com}
 }

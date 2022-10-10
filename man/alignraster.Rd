@@ -73,4 +73,6 @@ Errors and their origins:
 }
 \author{
 Simon Dedman, \email{simondedman@gmail.com}
+
+Maurits van Zinnicq Bergmann, \email{mauritsvzb@gmail.com}
 }
