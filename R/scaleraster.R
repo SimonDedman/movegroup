@@ -18,7 +18,7 @@
 #' 
 #' Step 4. Weight raster (optional).
 #' The scaled group-level UD raster is divided by the specified weighting factor(s). Note that this is only useful if you 
-#' want to account for an unbalanced receiver array and have split up the study site and receivers in regions, and have 
+#' want to account for an unbalanced listening station (e.g., acoustic receivers) array and have split up the study site and receivers in regions, and have 
 #' run the dBBMMhomeRange() for each regional data set separately. See van Zinnicq Bergmann et al. 2022 
 #' (https://doi.org/10.1016/j.biocon.2022.109469) for example. If not applicable, choose a value of "1".
 #' 

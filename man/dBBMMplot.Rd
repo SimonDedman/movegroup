@@ -2,7 +2,7 @@
 % Please edit documentation in R/dBBMM.plot.R
 \name{dBBMMplot}
 \alias{dBBMMplot}
-\title{Plots a group-level utilization distribution on a map background}
+\title{Plots a group-level utilization distribution}
 \usage{
 dBBMMplot(
   x = paste0("Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"),
@@ -142,19 +142,7 @@ space use patterns i.e. the home range is bigger than the coverage by the acoust
 \item{surface}{Plot complete UD surface along with contours.}
 }
 \description{
-Plots a group-level utilization distribution on a map background
-}
-\details{
-Description paragraph: Automates delta log normal boosted regression trees abundance prediction.
-Loops through all permutations of parameters provided (learning
-rate, tree complexity, bag fraction), chooses the best, then simplifies it.
-Generates line, dot and bar plots, and outputs these and the predictions
-and a report of all variables used, statistics for tests, variable
-interactions, predictors used and dropped, etc. If selected, generates
-predicted abundance maps, and Unrepresentativeness surfaces.
-See www.GitHub.com/SimonDedman/gbm.auto for issues, feedback, and development
-suggestions. See SimonDedman.com for links to walkthrough paper, and papers
-and thesis published using this package.
+Plots 50 and 95pct contours of a group-level utilization distribution raster on a spatial map background. Contains functionality to also visualize geographic locations of individual listening stations (e.g., acoustic receivers) as well as the entire surface UD.
 }
 \author{
 Simon Dedman, \email{simondedman@gmail.com}
