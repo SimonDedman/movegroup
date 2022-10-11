@@ -196,7 +196,7 @@ for (thistide in unique(DET$T.Ph)) { # thistide <- unique(DET$T.Ph)[1]
     x = paste0(saveloc, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc"), # path to scaled data
     myLocation = NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
     googlemap = TRUE, # If pulling basemap from Google maps, this sets expansion # FALSE
-    gmapsAPI = "AIzaSyB1B_HUjNo6KINtcndMEKncPXhT40J7Hh4", # enter your google maps API here, quoted character string
+    gmapsAPI = NULL, # enter your google maps API here, quoted character string
     expandfactor = 1.6, # extents expansion factor for basemap.
     mapzoom = 13, # 3 (continent) - 21 (building)
     mapsource = "google", # Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present. # stamen
