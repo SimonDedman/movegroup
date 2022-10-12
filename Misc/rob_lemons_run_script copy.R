@@ -59,9 +59,9 @@ dBBMMhomeRange(
   # Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash
   rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. 17
   rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
-  bbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
-  bbdext = 0.3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
-  bbdwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
+  dbblocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
+  dbbext = 0.3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
+  dbbwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
   writeRasterFormat = "ascii",
   writeRasterExtension = ".asc",
   writeRasterDatatype = "FLT4S",
@@ -71,7 +71,7 @@ dBBMMhomeRange(
 ) 
 
 scaleraster(path = paste0(saveloc, "dBBMM ASCII/"), # Location of files created by dBBMM.build. No terminal slash.
-            pathsubsets = saveloc,
+            pathsubsets = paste0(saveloc, "dBBMM ASCII/"),
             pattern = ".asc",
             weighting = 1, # weighting to divide individual and summed-scaled rasters by, for unbalanced arrays
             format = "ascii",
@@ -79,16 +79,16 @@ scaleraster(path = paste0(saveloc, "dBBMM ASCII/"), # Location of files created 
             bylayer = TRUE,
             overwrite = TRUE,
             scalefolder = "Scaled",
-            summedname = "All_Rasters_Summed",
-            scaledname = "All_Rasters_Scaled",
+            weightedsummedname = "All_Rasters_Weighted_Summed",
+            scaledweightedname = "All_Rasters_Scaled_Weighted",
             crsloc = paste0(saveloc, "dBBMM ASCII/"), # location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
             returnObj = FALSE)
 
 dBBMMplot(
-  x = paste0(saveloc, "dBBMM ASCII/Scaled/All_Rasters_Scaled_Weighted_LatLon.asc"), # path to scaled data
-  # dataCRS = 2958, # one of (i) character: a string accepted by GDAL, (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs.
+  x = paste0(saveloc, "dBBMM ASCII/Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"), # path to scaled data
+  crsloc = paste0(saveloc, "dBBMM ASCII/"),
   trim = TRUE, # remove NA & 0 values and crop to remaining date extents? Default TRUE
-  myLocation = NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
+  myLocation = c(-79.27, 25.72, -79.24, 25.75), # location for extents, format c(xmin, ymin, xmax, ymax).
   # Default NULL, extents autocreated from data.
   # c(-79.3, 25.68331, -79.24, 25.78)
   googlemap = FALSE, # If pulling basemap from Google maps, this sets expansion
@@ -98,11 +98,11 @@ dBBMMplot(
   expandfactor = 1.6, # extents expansion factor for basemap.
   # 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out).
   # 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
-  mapzoom = 13, # google: 3 (continent) - 21 (building). stamen: 0-18
+  mapzoom = 12, # google: 3 (continent) - 21 (building). stamen: 0-18
   mapsource = "google", # Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.
   maptype = "satellite", # Type of map for ggmap::get_map.
-  contour1colour = "red", # colour for contour 1, typically 95%.
-  contour2colour = "orange", # colour for contour 2, typically 50%.
+  contour1colour = "orange", # colour for contour 1, typically 95%.
+  contour2colour = "red", # colour for contour 2, typically 50%.
   plottitle = "Aggregated 95% and 50% UD contours",
   # Can use the term 'home range' when an animal can be detected wherever it goes
   # i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic
@@ -115,35 +115,39 @@ dBBMMplot(
   plotcaption = paste0("dBBMM_HomeRange, ", lubridate::today()),
   axisxlabel = "Longitude",
   axisylabel = "Latitude",
-  legendposition = c(0.16, 0.92), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top.
+  legendposition = c(0.16, 0.78), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top.
   filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
   savedir = paste0(saveloc, "dBBMM ASCII/Plot/"), # file.path(work.dir, out.dir, "Scaled")
   receiverlats = NULL, # vector of latitudes for receivers to be plotted
   receiverlons = NULL, # vector of longitudes for receivers to be plotted
   receivernames = NULL, # vector of names for receivers to be plotted
   receiverrange = NULL, # single (will be recycled), or vector of detection ranges in metres for receivers to be plotted
-  recpointscol = "black", # Colour of receiver centrepoint outlines.
-  recpointsfill = "white", # Colour of receiver centrepoint fills.
-  recpointsalpha = 0.5, # Alpha value of receiver centrepoint fills, 0 (invisible) to 1 (fully visible).
-  recpointssize = 1, # Size of receiver points.
-  recpointsshape = 21, # Shape of receiver points, default 21, circle with outline and fill.
-  recbufcol = "black", # Colour of the receiver buffer circle outlines.
-  recbuffill = "red", # Colour of the receiver buffer circle fills.
-  recbufalpha = 0.5,  # Alpha value of receiver buffer fills, 0 (invisible) to 1 (fully visible).
-  reclabcol = "black", # Receiver label text colour.
+  recpointscol = NULL, # Colour of receiver centrepoint outlines.
+  recpointsfill = NULL, # Colour of receiver centrepoint fills.
+  recpointsalpha = NULL, # Alpha value of receiver centrepoint fills, 0 (invisible) to 1 (fully visible).
+  recpointssize = NULL, # Size of receiver points.
+  recpointsshape = NULL, # Shape of receiver points, default 21, circle with outline and fill.
+  recbufcol = NULL, # Colour of the receiver buffer circle outlines.
+  recbuffill = NULL, # Colour of the receiver buffer circle fills.
+  recbufalpha = NULL,  # Alpha value of receiver buffer fills, 0 (invisible) to 1 (fully visible).
+  reclabcol = NULL, # Receiver label text colour.
   reclabfill = NA, # Receiver label fill colour, NA for no fill.
-  reclabnudgex = 0, # Receiver label offset nudge in X dimension.
-  reclabnudgey = -200, # Receiver label offset nudge in Y dimension.
-  reclabpad = 0, # Receiver label padding in lines.
-  reclabrad = 0.15, # Receiver label radius in lines.
-  reclabbord = 0 # Receiver label border in mm.
+  reclabnudgex = NULL, # Receiver label offset nudge in X dimension.
+  reclabnudgey = NULL, # Receiver label offset nudge in Y dimension.
+  reclabpad = NULL, # Receiver label padding in lines.
+  reclabrad = NULL, # Receiver label radius in lines.
+  reclabbord = NULL, # Receiver label border in mm.
+  surface = TRUE
 )
 
 # Tidal Cycle Loop ####
+
+## MO COMMENT 2022-10-11: the below loop within a loop no longer works as intended. first dbbmmhomerange() needs to be run for all tidal phases, then scaleraster()
+
 for (thistide in unique(DET$T.Ph)) { # thistide <- unique(DET$T.Ph)[1]
   
   # saveloc <- paste0("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/", thistide, "/") # si
-  saveloc <- paste0("~/github/A_day_in_the_life_analysis/dBBMMhomeRange/dBBMM ASCII/", thistide, "/") # si
+  saveloc <- paste0("~/github/A_day_in_the_life_analysis/dBBMMhomeRange/dBBMM ASCII/Tides/", thistide, "/") # si
   
   dir.create(saveloc)
   dir.create(paste0(saveloc, "Plot"))
@@ -168,9 +172,9 @@ for (thistide in unique(DET$T.Ph)) { # thistide <- unique(DET$T.Ph)[1]
     # Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash
     rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. 17
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
-    bbdlocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
-    bbdext = 0.3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
-    bbdwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
+    dbblocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
+    dbbext = 0.3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
+    dbbwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
     writeRasterFormat = "ascii",
     writeRasterExtension = ".asc",
     writeRasterDatatype = "FLT4S",
@@ -180,6 +184,7 @@ for (thistide in unique(DET$T.Ph)) { # thistide <- unique(DET$T.Ph)[1]
   ) 
   
   scaleraster(path = paste0(saveloc), # Location of files created by dBBMM.build. No terminal slash.
+              pathsubsets = "~/github/A_day_in_the_life_analysis/dBBMMhomeRange/dBBMM ASCII/Tides/",
               pattern = ".asc",
               weighting = 1, # weighting to divide individual and summed-scaled rasters by, for unbalanced arrays
               format = "ascii",
@@ -187,22 +192,24 @@ for (thistide in unique(DET$T.Ph)) { # thistide <- unique(DET$T.Ph)[1]
               bylayer = TRUE,
               overwrite = TRUE,
               scalefolder = "Scaled",
-              summedname = "All_Rasters_Summed",
-              scaledname = "All_Rasters_Scaled",
+              weightedsummedname = "All_Rasters_Weighted_Summed",
+              scaledweightedname = "All_Rasters_Scaled_Weighted",
               crsloc = paste0(saveloc), # location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
               returnObj = FALSE)
   
   dBBMMplot(
-    x = paste0(saveloc, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc"), # path to scaled data
-    myLocation = NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
-    googlemap = TRUE, # If pulling basemap from Google maps, this sets expansion # FALSE
+    x = paste0(saveloc, "Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"), # path to scaled data
+    crsloc = saveloc,
+    trim = TRUE,
+    myLocation = c(-79.27, 25.72, -79.24, 25.75),
+    googlemap = FALSE, # If pulling basemap from Google maps, this sets expansion # FALSE
     gmapsAPI = NULL, # enter your google maps API here, quoted character string
     expandfactor = 1.6, # extents expansion factor for basemap.
-    mapzoom = 13, # 3 (continent) - 21 (building)
+    mapzoom = 12, # 3 (continent) - 21 (building)
     mapsource = "google", # Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present. # stamen
     maptype = "satellite", # Type of map for ggmap::get_map. # terrain
-    contour1colour = "red", # colour for contour 1, typically 95%.
-    contour2colour = "orange", # colour for contour 2, typically 50%.
+    contour1colour = "orange", # colour for contour 1, typically 95%.
+    contour2colour = "red", # colour for contour 2, typically 50%.
     plottitle = "Aggregated 95% and 50% UD contours",
     plotsubtitle = paste0("Scaled contours. n = ",
                           length(list.files(path = saveloc, pattern = ".asc")),
@@ -215,7 +222,7 @@ for (thistide in unique(DET$T.Ph)) { # thistide <- unique(DET$T.Ph)[1]
     plotcaption = paste0("dBBMMhomeRange, ", lubridate::today()),
     axisxlabel = "Longitude",
     axisylabel = "Latitude",
-    legendposition = c(0.16, 0.92), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top.
+    legendposition = c(0.16, 0.78), #%dist (of middle? of legend box) from L to R, %dist from Bot to Top.
     filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
     savedir = paste0(saveloc, "Plot"), # file.path(work.dir, out.dir, "Scaled")
     receiverlats = NULL, # vector of latitudes for receivers to be plotted
@@ -236,7 +243,8 @@ for (thistide in unique(DET$T.Ph)) { # thistide <- unique(DET$T.Ph)[1]
     reclabnudgey = -200, # Receiver label offset nudge in Y dimension.
     reclabpad = 0, # Receiver label padding in lines.
     reclabrad = 0.15, # Receiver label radius in lines.
-    reclabbord = 0 # Receiver label border in mm.
+    reclabbord = 0, # Receiver label border in mm.
+    surface = TRUE
   )
 } # close thistide loop
 
