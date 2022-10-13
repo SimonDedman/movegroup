@@ -234,10 +234,10 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   # Calculate 50% and 95% volume areas per UD, the mean and stdev across UDs, and finally core and home range volume area sizes of the group-level UD
   # A. individual core and home range volume area sizes
-  area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50% volume area
+  area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) >= .50))) # 50% volume area
   area.50 <- round((area.50 * rasterres) / 1000000, 2) # Convert from m^2 to km^2
   
-  area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95% volume area
+  area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) >= .05))) # 95% volume area
   area.95 <- round((area.95 * rasterres) / 1000000, 2) # Convert from m^2 to km^2
   
   # B. Mean and SD
@@ -260,10 +260,10 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
                       bylayer = bylayer,
                       overwrite = overwrite)
   
-  group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 2)
+  group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) >= .50)) * rasterres) / 1000000, 2)
   group_area.50
   
-  group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 2)
+  group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) >= .05)) * rasterres) / 1000000, 2)
   group_area.95
   
   # Combine in a single df

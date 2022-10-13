@@ -25,7 +25,7 @@ gmapsAPI = NULL # enter your Google maps API here quoted character string
 expandfactor = 0 # extents expansion factor for basemap.
 # 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out).
 # 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
-mapzoom = 14 # google: 3 (continent) - 21 (building). stamen: 0-18
+mapzoom = 12 # google: 3 (continent) - 21 (building). stamen: 0-18
 mapsource = "google" # Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.
 maptype = "satellite" # Type of map for ggmap::get_map.
 contour1colour = "red" # colour for contour 1 typically 95%.
