@@ -685,8 +685,10 @@ dBBMMhomeRange <- function(
     
     # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: absolute scale
     # Note: Based on 'An introduciton to the 'move' package', it's the opposite of what you might expect: "A cell with a very high value in the UD raster will have a very low value in the contour raster"
-    area.50 <- sum(raster::values(move::getVolumeUD(bb) <= .50))
-    area.95 <- sum(raster::values(move::getVolumeUD(bb) <= .95))
+    # area.50 <- sum(raster::values(move::getVolumeUD(bb) <= .50))
+    # area.95 <- sum(raster::values(move::getVolumeUD(bb) <= .95))
+    area.50 <- round((sum(raster::values(bb) >= (max(bb@data@values) * 0.5))
+    area.95 <- round((sum(raster::values(bb) >= (max(bb@data@values) * 0.05))
     
     # Combine in single df
     area.ct <- data.frame(

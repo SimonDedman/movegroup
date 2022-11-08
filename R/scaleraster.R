@@ -143,14 +143,14 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   # Sum the scaled individual UDs, which should result in a single aggregated or ‘group-level' UD
   All_Rasters_Weighted_Summed <- raster::stackApply(x = rasterstack, # Raster* object or list of
-                                           indices = rep(1, raster::nlayers(rasterstack)), # Vector of length nlayers(x), performs the function (sum) PER UNIQUE index, i.e. 1:5 = 5 unique sums.
-                                           fun = sum, # returns a single value, e.g. mean or min, and that takes a na.rm argument
-                                           na.rm = TRUE, # If TRUE, NA cells are removed from calculations
-                                           # filename = paste0(path, "/", scalefolder, "/", summedname, pattern), # character. Optional output filename, causes file to be written
-                                           format = format,
-                                           datatype = datatype,
-                                           bylayer = bylayer,
-                                           overwrite = overwrite)
+                                                    indices = rep(1, raster::nlayers(rasterstack)), # Vector of length nlayers(x), performs the function (sum) PER UNIQUE index, i.e. 1:5 = 5 unique sums.
+                                                    fun = sum, # returns a single value, e.g. mean or min, and that takes a na.rm argument
+                                                    na.rm = TRUE, # If TRUE, NA cells are removed from calculations
+                                                    # filename = paste0(path, "/", scalefolder, "/", summedname, pattern), # character. Optional output filename, causes file to be written
+                                                    format = format,
+                                                    datatype = datatype,
+                                                    bylayer = bylayer,
+                                                    overwrite = overwrite)
   
   # Put the values back in the raster object
   All_Rasters_Weighted_Summed %<>% raster::setMinMax()
@@ -168,7 +168,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   
   # Now weight the group-level UD raster
   # All_Rasters_Scaled_Weighted <- All_Rasters_Scaled / weighting    # This line no longer needed as we moved it up to weight individual-level rasters
- # rm(All_Rasters_Scaled) # Remove, as not used again
+  # rm(All_Rasters_Scaled) # Remove, as not used again
   
   # Change projection of All_Rasters_Scaled_Weighted to latlon for proper plotting
   dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
@@ -232,12 +232,18 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   # Convert the scaled individual-level rasters within rasterlist to class ".UD". Also ensure that values within a raster sum to 1 so that they can be fed into getVolumeUD()
   UDlist <- UDlist %>% sapply(function(x) new(".UD", x / sum(raster::values(x))))
   
+  
+  
+  
+  
   # Calculate 50% and 95% volume areas per UD, the mean and stdev across UDs, and finally core and home range volume area sizes of the group-level UD
   # A. individual core and home range volume area sizes
-  area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50% volume area
+  # area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50% volume area
+  area.50 <- UDlist %>% sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.5))) # 50% volume area
   area.50 <- round((area.50 * rasterres) / 1000000, 2) # Convert from m^2 to km^2
   
-  area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95% volume area
+  # area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95% volume area
+  area.95 <- UDlist %>% sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.05))) # 95% volume area
   area.95 <- round((area.95 * rasterres) / 1000000, 2) # Convert from m^2 to km^2
   
   # B. Mean and SD
@@ -260,11 +266,11 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
                       bylayer = bylayer,
                       overwrite = overwrite)
   
-  group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 2)
-  group_area.50
+  # group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 2)
+  # group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 2)
   
-  group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 2)
-  group_area.95
+  group_area.50 <- round((sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.5)) * rasterres) / 1000000, 2)
+  group_area.95 <- round((sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.05)) * rasterres) / 1000000, 2)
   
   # Combine in a single df
   area.ct <- data.frame(core.use = area.50,
