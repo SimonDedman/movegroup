@@ -240,18 +240,18 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   # A. individual core and home range volume area sizes
   # area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50% volume area
   area.50 <- UDlist %>% sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.5))) # 50% volume area
-  area.50 <- round((area.50 * rasterres) / 1000000, 2) # Convert from m^2 to km^2
+  area.50 <- round((area.50 * rasterres) / 1000000, 4) # Convert from m^2 to km^2
   
   # area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95% volume area
   area.95 <- UDlist %>% sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.05))) # 95% volume area
-  area.95 <- round((area.95 * rasterres) / 1000000, 2) # Convert from m^2 to km^2
+  area.95 <- round((area.95 * rasterres) / 1000000, 4) # Convert from m^2 to km^2
   
   # B. Mean and SD
-  area.50.mean <- round(mean(area.50), 2) # 50% volume area mean
-  area.50.sd <- round(sd(area.50), 2) # 50% volume area SD
+  area.50.mean <- round(mean(area.50), 4) # 50% volume area mean
+  area.50.sd <- round(sd(area.50), 4) # 50% volume area SD
   
-  area.95.mean <- round(mean(area.95), 2) # 95% volume area mean
-  area.95.sd <- round(sd(area.95), 2) # 95% volume area SD
+  area.95.mean <- round(mean(area.95), 4) # 95% volume area mean
+  area.95.sd <- round(sd(area.95), 4) # 95% volume area SD
   
   # 3. Group-level core and home range volume areas
   UDScaled <- new(".UD", All_Rasters_Scaled_Weighted) # This uses the aeqd raster for calculations
@@ -266,11 +266,11 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
                       bylayer = bylayer,
                       overwrite = overwrite)
   
-  # group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 2)
-  # group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 2)
+  # group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 4)
+  # group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 4)
   
-  group_area.50 <- round((sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.5)) * rasterres) / 1000000, 2)
-  group_area.95 <- round((sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.05)) * rasterres) / 1000000, 2)
+  group_area.50 <- round((sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.5)) * rasterres) / 1000000, 4)
+  group_area.95 <- round((sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.05)) * rasterres) / 1000000, 4)
   
   # Combine in a single df
   area.ct <- data.frame(core.use = area.50,
