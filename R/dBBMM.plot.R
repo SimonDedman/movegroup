@@ -12,7 +12,6 @@
 #' @importFrom lubridate today
 #' @importFrom sf st_set_crs st_bbox st_transform st_as_sfc st_as_sf
 #' @importFrom starsExtra trim2
-#' @importFrom fishtrack3d volumeUD contourPoly
 #' @export
 #' 
 #' @param x Path to scaled raster.
