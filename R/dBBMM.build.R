@@ -544,7 +544,7 @@ dBBMMhomeRange <- function(
     # the boat coordinates, bearing and distance estimate, to be 1 m.
     
     if ("moveLocError" %in% colnames(data.i)) {
-      move.i$moveLocError <- data.i$moveLocError
+      move.i$LocationError <- data.i$moveLocError
     } else {
       if (exists("moveLocError")) {
         if (length(moveLocError) == 1) {
