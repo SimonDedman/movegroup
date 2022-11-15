@@ -77,7 +77,7 @@
 #' 
 #' @return Individual-level utilization distributions, saved as rasters, as well
 #'  as calculated volume area estimates for 50 and 95pct contours, saved in a 
-#'  .csv file
+#'  .csv file.
 #' 
 #' saved to disk.
 #' @details Errors and their origins:
