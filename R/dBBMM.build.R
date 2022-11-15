@@ -12,35 +12,72 @@
 #' Step 3. Loop through individuals.
 #' Individuals are looped through to construct individual-level movement models (on an absolute scale). See www.GitHub.com/SimonDedman/dBBMMhomeRange for issues, feedback, and development suggestions. 
 #'
-#' @param data Data frame object containing the data. Requires columns Lat Lon DateTime ID and optionally a grouping column.
+#' @param data Data frame object containing the data. Requires columns Lat Lon 
+#' DateTime ID and optionally a grouping column. Names specifide in later 
+#' parameters. Grouping not currently implemented 2022-11-15, see Group 
+#' parameter below.
 #' @param ID Name of animal tag ID column in data.
-#' @param Datetime Column name in data that contains date/time stamps for each recorded detection. Must be in POSIXct format.
+#' @param Datetime Column name in data that contains date/time stamps for each 
+#' recorded detection. Must be in POSIXct format.
 #' @param Lat Name of latitude column in data.
 #' @param Lon Name of longitude column in data.
-#' @param Group Name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?.
+#' @param Group Name of grouping column in data. UNUSED 2022-11-15
 #' @param dat.TZ Timezone of data for as.POSIXct.
 #' @param proj CRS for move function.
-#' @param projectedCRS EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone.
-#' @param sensor Sensor for move function. Single character or vector with length of the number of coordinates. Optional.
-#' @param moveLocError Location error (m) in the 'brownian.bridge.dyn' function in the 'move' package. Numeric. Either single or a vector of length nrow data.
-#' @param timeDiffLong Single numeric value. Threshold value in timeDiffUnits designating the length of long breaks in re-locations. Used for bursting a movement track into segments, thereby removing long breaks from the movement track. See ?move::bursted for details.
+#' @param projectedCRS EPSG code for CRS for initial transform of latlon points;
+#'  corresponds to rasterCRS zone.
+#' @param sensor Sensor for move function. Single character or vector with 
+#' length of the number of coordinates. Optional.
+#' @param moveLocError Location error (m) in the 'brownian.bridge.dyn' function 
+#' in the 'move' package. Numeric. Either single or a vector of length nrow 
+#' data. If using passive acoustic data this is the detection range of the 
+#' receiver(s).
+#' @param timeDiffLong Single numeric value. Threshold value in timeDiffUnits 
+#' designating the length of long breaks in re-locations. Used for bursting a 
+#' movement track into segments, thereby removing long breaks from the movement 
+#' track. See ?move::bursted for details.
 #' @param timeDiffUnits Character. Unit for timeDiffLong.
-#' @param center Center move object within extent? See spTransform.
+#' @param center Do you want to center the move object within extent? See 
+#' spTransform.
 #' @param buffpct Buffer extent for raster creation, proportion of 1.
-#' @param rasterExtent If NULL, raster extent calculated from data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 for ymax. Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash.
+#' @param rasterExtent Extent of raster created around data. If NULL, raster 
+#' extent calculated from data, buffpct, rasterResolution. Else length 4 vector,
+#'  c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 (degrees) north
+#'  or south for ymax or ymin. Doesn't prevent constraint to data limits (in 
+#' plot anyway), but prevents raster clipping crash.
 #' @param rasterCRS CRS for raster creation.
-#' @param rasterResolution Single numeric value to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km.
-#' @param dbblocationerror Location.error param in 'brownian.bridge.dyn' function in the 'move' package. Could use the same as moveLocError?.
-#' @param dbbext Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.
-#' @param dbbwindowsize window.size param in the 'brownian.bridge.dyn' function in the 'move' package. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
-#' @param writeRasterFormat Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).
-#' @param writeRasterExtension Character. Output file extension. Should match character writeRasterFormat.
-#' @param writeRasterDatatype Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).
-#' @param absVolumeAreaSaveName File name plus extension where UD estimates are saved (Mo: make VolumeArea_AbsoluteScale.csv. name default?).
-#' @param savedir Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here.
+#' @param rasterResolution Single numeric value to set raster resolution - cell 
+#' size in metres? 111000: 1 degree lat = 111km.
+#' @param dbblocationerror Location.error param in 'brownian.bridge.dyn' 
+#' function in the 'move' package. single numeric value or vector of the length 
+#' of coordinates that describes the error of the location (sender/receiver) 
+#' system in map units. Or a character string with the name of the column 
+#' containing the location error can be provided. Could use the same as 
+#' moveLocError?.
+#' @param dbbext Ext param in the 'brownian.bridge.dyn' function in the 'move' 
+#' package. Extends bounding box around track. Numeric single (all edges), 
+#' double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.
+#' @param dbbwindowsize window.size param in the 'brownian.bridge.dyn' function 
+#' in the 'move' package. The size of the moving window along the track. Larger 
+#' windows provide more stable/accurate estimates of the brownian motion 
+#' variance but are less well able to capture more frequent changes in behavior.
+#'  This number has to be odd. A dBBMM is not run if total detections of 
+#'  individual < window size (default 31).
+#' @param writeRasterFormat Character. Output file type. ascii. TO DEPRECIATE.
+#' @param writeRasterExtension Character. Output file extension. Should match 
+#' character writeRasterFormat. TO DEPRECIATE.
+#' @param writeRasterDatatype Character. Data type for writing values to disk. 
+#' TO DEPRECIATE.
+#' @param absVolumeAreaSaveName File name plus extension where UD estimates are 
+#' saved. TO DEPRECIATE.
+#' @param savedir Save outputs to a temporary directory (default) else change 
+#' to desired directory e.g. "/home/me/folder/". Do not use getwd() for this. 
+#' Include terminal slash.
 #' @param alerts Audio warning for failures.
 #' 
-#' @return Individual-level utilization distributions, saved as rasters, as well as calculated volume area estimates for 50 and 95pct contours, saved in a .csv file
+#' @return Individual-level utilization distributions, saved as rasters, as well
+#'  as calculated volume area estimates for 50 and 95pct contours, saved in a 
+#'  .csv file
 #' 
 #' saved to disk.
 #' @details Errors and their origins:
@@ -81,7 +118,7 @@ dBBMMhomeRange <- function(
     proj = sp::CRS("+proj=longlat +datum=WGS84"), # CRS for move function.
     projectedCRS = "+init=epsg:32617", # EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone. This is around Bimini, Bahamas.
     sensor = "VR2W", # sensor for move function. Single character or vector with length of the number of coordinates. Optional.
-    moveLocError = 1, # location error in metres for move function. Numeric. Either single or a vector of lenth nrow data.
+    moveLocError = 1, # location error in metres for move function. Numeric. Either single or a vector of length nrow data.
     timeDiffLong = 2, # threshold length of time in timeDiffUnits designating long breaks in relocations.
     timeDiffUnits = "hours", # units for time difference for move function.
     center = TRUE, # center move object within extent? See spTransform.
@@ -583,7 +620,7 @@ dBBMMhomeRange <- function(
       } # close if exists dbblocationerror
     }
     
-    # location error needs to be a postive number. Replace zeroes with 0.00001
+    # location error needs to be a positive number. Replace zeroes with 0.00001
     dbblocationerror.i[which(dbblocationerror.i == 0)] <- 0.00001
     
     # Construct the model. The time.step should reflect the ping frequency of the tag (in minutes)

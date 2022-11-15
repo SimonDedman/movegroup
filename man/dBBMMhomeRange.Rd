@@ -35,62 +35,99 @@ dBBMMhomeRange(
 )
 }
 \arguments{
-\item{data}{Data frame object containing the data. Requires columns Lat Lon DateTime ID and optionally a grouping column.}
+\item{data}{Data frame object containing the data. Requires columns Lat Lon 
+DateTime ID and optionally a grouping column. Names specifide in later 
+parameters. Grouping not currently implemented 2022-11-15, see Group 
+parameter below.}
 
 \item{ID}{Name of animal tag ID column in data.}
 
-\item{Datetime}{Column name in data that contains date/time stamps for each recorded detection. Must be in POSIXct format.}
+\item{Datetime}{Column name in data that contains date/time stamps for each 
+recorded detection. Must be in POSIXct format.}
 
 \item{Lat}{Name of latitude column in data.}
 
 \item{Lon}{Name of longitude column in data.}
 
-\item{Group}{Name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?.}
+\item{Group}{Name of grouping column in data. UNUSED 2022-11-15}
 
 \item{dat.TZ}{Timezone of data for as.POSIXct.}
 
 \item{proj}{CRS for move function.}
 
-\item{projectedCRS}{EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone.}
+\item{projectedCRS}{EPSG code for CRS for initial transform of latlon points;
+corresponds to rasterCRS zone.}
 
-\item{sensor}{Sensor for move function. Single character or vector with length of the number of coordinates. Optional.}
+\item{sensor}{Sensor for move function. Single character or vector with 
+length of the number of coordinates. Optional.}
 
-\item{moveLocError}{Location error (m) in the 'brownian.bridge.dyn' function in the 'move' package. Numeric. Either single or a vector of length nrow data.}
+\item{moveLocError}{Location error (m) in the 'brownian.bridge.dyn' function 
+in the 'move' package. Numeric. Either single or a vector of length nrow 
+data. If using passive acoustic data this is the detection range of the 
+receiver(s).}
 
-\item{timeDiffLong}{Single numeric value. Threshold value in timeDiffUnits designating the length of long breaks in re-locations. Used for bursting a movement track into segments, thereby removing long breaks from the movement track. See ?move::bursted for details.}
+\item{timeDiffLong}{Single numeric value. Threshold value in timeDiffUnits 
+designating the length of long breaks in re-locations. Used for bursting a 
+movement track into segments, thereby removing long breaks from the movement 
+track. See ?move::bursted for details.}
 
 \item{timeDiffUnits}{Character. Unit for timeDiffLong.}
 
-\item{center}{Center move object within extent? See spTransform.}
+\item{center}{Do you want to center the move object within extent? See 
+spTransform.}
 
 \item{buffpct}{Buffer extent for raster creation, proportion of 1.}
 
-\item{rasterExtent}{If NULL, raster extent calculated from data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 for ymax. Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash.}
+\item{rasterExtent}{Extent of raster created around data. If NULL, raster 
+extent calculated from data, buffpct, rasterResolution. Else length 4 vector,
+ c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 (degrees) north
+ or south for ymax or ymin. Doesn't prevent constraint to data limits (in 
+plot anyway), but prevents raster clipping crash.}
 
 \item{rasterCRS}{CRS for raster creation.}
 
-\item{rasterResolution}{Single numeric value to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km.}
+\item{rasterResolution}{Single numeric value to set raster resolution - cell 
+size in metres? 111000: 1 degree lat = 111km.}
 
-\item{dbblocationerror}{Location.error param in 'brownian.bridge.dyn' function in the 'move' package. Could use the same as moveLocError?.}
+\item{dbblocationerror}{Location.error param in 'brownian.bridge.dyn' 
+function in the 'move' package. single numeric value or vector of the length 
+of coordinates that describes the error of the location (sender/receiver) 
+system in map units. Or a character string with the name of the column 
+containing the location error can be provided. Could use the same as 
+moveLocError?.}
 
-\item{dbbext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.}
+\item{dbbext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' 
+package. Extends bounding box around track. Numeric single (all edges), 
+double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.}
 
-\item{dbbwindowsize}{window.size param in the 'brownian.bridge.dyn' function in the 'move' package. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).}
+\item{dbbwindowsize}{window.size param in the 'brownian.bridge.dyn' function 
+in the 'move' package. The size of the moving window along the track. Larger 
+windows provide more stable/accurate estimates of the brownian motion 
+variance but are less well able to capture more frequent changes in behavior.
+ This number has to be odd. A dBBMM is not run if total detections of 
+ individual < window size (default 31).}
 
-\item{writeRasterFormat}{Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).}
+\item{writeRasterFormat}{Character. Output file type. ascii. TO DEPRECIATE.}
 
-\item{writeRasterExtension}{Character. Output file extension. Should match character writeRasterFormat.}
+\item{writeRasterExtension}{Character. Output file extension. Should match 
+character writeRasterFormat. TO DEPRECIATE.}
 
-\item{writeRasterDatatype}{Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).}
+\item{writeRasterDatatype}{Character. Data type for writing values to disk. 
+TO DEPRECIATE.}
 
-\item{absVolumeAreaSaveName}{File name plus extension where UD estimates are saved (Mo: make VolumeArea_AbsoluteScale.csv. name default?).}
+\item{absVolumeAreaSaveName}{File name plus extension where UD estimates are 
+saved. TO DEPRECIATE.}
 
-\item{savedir}{Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here.}
+\item{savedir}{Save outputs to a temporary directory (default) else change 
+to desired directory e.g. "/home/me/folder/". Do not use getwd() for this. 
+Include terminal slash.}
 
 \item{alerts}{Audio warning for failures.}
 }
 \value{
-Individual-level utilization distributions, saved as rasters, as well as calculated volume area estimates for 50 and 95pct contours, saved in a .csv file
+Individual-level utilization distributions, saved as rasters, as well
+ as calculated volume area estimates for 50 and 95pct contours, saved in a 
+ .csv file
 
 saved to disk.
 }
