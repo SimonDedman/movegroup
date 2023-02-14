@@ -23,7 +23,7 @@ alignraster(
 )
 }
 \arguments{
-\item{folderroots}{Character vector of locations of folder roots output by dBBMMhomeRange. Function expects CRS.Rds file and a subfolder with the scaled raster.}
+\item{folderroots}{Character vector of locations of folder roots output by movegroup. Function expects CRS.Rds file and a subfolder with the scaled raster.}
 
 \item{foldernames}{Character vector names of folders corresponding to files in folderroots, i.e. the names of the objects, arrays, regions, etc.}
 

@@ -2,7 +2,7 @@
 #'
 #' Extends the spatial extent of each area-specific group-level raster to the spatial extent shared by all rasters.
 #'
-#' @param folderroots Character vector of locations of folder roots output by dBBMMhomeRange. Function expects CRS.Rds file and a subfolder with the scaled raster.
+#' @param folderroots Character vector of locations of folder roots output by movegroup. Function expects CRS.Rds file and a subfolder with the scaled raster.
 #' @param foldernames Character vector names of folders corresponding to files in folderroots, i.e. the names of the objects, arrays, regions, etc.
 #' @param pattern For input rasters from scaleraster. Default ".asc".
 #' @param scalefolder For input rasters from scaleraster. Default "Scaled".
@@ -36,7 +36,7 @@
 
 
 # read in rasters & add to list####
-alignraster <- function(folderroots = c("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/H", # character vector of locations of folder roots output by dBBMMhomeRange. Function expects CRS.Rds file and a subfolder with the scaled raster.
+alignraster <- function(folderroots = c("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/H", # character vector of locations of folder roots output by movegroup. Function expects CRS.Rds file and a subfolder with the scaled raster.
                                         "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/L",
                                         "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/M"),
                         foldernames = c("H", "L", "M"), # character vector names of folders corresponding to files in folderroots, i.e. the names of the objects, arrays, regions, etc.

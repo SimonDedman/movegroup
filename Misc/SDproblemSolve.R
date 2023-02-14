@@ -12,7 +12,7 @@ library(fishtrack3d)
 
 x = "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/All_Rasters_Scaled_Weighted_UDScaled.asc" # path to scaled data
 # dataCRS = 2958 # one of (i) character: a string accepted by GDAL (ii) integer a valid EPSG value (numeric) or (iii) an object of class crs.
-crsloc = NULL # Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.
+crsloc = NULL # Location of saved CRS Rds file from movegroup.R. Should be same as path.
 trim = TRUE # remove NA & 0 values and crop to remaining date extents? Default TRUE
 myLocation = NULL # location for extents format c(xmin ymin xmax ymax).
 # Default NULL extents autocreated from data.
@@ -39,7 +39,7 @@ plottitle = "Aggregated 95% and 50% UD contours"
 # i.e. the home range is bigger than the coverage by the acoustic array; put in Details
 plotsubtitle = "Scaled contours. n = 13" # data %>% distinct(ID) %>% nrow() # 13
 legendtitle = "Percent UD Contours"
-plotcaption = paste0("dBBMM_HomeRange ", lubridate::today())
+plotcaption = paste0("movegroup ", lubridate::today())
 axisxlabel = "Longitude"
 axisylabel = "Latitude"
 legendposition = c(0.11, 0.85) # Percent distance (of middle? of legend box) from L to R percent distance from Bottom to Top.

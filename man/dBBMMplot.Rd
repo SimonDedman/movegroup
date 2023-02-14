@@ -20,7 +20,7 @@ dBBMMplot(
   plottitle = "Aggregated 95\% and 50\% UD contours",
   plotsubtitle = "Scaled contours. n = 13",
   legendtitle = "Percent UD Contours",
-  plotcaption = paste0("dBBMM_HomeRange, ", lubridate::today()),
+  plotcaption = paste0("movegroup, ", lubridate::today()),
   axisxlabel = "Longitude",
   axisylabel = "Latitude",
   legendposition = c(0.11, 0.85),
@@ -53,7 +53,7 @@ dBBMMplot(
 \arguments{
 \item{x}{Path to scaled raster.}
 
-\item{crsloc}{Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.}
+\item{crsloc}{Location of saved CRS Rds file from movegroup.R. Should be same as path.}
 
 \item{trim}{Remove NA & 0 values and crop to remaining date extents? Default TRUE.}
 

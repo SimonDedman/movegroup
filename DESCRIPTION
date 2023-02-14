@@ -1,4 +1,4 @@
-Package: dBBMMhomeRange
+Package: movegroup
 Title: Visualizing and Quantifying Space Use Data for groups of animals
 Version: 2023.02.14
 Authors@R: c(
@@ -35,4 +35,4 @@ Imports:
     starsExtra (>= 0.2.7),
     stringr (>= 1.4.0),
     tidyr (>= 1.2.0)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
