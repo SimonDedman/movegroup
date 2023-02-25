@@ -721,11 +721,18 @@ movegroup <- function(
     rm(tmp)
     
     # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: absolute scale
-    # Note: Based on 'An introduciton to the 'move' package', it's the opposite of what you might expect: "A cell with a very high value in the UD raster will have a very low value in the contour raster"
-    # area.50 <- sum(raster::values(move::getVolumeUD(bb) <= .50))
-    # area.95 <- sum(raster::values(move::getVolumeUD(bb) <= .95))
-    area.50 <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.5)), 4)
-    area.95 <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.05)), 4)
+    # Note: Based on 'An introduction to the 'move' package', it's the opposite of what you might expect: "A cell with a very high value in the UD raster will have a very low value in the contour raster"
+    area.50 <- round(sum(raster::values(move::getVolumeUD(bb) <= .50)), 4)
+    area.95 <- round(sum(raster::values(move::getVolumeUD(bb) <= .95)), 4)
+    
+    # Below calc introduced in 2022-10-08 commit, message = 
+    #"changed code volume area: instead of using getVolumeUD() from the move package,
+    # we just did the calculations on the UD raster and not using the function.
+    # these seem to produce very plausbile estimates!"
+    # This change creates unnaturally small areas.
+    # Changed back to previous calcs 2023-02-24. Added rounding
+    # area.50 <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.5)), 4)
+    # area.95 <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.05)), 4)
     
     # Combine in single df
     area.ct <- data.frame(
