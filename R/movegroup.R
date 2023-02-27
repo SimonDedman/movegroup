@@ -81,6 +81,11 @@
 #' 
 #' saved to disk.
 #' @details Errors and their origins:
+#' 
+#' 1. Error in .local(object, raster, location.error = location.error, ext = ext: Higher y grid not 
+#' large enough, consider extending the raster in that direction or enlarging the ext argument.
+#' Increase buffpct, e.g. to 3.
+#' 
 #' @examples
 #' \donttest{
 #' # Not run
