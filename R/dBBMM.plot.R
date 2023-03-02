@@ -204,9 +204,9 @@ dBBMMplot <- function(
   #                     layer = paste0("Crop_Map"),
   #                     quiet = TRUE) # read in worldmap
   
-  # if (is.null(gmapsAPI)) register_google(key = gmapsAPI, # an api key
-  #                                        account_type = "standard",
-  #                                        write = TRUE)
+  if (!is.null(gmapsAPI)) ggmap::register_google(key = gmapsAPI, # an api key
+                                                 account_type = "standard",
+                                                 write = TRUE)
   
   if (mapsource != "google") googlemap <- FALSE # in case user forgot to set both
   
@@ -356,26 +356,26 @@ dBBMMplot <- function(
                      ggplot2::aes(colour = "50% UD")) +
     
     # UD surface colours
-  viridis::scale_fill_viridis(
-    alpha = 1, # 0:1
-    begin = 0, # hue
-    end = 1, # hue
-    direction = 1, # colour order, 1 or -1
-    discrete = FALSE, # false = continuous
-    option = "D", # A magma B inferno C plasma D viridis E cividis F rocket G mako H turbo
-    space = "Lab",
-    na.value = "grey50",
-    guide = "colourbar",
-    aesthetics = "fill",
-    # name = waiver(),
-    name = "UD%",
-    # limits = NA,
-    # position = "left"
-    position = "right"
-  ) +
-  
-  # UD contour colours
-  ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour, "95% UD" = contour1colour)) +
+    viridis::scale_fill_viridis(
+      alpha = 1, # 0:1
+      begin = 0, # hue
+      end = 1, # hue
+      direction = 1, # colour order, 1 or -1
+      discrete = FALSE, # false = continuous
+      option = "D", # A magma B inferno C plasma D viridis E cividis F rocket G mako H turbo
+      space = "Lab",
+      na.value = "grey50",
+      guide = "colourbar",
+      aesthetics = "fill",
+      # name = waiver(),
+      name = "UD%",
+      # limits = NA,
+      # position = "left"
+      position = "right"
+    ) +
+    
+    # UD contour colours
+    ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour, "95% UD" = contour1colour)) +
     # https://stackoverflow.com/questions/64425970/ggmap-in-r-keep-google-copyright-information-on-cropped-map
     # scale_x_continuous(limits = c(myLocation[1], myLocation[3]), expand = c(0, 0)) +
     # scale_y_continuous(limits = c(myLocation[2], myLocation[4]), expand = c(0, 0)) +
