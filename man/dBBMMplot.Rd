@@ -84,7 +84,8 @@ Google Maps.}
 i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic receivers cover 
 the entire home range of the study species. This term is problematic when applied to a passive 
 acoustic telemetry setting where an array of non-overlapping receivers are used to assess local 
-space use patterns i.e. the home range is bigger than the coverage by the acoustic array; put in Details.}
+space use patterns i.e. the home range is bigger than the coverage by the acoustic array; put in 
+Details.}
 
 \item{plotsubtitle}{Plot subtitle.}
 
@@ -96,7 +97,8 @@ space use patterns i.e. the home range is bigger than the coverage by the acoust
 
 \item{axisylabel}{Latitude.}
 
-\item{legendposition}{Vector of 2, format c(1,2), Percent distance (of middle? of legend box) from L to R, percent distance from Bottom to Top, values 0 to 1.}
+\item{legendposition}{Vector of 2, format c(1,2), Percent distance (of middle? of legend box) 
+from L to R, percent distance from Bottom to Top, values 0 to 1.}
 
 \item{fontsize}{Font size, default 12.}
 
@@ -104,7 +106,8 @@ space use patterns i.e. the home range is bigger than the coverage by the acoust
 
 \item{filesavename}{File savename.}
 
-\item{savedir}{Save outputs to a temporary directory (default) else. Change to current directory e.g. "/home/me/folder". Do not use getwd() here. No terminal slash.}
+\item{savedir}{Save outputs to a temporary directory (default) else. Change to current directory 
+e.g. "/home/me/folder". Do not use getwd() here. No terminal slash.}
 
 \item{receiverlats}{Vector of latitudes for receivers to be plotted.}
 
@@ -113,13 +116,15 @@ space use patterns i.e. the home range is bigger than the coverage by the acoust
 \item{receivernames}{Vector of names for receivers to be plotted.}
 
 \item{receiverrange}{Single (will be recycled), or vector of detection ranges in metres for 
-receivers to be plotted. If you have a max and a (e.g.) 90% detection range, probably use max.}
+receivers to be plotted. If you have a max and a (e.g.) 90 percent detection range, probably use 
+max.}
 
 \item{recpointscol}{Colour of receiver centrepoint outlines.}
 
 \item{recpointsfill}{Colour of receiver centrepoint fills.}
 
-\item{recpointsalpha}{Alpha value of receiver centrepoint fills, 0 (invisible) to 1 (fully visible).}
+\item{recpointsalpha}{Alpha value of receiver centrepoint fills, 0 (invisible) to 1 (fully 
+visible).}
 
 \item{recpointssize}{Size of receiver points.}
 
@@ -152,7 +157,9 @@ Individual-level utilization distributions, saved as rasters, as well as calcula
 volume area estimates for 50 and 95pct contours, saved in a .csv file.
 }
 \description{
-Plots 50 and 95pct contours of a group-level utilization distribution raster on a spatial map background. Contains functionality to also visualize geographic locations of individual listening stations (e.g., acoustic receivers) as well as the entire surface UD.
+Plots 50 and 95pct contours of a group-level utilization distribution raster on a spatial map 
+background. Contains functionality to also visualize geographic locations of individual listening
+ stations (e.g., acoustic receivers) as well as the entire surface UD.
 }
 \details{
 Errors and their origins:
@@ -162,11 +169,14 @@ probable reason 'No such file or directory'. Cause: index.rds may not have been 
 problem with ggmap::get_map, likely due to your API key failing silently.
 Filename too long - solve with filename = "whatever" but doesn't do anything. Added issue in 
 github: https://github.com/dkahle/ggmap/issues/346 .
-
-API key help: https://github.com/dkahle/ggmap/issues/235
-
+API key help: https://github.com/dkahle/ggmap/issues/235 .
 2. trying to read file: All_Rasters_Scaled_Weighted_UDScaled.asc: Error in CPL_read_gdal(
 as.character(x), as.character(options), as.character(driver),: file not found. Check x is correct.
+
+#' @examples
+\donttest{
+# Not run
+}
 }
 \author{
 Simon Dedman, \email{simondedman@gmail.com}
