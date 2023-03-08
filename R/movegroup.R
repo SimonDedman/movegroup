@@ -47,7 +47,10 @@
 #' plot anyway), but prevents raster clipping crash.
 #' @param rasterCRS CRS for raster creation.
 #' @param rasterResolution Single numeric value to set raster resolution - cell 
-#' size in metres? 111000: 1 degree lat = 111km.
+#' size in metres? 111000: 1 degree lat = 111km. Tradeoff between small res = big file & processing 
+#' time. Should be a function of the spatial resolution of your receivers or positioning tags. 
+#' Higher resolution will lead to more precision in the volume areas calculations. Try using 
+#' 2*dbblocationerror.
 #' @param dbblocationerror Location.error param in 'brownian.bridge.dyn' 
 #' function in the 'move' package. single numeric value or vector of the length 
 #' of coordinates that describes the error of the location (sender/receiver) 
@@ -72,14 +75,12 @@
 #' saved. TO DEPRECIATE.
 #' @param savedir Save outputs to a temporary directory (default) else change 
 #' to desired directory e.g. "/home/me/folder/". Do not use getwd() for this. 
-#' Include terminal slash.
+#' Include terminal slash. Directory must exist.
 #' @param alerts Audio warning for failures.
 #' 
 #' @return Individual-level utilization distributions, saved as rasters, as well
 #'  as calculated volume area estimates for 50 and 95pct contours, saved in a 
 #'  .csv file.
-#' 
-#' saved to disk.
 #' @details Errors and their origins:
 #' 
 #' 1. Error in .local(object, raster, location.error = location.error, ext = ext: Higher y grid not 
@@ -139,8 +140,8 @@ movegroup <- function(
     writeRasterExtension = ".asc",
     writeRasterDatatype = "FLT4S",
     absVolumeAreaSaveName = "VolumeArea_AbsoluteScale.csv",
-    savedir = tempdir(),  # save outputs to a temporary directory (default) else.
-    # change to current directory e.g. "/home/me/folder". Do not use getwd() here.
+    savedir = tempdir(),  # save outputs to a temporary directory (default) else change to current 
+    # directory e.g. "/home/me/folder". Do not use getwd() here.
     alerts = TRUE # audio warning for failures
 ) {
   # TODO:

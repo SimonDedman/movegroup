@@ -87,7 +87,10 @@ plot anyway), but prevents raster clipping crash.}
 \item{rasterCRS}{CRS for raster creation.}
 
 \item{rasterResolution}{Single numeric value to set raster resolution - cell 
-size in metres? 111000: 1 degree lat = 111km.}
+size in metres? 111000: 1 degree lat = 111km. Tradeoff between small res = big file & processing 
+time. Should be a function of the spatial resolution of your receivers or positioning tags. 
+Higher resolution will lead to more precision in the volume areas calculations. Try using 
+2*dbblocationerror.}
 
 \item{dbblocationerror}{Location.error param in 'brownian.bridge.dyn' 
 function in the 'move' package. single numeric value or vector of the length 
@@ -120,7 +123,7 @@ saved. TO DEPRECIATE.}
 
 \item{savedir}{Save outputs to a temporary directory (default) else change 
 to desired directory e.g. "/home/me/folder/". Do not use getwd() for this. 
-Include terminal slash.}
+Include terminal slash. Directory must exist.}
 
 \item{alerts}{Audio warning for failures.}
 }
@@ -128,8 +131,6 @@ Include terminal slash.}
 Individual-level utilization distributions, saved as rasters, as well
  as calculated volume area estimates for 50 and 95pct contours, saved in a 
  .csv file.
-
-saved to disk.
 }
 \description{
 Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple 
