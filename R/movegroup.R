@@ -526,8 +526,11 @@ movegroup <- function(
   
   # get resolution from raster in rasterlist, assign it object, squared
   rasterres <- (raster::res(xAEQD)[1]) ^ 2
-  print(paste0("rasterres = ", rasterres, " (cell size, metres)"))
-  print(paste0("rasterResolution = ", rasterResolution))
+  write.csv(x = data.frame(rasterres = rasterres,
+                           rasterResolution = rasterResolution),
+            file = paste0(savedir, "Resolutions.csv"))
+  # print(paste0("rasterres = ", rasterres, " (cell size, metres)"))
+  # print(paste0("rasterResolution = ", rasterResolution))
   
   # Loop through all unique tags
   counter <- 0
