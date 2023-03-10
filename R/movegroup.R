@@ -16,11 +16,11 @@
 #' DateTime ID and optionally a grouping column. Names specifide in later 
 #' parameters. Grouping not currently implemented 2022-11-15, see Group 
 #' parameter below.
-#' @param ID Name of animal tag ID column in data.
-#' @param Datetime Column name in data that contains date/time stamps for each 
+#' @param ID Name of animal tag ID column in data. "Character".
+#' @param Datetime Column name in data that contains date/time stamps for each. "Character".
 #' recorded detection. Must be in POSIXct format.
-#' @param Lat Name of latitude column in data.
-#' @param Lon Name of longitude column in data.
+#' @param Lat Name of latitude column in data. "Character".
+#' @param Lon Name of longitude column in data. "Character".
 #' @param Group Name of grouping column in data. UNUSED 2022-11-15
 #' @param dat.TZ Timezone of data for as.POSIXct.
 #' @param proj CRS for move function.
@@ -80,12 +80,22 @@
 #' 
 #' @return Individual-level utilization distributions, saved as rasters, as well
 #'  as calculated volume area estimates for 50 and 95pct contours, saved in a 
-#'  .csv file.
+#'  .csv file. No processed object is returned, i.e. bad: "objectname <- movegroup()", good: 
+#'  "movegroup()"
 #' @details Errors and their origins:
 #' 
 #' 1. Error in .local(object, raster, location.error = location.error, ext = ext: Higher y grid not 
 #' large enough, consider extending the raster in that direction or enlarging the ext argument.
 #' Increase buffpct, e.g. to 3.
+#' 2. Error in .data[[dttm]]: Must subset the data pronoun with a string, not a <POSIXct/POSIXt> 
+#' object. Use "ColName" not dataframe$ColName syntax for Datetime, ID, Lat, Lon.
+#' 3. Error in splice(dot_call(capture_dots, frame_env = frame_env, named = named,: object 
+#' 'DateTime' not found. Use "ColName" not ColName syntax for Datetime, ID, Lat, Lon.
+#' 4. Error in .local(object, raster, location.error = location.error, ext = ext: Higher x grid not 
+#' large enough, consider extending the raster in that direction or enlarging the ext argument. Try 
+#' "buffpct = 1," , then larger e.g. 3, if still getting the error.
+
+
 #' 
 #' @examples
 #' \donttest{
@@ -516,6 +526,8 @@ movegroup <- function(
   
   # get resolution from raster in rasterlist, assign it object, squared
   rasterres <- (raster::res(xAEQD)[1]) ^ 2
+  print(paste0("rasterres = ", rasterres, " (cell size, metres)"))
+  print(paste0("rasterResolution = ", rasterResolution))
   
   # Loop through all unique tags
   counter <- 0
@@ -811,7 +823,7 @@ movegroup <- function(
   ) %>%
     dplyr::select(!column_label) # remove column_label column
   
-  md$core.use <- (rasterres * md$core.use) / 1000000 # convert from cells/pixels to kilometres squared area
+  md$core.use <- (rasterres * md$core.use) / 1000000 # convert from cells/pixels to metres squared area based on cell size, then to kilometres squared area
   md$general.use <- (rasterres * md$general.use) / 1000000
 
   write.csv(md,

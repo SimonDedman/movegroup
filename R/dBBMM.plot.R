@@ -24,7 +24,8 @@
 #' autocreated from data.
 #' @param googlemap If pulling basemap from Google maps, this sets expansion factors since Google 
 #' Maps tiling zoom setup doesn't align to myLocation extents. Default FALSE.
-#' @param gmapsAPI Enter your google maps API here, quoted character string.
+#' @param gmapsAPI Enter your google maps API here, quoted character string. Can leave NULL if 
+#' already registered with ggmap::register_google.
 #' @param expandfactor Extents expansion factor for basemap. 1.3 to 1.5 are the same zoom as 1. 1.6 
 #' is a big leap up in zoom (out). 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using 
 #' Google Maps.

@@ -40,14 +40,14 @@ DateTime ID and optionally a grouping column. Names specifide in later
 parameters. Grouping not currently implemented 2022-11-15, see Group 
 parameter below.}
 
-\item{ID}{Name of animal tag ID column in data.}
+\item{ID}{Name of animal tag ID column in data. "Character".}
 
-\item{Datetime}{Column name in data that contains date/time stamps for each 
+\item{Datetime}{Column name in data that contains date/time stamps for each. "Character".
 recorded detection. Must be in POSIXct format.}
 
-\item{Lat}{Name of latitude column in data.}
+\item{Lat}{Name of latitude column in data. "Character".}
 
-\item{Lon}{Name of longitude column in data.}
+\item{Lon}{Name of longitude column in data. "Character".}
 
 \item{Group}{Name of grouping column in data. UNUSED 2022-11-15}
 
@@ -130,7 +130,8 @@ Include terminal slash. Directory must exist.}
 \value{
 Individual-level utilization distributions, saved as rasters, as well
  as calculated volume area estimates for 50 and 95pct contours, saved in a 
- .csv file.
+ .csv file. No processed object is returned, i.e. bad: "objectname <- movegroup()", good: 
+ "movegroup()"
 }
 \description{
 Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple 
@@ -151,6 +152,13 @@ Errors and their origins:
 1. Error in .local(object, raster, location.error = location.error, ext = ext: Higher y grid not 
 large enough, consider extending the raster in that direction or enlarging the ext argument.
 Increase buffpct, e.g. to 3.
+2. Error in .data[[dttm]]: Must subset the data pronoun with a string, not a <POSIXct/POSIXt> 
+object. Use "ColName" not dataframe$ColName syntax for Datetime, ID, Lat, Lon.
+3. Error in splice(dot_call(capture_dots, frame_env = frame_env, named = named,: object 
+'DateTime' not found. Use "ColName" not ColName syntax for Datetime, ID, Lat, Lon.
+4. Error in .local(object, raster, location.error = location.error, ext = ext: Higher x grid not 
+large enough, consider extending the raster in that direction or enlarging the ext argument. Try 
+"buffpct = 1," , then larger e.g. 3, if still getting the error.
 }
 \examples{
 \donttest{
