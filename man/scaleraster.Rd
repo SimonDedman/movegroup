@@ -21,9 +21,9 @@ scaleraster(
 )
 }
 \arguments{
-\item{path}{Path to directory where the individual-level UDs are saved. No terminal slash.}
+\item{path}{Path to directory where the individual-level UDs are saved. Likely the same as savedir from movegroup.}
 
-\item{pathsubsets}{Path to parent directory that contains all UDs across spatial groups or subsets If none are used, make same as path. No terminal slash.}
+\item{pathsubsets}{Path to parent directory that contains all UDs across spatial groups or subsets If none are used, make same as path. Likely the same as savedir from movegroup.}
 
 \item{pattern}{Extension pattern used to read in all UDs in directory and pathsubsets directory. Default ".asc".}
 

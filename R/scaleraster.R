@@ -34,8 +34,8 @@
 #' 
 #' Errors and their origins.
 #' 
-#' @param path Path to directory where the individual-level UDs are saved. No terminal slash.
-#' @param pathsubsets Path to parent directory that contains all UDs across spatial groups or subsets If none are used, make same as path. No terminal slash.
+#' @param path Path to directory where the individual-level UDs are saved. Likely the same as savedir from movegroup.
+#' @param pathsubsets Path to parent directory that contains all UDs across spatial groups or subsets If none are used, make same as path. Likely the same as savedir from movegroup.
 #' @param pattern Extension pattern used to read in all UDs in directory and pathsubsets directory. Default ".asc".
 #' @param weighting Addresses unbalanced receiver array design after receivers have first been partitioned into regions and group-level UDs estimated per region. Numeric. 
 #' Weights area-specific scaled group-level UD raster by value. This then means that estimated scaled individual-level volume areas also become weighted. 
@@ -107,6 +107,7 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   # Extract appropriate raster names i.e. do not import scaled rasters
   
   # NOTE: if pathsubsets = NULL, it will crash. can avoid by setting pathsubsets = path, but may be more elegant solution.
+  # If pathsubsets has a terminal slash, remove it, it's added later
   if (substr(x = pathsubsets, start = nchar(pathsubsets), stop = nchar(pathsubsets)) == "/") pathsubsets = substr(x = pathsubsets, start = 1, stop = nchar(pathsubsets) - 1)
   
   filelist_subsets <- as.list(list.files(path = pathsubsets, pattern = pattern, recursive = TRUE))
@@ -198,7 +199,8 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   #                     overwrite = overwrite)
   
   # Change the crs to LatLong for plotting and calculation purposes
-  All_Rasters_Scaled_Weighted_LatLon <- raster::projectExtent(object = All_Rasters_Scaled_Weighted, crs = sp::CRS("+proj=longlat")) # crs = proj
+  All_Rasters_Scaled_Weighted_LatLon <- raster::projectExtent(object = All_Rasters_Scaled_Weighted,
+                                                              crs = sp::CRS("+proj=longlat")) # crs = proj
   
   # Change res so x & y match (kills values)
   raster::res(All_Rasters_Scaled_Weighted_LatLon) <- rep(mean(raster::res(All_Rasters_Scaled_Weighted_LatLon)), 2)

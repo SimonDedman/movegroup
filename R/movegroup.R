@@ -529,8 +529,6 @@ movegroup <- function(
   write.csv(x = data.frame(rasterres = rasterres,
                            rasterResolution = rasterResolution),
             file = paste0(savedir, "Resolutions.csv"))
-  # print(paste0("rasterres = ", rasterres, " (cell size, metres)"))
-  # print(paste0("rasterResolution = ", rasterResolution))
   
   # Loop through all unique tags
   counter <- 0
