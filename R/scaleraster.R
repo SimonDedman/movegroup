@@ -56,6 +56,12 @@
 #' 1. Error in (function (cond): error in evaluating the argument 'x' in selecting a method for 
 #' function 'res': subscript out of bounds. Probably path can't find any files of type=pattern:
 #' check you used a terminal slash in savedir in movegroup, and that path has files of type=pattern.
+#' 
+#' 2. Error in if (substr(x = pathsubsets, start = nchar(pathsubsets), stop = nchar(pathsubsets))==:
+#' argument is of length zero: pathsubsets is wrong. Try setting to same as path. NULL does this.
+#' 
+#' 3. Error in gzfile(file, "rb"): cannot open compressed file 'CRS.Rds', probable reason 'No such 
+#' file or directory': crsloc is wrong. Try setting to same as path. NULL does this.
 #'
 #' @examples
 #' \donttest{
@@ -106,7 +112,9 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
   # Now extract the max of maxes across subsets. To do this, repeat the steps from above, but now import all individual-level rasters across subsets
   # Extract appropriate raster names i.e. do not import scaled rasters
   
-  # NOTE: if pathsubsets = NULL, it will crash. can avoid by setting pathsubsets = path, but may be more elegant solution.
+  # NOTE: if pathsubsets = NULL, it will crash, ditto crsloc
+  if (is.null(pathsubsets)) pathsubsets <- path
+  if (is.null(crsloc)) crsloc <- path
   # If pathsubsets has a terminal slash, remove it, it's added later
   if (substr(x = pathsubsets, start = nchar(pathsubsets), stop = nchar(pathsubsets)) == "/") pathsubsets = substr(x = pathsubsets, start = 1, stop = nchar(pathsubsets) - 1)
   
@@ -292,8 +300,8 @@ scaleraster <- function(path = NULL, # Location of files created by dBBMM.build 
                    c(area.50.mean,
                      area.95.mean,
                      "mean_across_UDs"),
-                   c(area.50.sd,
-                     area.95.sd,
+                   c(round(area.50.sd, 1),
+                     round(area.95.sd, 1),
                      "sd_across_UDs"),
                    c(group_area.50,
                      group_area.95,

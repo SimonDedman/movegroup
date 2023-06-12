@@ -2,7 +2,7 @@
 #' 
 #' Plots 50 and 95pct contours of a group-level utilization distribution raster on a spatial map 
 #' background. Contains functionality to also visualize geographic locations of individual listening
-#'  stations (e.g., acoustic receivers) as well as the entire surface UD.
+#' stations (e.g., acoustic receivers) as well as the entire surface UD.
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
@@ -27,7 +27,7 @@
 #' @param googlemap If pulling basemap from Google maps, this sets expansion factors since Google 
 #' Maps tiling zoom setup doesn't align to myLocation extents. Default FALSE.
 #' @param gmapsAPI Enter your google maps API here, quoted character string. Can leave NULL if 
-#' already registered with ggmap::register_google.
+#' already registered with ggmap::register_google().
 #' @param expandfactor Extents expansion factor for basemap. 1.3 to 1.5 are the same zoom as 1. 1.6 
 #' is a big leap up in zoom (out). 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using 
 #' Google Maps.
@@ -42,7 +42,8 @@
 #' acoustic telemetry setting where an array of non-overlapping receivers are used to assess local 
 #' space use patterns i.e. the home range is bigger than the coverage by the acoustic array; put in 
 #' Details.
-#' @param plotsubtitle Plot subtitle.
+#' @param plotsubtitle Plot subtitle. If NULL (default) will print "Scaled contours". Can add the n 
+#' of your individuals.
 #' @param legendtitle Legend title.
 #' @param plotcaption Plot caption.
 #' @param axisxlabel Longitude.
@@ -92,6 +93,8 @@
 #' 2. trying to read file: All_Rasters_Scaled_Weighted_UDScaled.asc: Error in CPL_read_gdal(
 #' as.character(x), as.character(options), as.character(driver),: file not found. Check x is correct.
 #' 
+#' How to get Google map basemaps:
+#' 
 #' #' @examples
 #' \donttest{
 #' # Not run
@@ -124,7 +127,7 @@ dBBMMplot <- function(
     # This term is problematic when applied to a passive acoustic telemetry setting
     # where an array of non-overlapping receivers are used to assess local space use patterns
     # i.e. the home range is bigger than the coverage by the acoustic array; put in Details
-    plotsubtitle = "Scaled contours. n = 13", # data %>% distinct(ID) %>% nrow() # 13
+    plotsubtitle = "Scaled contours", # data %>% distinct(ID) %>% nrow() # 13
     legendtitle = "Percent UD Contours",
     plotcaption = paste0("movegroup, ", lubridate::today()),
     axisxlabel = "Longitude",

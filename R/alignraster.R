@@ -1,6 +1,9 @@
 #' Combines region-specific group-level UD rasters into a single raster.
 #'
-#' Extends the spatial extent of each area-specific group-level raster to the spatial extent shared by all rasters.
+#' Extends the spatial extent of each area-specific group-level raster to the spatial extent shared by all rasters. 
+#' This will only be required if you have multiple individuals (e.g. different sharks) divided amongst a few discrete areas 
+#' (e.g. around different islands) and the effort (e.g. receiver coverage) is different among islands. 
+#' Not required for multiple individuals all within the same region or sampling regime.
 #'
 #' @param folderroots Character vector of locations of folder roots output by movegroup. Function expects CRS.Rds file and a subfolder with the scaled raster.
 #' @param foldernames Character vector names of folders corresponding to files in folderroots, i.e. the names of the objects, arrays, regions, etc.

@@ -50,22 +50,23 @@
 #' size in metres? 111000: 1 degree lat = 111km. Tradeoff between small res = big file & processing 
 #' time. Should be a function of the spatial resolution of your receivers or positioning tags. 
 #' Higher resolution will lead to more precision in the volume areas calculations. Try using 
-#' 2*dbblocationerror.
+#' 2*dbblocationerror, if dbblocationerror is a single value. Default 6 = 6m. Try around the median 
+#' of your moveLocError.
 #' @param dbblocationerror Location.error param in 'brownian.bridge.dyn' 
 #' function in the 'move' package. single numeric value or vector of the length 
 #' of coordinates that describes the error of the location (sender/receiver) 
 #' system in map units. Or a character string with the name of the column 
-#' containing the location error can be provided. Could use the same as 
-#' moveLocError?.
+#' containing the location error can be provided. Default is moveLocError.
 #' @param dbbext Ext param in the 'brownian.bridge.dyn' function in the 'move' 
 #' package. Extends bounding box around track. Numeric single (all edges), 
-#' double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3.
+#' double (x & y), or 4 (xmin xmax ymin ymax). Default 3. Excessive buffering will get cropped 
+#' automatically.
 #' @param dbbwindowsize window.size param in the 'brownian.bridge.dyn' function 
 #' in the 'move' package. The size of the moving window along the track. Larger 
 #' windows provide more stable/accurate estimates of the brownian motion 
 #' variance but are less well able to capture more frequent changes in behavior.
 #'  This number has to be odd. A dBBMM is not run if total detections of 
-#'  individual < window size (default 31).
+#'  individual < window size (default 23).
 #' @param writeRasterFormat Character. Output file type. ascii. TO DEPRECIATE.
 #' @param writeRasterExtension Character. Output file extension. Should match 
 #' character writeRasterFormat. TO DEPRECIATE.
@@ -87,13 +88,18 @@
 #' 1. Error in .local(object, raster, location.error = location.error, ext = ext: Higher y grid not 
 #' large enough, consider extending the raster in that direction or enlarging the ext argument.
 #' Increase buffpct, e.g. to 3.
+#' 
 #' 2. Error in .data[[dttm]]: Must subset the data pronoun with a string, not a <POSIXct/POSIXt> 
 #' object. Use "ColName" not dataframe$ColName syntax for Datetime, ID, Lat, Lon.
+#' 
 #' 3. Error in splice(dot_call(capture_dots, frame_env = frame_env, named = named,: object 
 #' 'DateTime' not found. Use "ColName" not ColName syntax for Datetime, ID, Lat, Lon.
+#' 
 #' 4. Error in .local(object, raster, location.error = location.error, ext = ext: Higher x grid not 
 #' large enough, consider extending the raster in that direction or enlarging the ext argument. Try 
 #' "buffpct = 1," , then larger e.g. 3, if still getting the error.
+#' 
+#' 5. cannot allocate vector of size (BIG) Gb: Increase rasterResolution value.
 
 
 #' 
@@ -143,9 +149,9 @@ movegroup <- function(
     # Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash
     rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. This is around Bimini, Bahamas.
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
-    dbblocationerror = "LocationError", # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
-    dbbext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 0.3,
-    dbbwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 31).
+    dbblocationerror = moveLocError, # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
+    dbbext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 3.
+    dbbwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 23).
     writeRasterFormat = "ascii",
     writeRasterExtension = ".asc",
     writeRasterDatatype = "FLT4S",
