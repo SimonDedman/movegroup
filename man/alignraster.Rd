@@ -49,7 +49,10 @@ alignraster(
 Region-specific group-level UD rasters that share the same spatial extent.
 }
 \description{
-Extends the spatial extent of each area-specific group-level raster to the spatial extent shared by all rasters.
+Extends the spatial extent of each area-specific group-level raster to the spatial extent shared by all rasters. 
+This will only be required if you have multiple individuals (e.g. different sharks) divided amongst a few discrete areas 
+(e.g. around different islands) and the effort (e.g. receiver coverage) is different among islands. 
+Not required for multiple individuals all within the same region or sampling regime.
 }
 \details{
 Errors and their origins:

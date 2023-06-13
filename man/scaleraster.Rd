@@ -51,7 +51,7 @@ Default is 1 for no weighting.}
 }
 \value{
 Scaled and weighted individual-level and group-level utilization distributions saved as rasters. Additionally, scaled 50 and 95pct 
-contour volume area estimates for individuals and the group, saved in .csv format.
+contour volume area estimates (in km2) for individuals and the group, saved in .csv format.
 }
 \description{
 Scales individual-level utilization distribution (UD) rasters from 0 to 1 to facilitate interpretation as relative 
@@ -87,12 +87,16 @@ Step 7. Estimate 50 and 95pct contour volume areas.
 For each scaled individual-level UD raster, estimate 50 and 95pct contour volume areas, as well as their mean and standard
 deviation. Additionally, the 50 and 95pct volume area is estimated for the group-level UD raster.
 
-Errors and their origins.
-
 Errors and their origins:
 1. Error in (function (cond): error in evaluating the argument 'x' in selecting a method for 
 function 'res': subscript out of bounds. Probably path can't find any files of type=pattern:
 check you used a terminal slash in savedir in movegroup, and that path has files of type=pattern.
+
+2. Error in if (substr(x = pathsubsets, start = nchar(pathsubsets), stop = nchar(pathsubsets))==:
+argument is of length zero: pathsubsets is wrong. Try setting to same as path. NULL does this.
+
+3. Error in gzfile(file, "rb"): cannot open compressed file 'CRS.Rds', probable reason 'No such 
+file or directory': crsloc is wrong. Try setting to same as path. NULL does this.
 }
 \examples{
 \donttest{

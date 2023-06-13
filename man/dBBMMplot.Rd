@@ -18,7 +18,7 @@ dBBMMplot(
   contour1colour = "red",
   contour2colour = "orange",
   plottitle = "Aggregated 95\% and 50\% UD contours",
-  plotsubtitle = "Scaled contours. n = 13",
+  plotsubtitle = "Scaled contours",
   legendtitle = "Percent UD Contours",
   plotcaption = paste0("movegroup, ", lubridate::today()),
   axisxlabel = "Longitude",
@@ -67,7 +67,7 @@ autocreated from data.}
 Maps tiling zoom setup doesn't align to myLocation extents. Default FALSE.}
 
 \item{gmapsAPI}{Enter your google maps API here, quoted character string. Can leave NULL if 
-already registered with ggmap::register_google.}
+already registered with ggmap::register_google().}
 
 \item{expandfactor}{Extents expansion factor for basemap. 1.3 to 1.5 are the same zoom as 1. 1.6 
 is a big leap up in zoom (out). 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using 
@@ -90,7 +90,8 @@ acoustic telemetry setting where an array of non-overlapping receivers are used 
 space use patterns i.e. the home range is bigger than the coverage by the acoustic array; put in 
 Details.}
 
-\item{plotsubtitle}{Plot subtitle.}
+\item{plotsubtitle}{Plot subtitle. If NULL (default) will print "Scaled contours". Can add the n 
+of your individuals.}
 
 \item{legendtitle}{Legend title.}
 
@@ -163,7 +164,7 @@ volume area estimates for 50 and 95pct contours, saved in a .csv file.
 \description{
 Plots 50 and 95pct contours of a group-level utilization distribution raster on a spatial map 
 background. Contains functionality to also visualize geographic locations of individual listening
- stations (e.g., acoustic receivers) as well as the entire surface UD.
+stations (e.g., acoustic receivers) as well as the entire surface UD.
 }
 \details{
 Errors and their origins:
@@ -176,6 +177,8 @@ github: https://github.com/dkahle/ggmap/issues/346 .
 API key help: https://github.com/dkahle/ggmap/issues/235 .
 2. trying to read file: All_Rasters_Scaled_Weighted_UDScaled.asc: Error in CPL_read_gdal(
 as.character(x), as.character(options), as.character(driver),: file not found. Check x is correct.
+
+How to get Google map basemaps:
 
 #' @examples
 \donttest{
