@@ -753,7 +753,7 @@ movegroup <- function(
     # Below calc introduced in 2022-10-08 commit, message = 
     #"changed code volume area: instead of using getVolumeUD() from the move package,
     # we just did the calculations on the UD raster and not using the function.
-    # these seem to produce very plausbile estimates!"
+    # these seem to produce very plausible estimates!"
     # This change creates unnaturally small areas.
     # Changed back to previous calcs 2023-02-24. Added rounding
     # area.50 <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.5)), 4)
