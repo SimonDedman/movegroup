@@ -35,7 +35,14 @@
 #' @param timeDiffLong Single numeric value. Threshold value in timeDiffUnits 
 #' designating the length of long breaks in re-locations. Used for bursting a 
 #' movement track into segments, thereby removing long breaks from the movement 
-#' track. See ?move::bursted for details.
+#' track. See ?move::bursted for details. Default 2 hours is arbitrary, looping through 18, 24, and 
+#' 36 hours for satellite data on great hammerhead sharks revealed volume areas for core and general
+#'  use gradually rise with timeDiffLong increases, multiple small dots of presence get blobbed 
+#'  together, and therefore sometimes this covers land. Ideally one would not discard any data, in 
+#'  which case one should choose a value higher than the largest between-detections gap in their 
+#'  dataset (or just pick a very large number). This parameter is useful when the model would 
+#'  otherwise get stuck trying to calculate a UD for an individual with a very large home range that
+#'   is inadequately captured by a receiver array.
 #' @param timeDiffUnits Character. Unit for timeDiffLong.
 #' @param center Do you want to center the move object within extent? See 
 #' spTransform.
