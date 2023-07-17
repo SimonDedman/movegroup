@@ -7,6 +7,13 @@
 dBBMMplot(
   x = paste0("Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"),
   crsloc = NULL,
+  xlatlon = NULL,
+  locationpoints =
+    paste0("/home/simon/Documents/Si Work/PostDoc Work/movegroup help/Liberty Boyd/Points in UD contours/",
+    "turtlehab_all.csv"),
+  pointsincontourssave =
+    paste0("/home/simon/Documents/Si Work/PostDoc Work/movegroup help/Liberty Boyd/Points in UD contours/",
+    "pointsincontours.csv"),
   trim = TRUE,
   myLocation = NULL,
   googlemap = FALSE,
@@ -56,6 +63,15 @@ paste0(movegroupSavedir, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc").}
 
 \item{crsloc}{Location of saved CRS Rds file from movegroup.R. Should be same as path. Likely 
 movegroupSavedir.}
+
+\item{xlatlon}{If you want to also return a csv of your original locations labelled with which UD
+ contours they fall within, include the location of that here. Try 
+ paste0(crsloc, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc") . Default NULL will not produce 
+the csv output.}
+
+\item{locationpoints}{Original input location points of animals, for xlatlon. MUST have columns labelkled "lat" and "lon".}
+
+\item{pointsincontourssave}{Location and name of location in countours csv, including the .csv.}
 
 \item{trim}{Remove NA & 0 values and crop to remaining date extents? Shrinks lots of dead space 
 at the edges of the raster. Default TRUE.}

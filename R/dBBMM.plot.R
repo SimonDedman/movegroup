@@ -20,6 +20,12 @@
 #' paste0(movegroupSavedir, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc").
 #' @param crsloc Location of saved CRS Rds file from movegroup.R. Should be same as path. Likely 
 #' movegroupSavedir.
+#' @param xlatlon If you want to also return a csv of your original locations labelled with which UD
+#'  contours they fall within, include the location of that here. Try 
+#'  paste0(crsloc, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc") . Default NULL will not produce 
+#' the csv output.
+#' @param locationpoints Original input location points of animals, for xlatlon. MUST have columns labelkled "lat" and "lon".
+#' @param pointsincontourssave Location and name of location in countours csv, including the .csv.
 #' @param trim Remove NA & 0 values and crop to remaining date extents? Shrinks lots of dead space 
 #' at the edges of the raster. Default TRUE.
 #' @param myLocation Location for extents, format c(xmin, ymin, xmax, ymax). Default NULL, extents 
@@ -104,6 +110,9 @@ dBBMMplot <- function(
     x = paste0("Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"), # path to scaled data
     # dataCRS = 2958, # one of (i) character: a string accepted by GDAL, (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs.
     crsloc = NULL, # Location of saved CRS Rds file from movegroup.R. Should be same as path.
+    xlatlon = NULL, # if you want to also return a csv of your original locations labelled with which UD contours they fall within, include the location of that here. Try paste0(crsloc, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc") .
+    locationpoints = paste0("/home/simon/Documents/Si Work/PostDoc Work/movegroup help/Liberty Boyd/Points in UD contours/", "turtlehab_all.csv"), # original input location points of animals, for xlatlon. MUST have columns labelkled "lat" and "lon".
+    pointsincontourssave = paste0("/home/simon/Documents/Si Work/PostDoc Work/movegroup help/Liberty Boyd/Points in UD contours/", "pointsincontours.csv"), # Location and name of location in countours csv, including the .csv.
     trim = TRUE, # remove NA & 0 values and crop to remaining date extents? Default TRUE
     myLocation = NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
     # Default NULL, extents autocreated from data.
@@ -201,7 +210,7 @@ dBBMMplot <- function(
   x <- stars::read_stars(x)
   # %>% sf::st_set_crs(4326) # 4326 2958
   dataCRS <- readRDS(paste0(crsloc, "CRS.Rds")) # load CRS from file
-  sf::st_crs(x) <- proj4string(dataCRS) # set CRS
+  sf::st_crs(x) <- proj4string(dataCRS) # set CRS, function from sp
   
   # for plotting the surface UD on the map:
   # surfaceUD <- x %>% sf::st_set_crs(3857) # 4326 = WGS84. Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: degree
@@ -314,6 +323,51 @@ dBBMMplot <- function(
     }
   }
   
+  # Produce CSV of which points are within which UD contour
+  if (!is.null(xlatlon)) {
+    # Import raster
+    xlatlon <- stars::read_stars() # UDScaled
+    sf::st_crs(xlatlon) <- sp::proj4string(dataCRS) # set CRS
+    
+    # Create contours & polygons for ggplot & polygon count objects
+    # 95% UD
+    UD95poly <- stars::st_contour(x = xlatlon,
+                                  contour_lines = TRUE,
+                                  breaks = max(xlatlon[[1]],
+                                               na.rm = TRUE) * 0.05) |> 
+      
+      sf::st_cast("POLYGON")
+    sf::st_crs(UD95poly) <- sp::proj4string(dataCRS)# set CRS
+    UD95poly <- UD95poly |> sf::st_set_crs(4326) # make 4326, doesn't match CRS of mypointssf otherwise
+    
+    # 50% UD
+    UD50poly <- stars::st_contour(x = xlatlon,
+                                  contour_lines = TRUE,
+                                  breaks = max(xlatlon[[1]],
+                                               na.rm = TRUE) * 0.5) |> 
+      sf::st_cast("POLYGON")
+    sf::st_crs(UD50poly) <- sp::proj4string(UD50poly)# set CRS
+    UD50poly <- UD50poly |> sf::st_set_crs(4326) # make 4326, doesn't match CRS of mypointssf otherwise
+    
+    # Import points
+    mypoints <- readr::read_csv(locationpoints) |>
+      # dplyr::rename(lat = "Lat",
+      #               lon = "Lon") |>
+      dplyr::mutate(Index = 1:length(lat)) # add unique index for later
+    mypointssf <- sf::st_as_sf(mypoints, coords = c("lon","lat")) |> sf::st_set_crs(4326) #points by day, # Convert points to sf
+    
+    # Assign points to contours/UDs
+    pointsin50 <- mypointssf[UD50,]
+    mypoints[mypoints$Index %in% pointsin50$Index, "UD50"] <- as.logical(TRUE)
+    pointsin95 <- mypointssf[UD95,]
+    mypoints[mypoints$Index %in% pointsin95$Index, "UD95"] <- as.logical(TRUE)
+    write.csv(mypoints, file = pointsincontourssave)
+    print(paste0(nrow(pointsin50) / nrow(mypoints) * 100), "% of location points within 50% contour") # 72.16
+    print(paste0(nrow(pointsin95) / nrow(mypoints) * 100), "% of location points within 50% contour") # 99.77
+  } # close if (!is.null(xlatlon))
+  
+  
+  
   # plot map ####
   ggmap::ggmap(myMap) + # basemap CRS = 3857
     
@@ -366,11 +420,9 @@ dBBMMplot <- function(
     } +
     
     # 95% UD
-    # ggplot2::geom_sf(data = sf_95 %>%
-    #                    sf::st_transform(3857), # Vector transform after st_contour
-    #                  # already 3857 above so converting twice but it ain't broke
-    #                  fill = NA, inherit.aes = FALSE,
-    #                  ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
+    # sf::st_transform(3857), # Vector transform after st_contour
+    # # already 3857 above so converting twice but it ain't broke
+    # ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
     
     ggplot2::geom_sf(data = stars::st_contour(x = x,
                                               contour_lines = TRUE,
@@ -381,12 +433,6 @@ dBBMMplot <- function(
                      ggplot2::aes(colour = "95% UD")) +
     
     # 50% UD
-    # ggplot2::geom_sf(data = sf_50 %>%
-    #                    sf::st_transform(3857),
-    #                  # already 3857 above so converting twice but it ain't broke
-    #                  fill = NA, inherit.aes = FALSE,
-    #                  ggplot2::aes(colour = "50% UD")) +
-    
     ggplot2::geom_sf(data = stars::st_contour(x = x,
                                               contour_lines = TRUE,
                                               breaks = max(x[[1]],
