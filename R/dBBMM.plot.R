@@ -96,12 +96,13 @@
 #' Filename too long - solve with filename = "whatever" but doesn't do anything. Added issue in 
 #' github: https://github.com/dkahle/ggmap/issues/346 .
 #' API key help: https://github.com/dkahle/ggmap/issues/235 .
+#' 
 #' 2. trying to read file: All_Rasters_Scaled_Weighted_UDScaled.asc: Error in CPL_read_gdal(
 #' as.character(x), as.character(options), as.character(driver),: file not found. Check x is correct.
 #' 
 #' How to get Google map basemaps:
 #' 
-#' #' @examples
+#' @examples
 #' \donttest{
 #' # Not run
 #' }

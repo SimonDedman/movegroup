@@ -36,14 +36,14 @@ movegroup(
 }
 \arguments{
 \item{data}{Data frame object containing the data. Requires columns Lat Lon 
-DateTime ID and optionally a grouping column. Names specifide in later 
+DateTime ID and optionally a grouping column. Names specified in later 
 parameters. Grouping not currently implemented 2022-11-15, see Group 
 parameter below.}
 
 \item{ID}{Name of animal tag ID column in data. "Character".}
 
 \item{Datetime}{Column name in data that contains date/time stamps for each. "Character".
-recorded detection. Must be in POSIXct format.}
+Recorded detection. Must be in POSIXct format.}
 
 \item{Lat}{Name of latitude column in data. "Character".}
 
@@ -94,7 +94,7 @@ plot anyway), but prevents raster clipping crash.}
 \item{rasterCRS}{CRS for raster creation.}
 
 \item{rasterResolution}{Single numeric value to set raster resolution - cell 
-size in metres? 111000: 1 degree lat = 111km. Tradeoff between small res = big file & processing 
+size in metres? 111000: 1 degree lat = 111km. Trade-off between small res = big file & processing 
 time. Should be a function of the spatial resolution of your receivers or positioning tags. 
 Higher resolution will lead to more precision in the volume areas calculations. Try using 
 2*dbblocationerror, if dbblocationerror is a single value. Default 6 = 6m. Try around the median 
@@ -111,10 +111,10 @@ package. Extends bounding box around track. Numeric single (all edges),
 double (x & y), or 4 (xmin xmax ymin ymax). Default 3. Excessive buffering will get cropped 
 automatically.}
 
-\item{dbbwindowsize}{window.size param in the 'brownian.bridge.dyn' function 
+\item{dbbwindowsize}{The window.size param in the 'brownian.bridge.dyn' function 
 in the 'move' package. The size of the moving window along the track. Larger 
 windows provide more stable/accurate estimates of the brownian motion 
-variance but are less well able to capture more frequent changes in behavior.
+variance but are less well able to capture more frequent changes in behaviour.
  This number has to be odd. A dBBMM is not run if total detections of 
  individual < window size (default 23).}
 
