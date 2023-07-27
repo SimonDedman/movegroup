@@ -23,9 +23,11 @@ alignraster(
 )
 }
 \arguments{
-\item{folderroots}{Character vector of locations of folder roots output by movegroup. Function expects CRS.Rds file and a subfolder with the scaled raster.}
+\item{folderroots}{Character vector of locations of folder roots output by movegroup. Function 
+expects CRS.Rds file and a subfolder with the scaled raster.}
 
-\item{foldernames}{Character vector names of folders corresponding to files in folderroots, i.e. the names of the objects, arrays, regions, etc.}
+\item{foldernames}{Character vector names of folders corresponding to files in folderroots, i.e. 
+the names of the objects, arrays, regions, etc.}
 
 \item{pattern}{For input rasters from scaleraster. Default ".asc".}
 
@@ -33,17 +35,20 @@ alignraster(
 
 \item{scaledweightedname}{For input rasters from scaleraster. Default "All_Rasters_Scaled".}
 
-\item{savefolder}{Single character entry, no trailing slash.}
+\item{savefolder}{Single character entry of folder to save outputs, no trailing slash.}
 
-\item{format}{Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).}
+\item{format}{Character. Output file type for raster::writeRaster param format. Default ascii, 
+other options have generally not worked well in SD's experience.}
 
-\item{datatype}{Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).}
+\item{datatype}{Character. Data type for writing values to disk for raster::writeRaster param 
+datatype. Default FLT4S.}
 
-\item{bylayer}{Default TRUE.}
+\item{bylayer}{For raster::writeRaster param bylayer. Default TRUE.}
 
-\item{overwrite}{Default TRUE.}
+\item{overwrite}{For raster::writeRaster param overwrite. Default TRUE.}
 
-\item{returnObj}{Logical. Return the scaled object to the parent environment? Default FALSE.}
+\item{returnObj}{Logical. Return the scaled object to the parent environment to be assigned as an
+object? Default FALSE.}
 }
 \value{
 Region-specific group-level UD rasters that share the same spatial extent.
@@ -55,7 +60,8 @@ This will only be required if you have multiple individuals (e.g. different shar
 Not required for multiple individuals all within the same region or sampling regime.
 }
 \details{
-Errors and their origins:
+When used in a movegroup pipeline, the order would be: movegroup.R, scaleraster.R, 
+alignraster.R if required, plotraster.R.
 }
 \examples{
 \donttest{

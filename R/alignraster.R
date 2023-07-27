@@ -5,21 +5,28 @@
 #' (e.g. around different islands) and the effort (e.g. receiver coverage) is different among islands. 
 #' Not required for multiple individuals all within the same region or sampling regime.
 #'
-#' @param folderroots Character vector of locations of folder roots output by movegroup. Function expects CRS.Rds file and a subfolder with the scaled raster.
-#' @param foldernames Character vector names of folders corresponding to files in folderroots, i.e. the names of the objects, arrays, regions, etc.
+#' @param folderroots Character vector of locations of folder roots output by movegroup. Function 
+#' expects CRS.Rds file and a subfolder with the scaled raster.
+#' @param foldernames Character vector names of folders corresponding to files in folderroots, i.e. 
+#' the names of the objects, arrays, regions, etc.
 #' @param pattern For input rasters from scaleraster. Default ".asc".
 #' @param scalefolder For input rasters from scaleraster. Default "Scaled".
 #' @param scaledweightedname For input rasters from scaleraster. Default "All_Rasters_Scaled".
-#' @param savefolder Single character entry, no trailing slash.
-#' @param format Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).
-#' @param datatype Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).
-#' @param bylayer Default TRUE.
-#' @param overwrite Default TRUE.
-#' @param returnObj Logical. Return the scaled object to the parent environment? Default FALSE.
+#' @param savefolder Single character entry of folder to save outputs, no trailing slash.
+#' @param format Character. Output file type for raster::writeRaster param format. Default ascii, 
+#' other options have generally not worked well in SD's experience.
+#' @param datatype Character. Data type for writing values to disk for raster::writeRaster param 
+#' datatype. Default FLT4S.
+#' @param bylayer For raster::writeRaster param bylayer. Default TRUE.
+#' @param overwrite For raster::writeRaster param overwrite. Default TRUE.
+#' @param returnObj Logical. Return the scaled object to the parent environment to be assigned as an
+#'  object? Default FALSE.
 #' 
 #' @return Region-specific group-level UD rasters that share the same spatial extent.
 #'
-#' @details Errors and their origins:
+#' @details When used in a movegroup pipeline, the order would be: movegroup.R, scaleraster.R, 
+#' alignraster.R if required, plotraster.R.
+#' 
 #' @examples
 #' \donttest{
 #' # Not run
@@ -30,7 +37,6 @@
 
 #' @export
 
-#' @import magrittr
 #' @importFrom sp bbox
 #' @importFrom raster crs setMinMax raster extend writeRaster
 #' @importFrom purrr map2
@@ -61,19 +67,19 @@ alignraster <- function(folderroots = c("/home/simon/Dropbox/PostDoc Work/Rob Bu
   
   if (substr(x = savefolder, start = nchar(savefolder), stop = nchar(savefolder)) == "/") savefolder = substr(x = savefolder, start = 1, stop = nchar(savefolder) - 1)
   
-  foldernames %<>% as.list()
+  foldernames <- as.list(foldernames)
   
   # Read in CRS files as list
-  crslist <- as.list(paste0(folderroots, "/CRS.Rds")) %>%
+  crslist <- as.list(paste0(folderroots, "/CRS.Rds"))  |> 
     lapply(function(x) readRDS(x))
   names(crslist) <- foldernames # unnecessary?
   
   rasterlist <- 
-    as.list(paste0(folderroots, "/", scalefolder, "/", scaledweightedname, pattern)) %>% # Pull all raster names from folderroots into a list
-    lapply(function(x) raster::raster(x)) %>% # read in rasters
-    lapply(function(x) raster::setMinMax(x)) %>% # set minmax values
+    as.list(paste0(folderroots, "/", scalefolder, "/", scaledweightedname, pattern))  |> # Pull all raster names from folderroots into a list
+    lapply(function(x) raster::raster(x))  |>  # read in rasters
+    lapply(function(x) raster::setMinMax(x))  |>  # set minmax values
     # https://stackoverflow.com/questions/72063819/use-an-arrow-assignment-function-as-r-purrr-map2
-    purrr::map2(crslist, ~ {raster::crs(.x) <- .y;.x}) %>%
+    purrr::map2(crslist, ~ {raster::crs(.x) <- .y;.x})  |> 
     purrr::map2(foldernames, ~ {names(.x) <- .y;.x})
   
   # calculate full shared extent
@@ -84,17 +90,17 @@ alignraster <- function(folderroots = c("/home/simon/Dropbox/PostDoc Work/Rob Bu
                     min(sharedextent[2]), # ymin
                     max(sharedextent[4])) # ymax
   
-  rasterlist %<>%
-    lapply(function(x) raster::extend(x, sharedextent)) # align to same spatial extent
+  # align to same spatial extent
+  rasterlist <- lapply(rasterlist, function(x) raster::extend(x, sharedextent))
   
   # Convert to SpatRaster format to be used by {terra}
-  rasterlist %<>% lapply(function(x) as(x, "SpatRaster"))
+  rasterlist <- lapply(rasterlist, function(x) as(x, "SpatRaster"))
   
   # Reproject all rasters simultaneously
-  rasterlist %<>% lapply(function(x) project(x, y = rasterlist[[length(rasterlist)]]))
+  rasterlist <- lapply(rasterlist, function(x) project(x, y = rasterlist[[length(rasterlist)]]))
   
   # Convert back to RasterLayer to save CRS
-  rasterlist %<>% lapply(function(x) raster::raster(x))
+  rasterlist <- lapply(rasterlist, function(x) raster::raster(x))
   
   # Save CRS
   rasterlistCRS <- sp::CRS(sp::proj4string(rasterlist[[1]]))
@@ -102,7 +108,7 @@ alignraster <- function(folderroots = c("/home/simon/Dropbox/PostDoc Work/Rob Bu
   write.csv(sp::proj4string(rasterlistCRS), paste0(savefolder, "/", "CRS.csv"), row.names = FALSE)
   saveRDS(rasterlistCRS, file = paste0(savefolder, "/", "CRS.Rds"))
   
-  rasterlist %<>% lapply(function(x) raster::writeRaster(x = x, # resave individual rasters
+  rasterlist <- lapply(rasterlist, function(x) raster::writeRaster(x = x, # resave individual rasters
                                                          filename = paste0(savefolder, "/", names(x)), # , pattern: removed ability to resave as different format
                                                          # error: adds X to start of numerical named objects####
                                                          format = format,

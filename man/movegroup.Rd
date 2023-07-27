@@ -2,7 +2,7 @@
 % Please edit documentation in R/movegroup.R
 \name{movegroup}
 \alias{movegroup}
-\title{Automates dynamic Brownian bridge construction across individuals}
+\title{Automates dynamic Brownian bridge movement model construction across individuals}
 \usage{
 movegroup(
   data = NULL,
@@ -19,6 +19,7 @@ movegroup(
   timeDiffLong = 2,
   timeDiffUnits = "hours",
   center = TRUE,
+  centre = NULL,
   buffpct = 0.3,
   rasterExtent = NULL,
   rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"),
@@ -35,105 +36,106 @@ movegroup(
 )
 }
 \arguments{
-\item{data}{Data frame object containing the data. Requires columns Lat Lon 
-DateTime ID and optionally a grouping column. Names specified in later 
-parameters. Grouping not currently implemented 2022-11-15, see Group 
-parameter below.}
+\item{data}{Data frame object containing the data. Requires columns Lat Lon DateTime ID and 
+optionally a grouping column. Names specified in later parameters. Grouping not currently 
+implemented 2023-07-26, see Group parameter below.}
 
 \item{ID}{Name of animal tag ID column in data. "Character".}
 
-\item{Datetime}{Column name in data that contains date/time stamps for each. "Character".
-Recorded detection. Must be in POSIXct format.}
+\item{Datetime}{Column name in data that contains date/time stamps for each recorded detection. 
+Must be in POSIXct format. "Character".}
 
 \item{Lat}{Name of latitude column in data. "Character".}
 
 \item{Lon}{Name of longitude column in data. "Character".}
 
-\item{Group}{Name of grouping column in data. UNUSED 2022-11-15}
+\item{Group}{Name of grouping column in data. Unused 2023-07-26}
 
-\item{dat.TZ}{Timezone of data for as.POSIXct.}
+\item{dat.TZ}{Timezone of data for as.POSIXct. Default "US/Eastern".}
 
-\item{proj}{CRS for move function.}
+\item{proj}{CRS for move function. Default sp::CRS("+proj=longlat +datum=WGS84").}
 
-\item{projectedCRS}{EPSG code for CRS for initial transform of latlon points;
-corresponds to rasterCRS zone.}
+\item{projectedCRS}{EPSG code for CRS for initial transform of latlon points; corresponds to 
+rasterCRS zone. Default "+init=epsg:32617".}
 
-\item{sensor}{Sensor for move function. Single character or vector with 
-length of the number of coordinates. Optional.}
+\item{sensor}{Sensor for move function. Single character or vector with length of the number of 
+coordinates. Optional. Default "VR2W".}
 
-\item{moveLocError}{Location error (m) in the 'brownian.bridge.dyn' function 
-in the 'move' package. Numeric. Either single or a vector of length nrow 
-data. If using passive acoustic data this is the detection range of the 
-receiver(s).}
+\item{moveLocError}{Location error (m) in the 'brownian.bridge.dyn' function in the 'move' 
+package. Numeric. Either single or a vector of length nrow data. If using passive acoustic data 
+this is the detection range of the receiver(s). Default 1. See MoveLocErrorCalc function for 
+satellite data with state space modelled locations with 95% confidence intervals for latlon i.e. 
+lat and lon025 and 975.}
 
-\item{timeDiffLong}{Single numeric value. Threshold value in timeDiffUnits 
-designating the length of long breaks in re-locations. Used for bursting a 
-movement track into segments, thereby removing long breaks from the movement 
-track. See ?move::bursted for details. Default 2 hours is arbitrary, looping through 18, 24, and 
-36 hours for satellite data on great hammerhead sharks revealed volume areas for core and general
- use gradually rise with timeDiffLong increases, multiple small dots of presence get blobbed 
- together, and therefore sometimes this covers land. Ideally one would not discard any data, in 
- which case one should choose a value higher than the largest between-detections gap in their 
- dataset (or just pick a very large number). This parameter is useful when the model would 
- otherwise get stuck trying to calculate a UD for an individual with a very large home range that
-  is inadequately captured by a receiver array.}
+\item{timeDiffLong}{Single numeric value. Threshold value in timeDiffUnits designating the length
+of long breaks in re-locations. Used for bursting a movement track into segments, thereby 
+removing long breaks from the movement track. See ?move::bursted for details. Default 2 hours is
+ arbitrary, looping through 18, 24, and 36 hours for satellite data on great hammerhead sharks 
+revealed volume areas for core and general use gradually rise with timeDiffLong increases, 
+multiple small dots of presence get blobbed together, and therefore sometimes this covers land. 
+Ideally one would not discard any data, in which case one should choose a value higher than the 
+largest between-detections gap in their dataset (or just pick a very large number). This 
+parameter is useful when the model would otherwise get stuck trying to calculate a UD for an 
+individual with a very large home range that is inadequately captured by a receiver array. 
+Default 2.}
 
-\item{timeDiffUnits}{Character. Unit for timeDiffLong.}
+\item{timeDiffUnits}{Character. Unit for timeDiffLong. Default "hours".}
 
-\item{center}{Do you want to center the move object within extent? See 
-spTransform.}
+\item{center}{Do you want to center the move object within extent? See spTransform. Default TRUE.}
 
-\item{buffpct}{Buffer extent for raster creation, proportion of 1.}
+\item{centre}{British ENglish alternate to center. Do you want to center the move object within 
+extent? See spTransform. Default NULL.}
 
-\item{rasterExtent}{Extent of raster created around data. If NULL, raster 
-extent calculated from data, buffpct, rasterResolution. Else length 4 vector,
- c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 (degrees) north
- or south for ymax or ymin. Doesn't prevent constraint to data limits (in 
-plot anyway), but prevents raster clipping crash.}
+\item{buffpct}{Buffer extent for raster creation, proportion of 1. Default 0.3, can try e.g. 3 
+for a large buffer to avoid clipping, at the cost of file size, but later cropping in 
+plotraster.R will remove extraneous blank space.}
 
-\item{rasterCRS}{CRS for raster creation.}
+\item{rasterExtent}{Extent of raster created around data. If NULL (default), calculated from 
+data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon 
+degrees. Don't go to 90 (degrees) north or south for ymax or ymin. Doesn't prevent constraint to 
+data limits (in plot anyway), but prevents raster clipping crash.}
+
+\item{rasterCRS}{CRS for raster creation. Default sp::CRS("+proj=utm +zone=17 +datum=WGS84").}
 
 \item{rasterResolution}{Single numeric value to set raster resolution - cell 
 size in metres? 111000: 1 degree lat = 111km. Trade-off between small res = big file & processing 
 time. Should be a function of the spatial resolution of your receivers or positioning tags. 
 Higher resolution will lead to more precision in the volume areas calculations. Try using 
-2*dbblocationerror, if dbblocationerror is a single value. Default 6 = 6m. Try around the median 
-of your moveLocError.}
+2*dbblocationerror, if dbblocationerror is a single value. Default 50 = 50m. Try around the 
+median of your moveLocError.}
 
-\item{dbblocationerror}{Location.error param in 'brownian.bridge.dyn' 
-function in the 'move' package. single numeric value or vector of the length 
-of coordinates that describes the error of the location (sender/receiver) 
-system in map units. Or a character string with the name of the column 
-containing the location error can be provided. Default is moveLocError.}
+\item{dbblocationerror}{Location.error param in 'brownian.bridge.dyn' function in the 'move' 
+package. single numeric value or vector of the length of coordinates that describes the error of 
+the location (sender/receiver) system in map units. Or a character string with the name of the 
+column containing the location error can be provided. Default is moveLocError.}
 
-\item{dbbext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' 
-package. Extends bounding box around track. Numeric single (all edges), 
-double (x & y), or 4 (xmin xmax ymin ymax). Default 3. Excessive buffering will get cropped 
-automatically.}
+\item{dbbext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends 
+bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax)
+. Default 3. Excessive buffering will get cropped automatically.}
 
 \item{dbbwindowsize}{The window.size param in the 'brownian.bridge.dyn' function 
-in the 'move' package. The size of the moving window along the track. Larger 
-windows provide more stable/accurate estimates of the brownian motion 
-variance but are less well able to capture more frequent changes in behaviour.
- This number has to be odd. A dBBMM is not run if total detections of 
+in the 'move' package. The size of the moving window along the track. Larger windows provide more
+ stable/accurate estimates of the brownian motion variance but are less well able to capture more
+  frequent changes in behaviour. Number must be odd. dBBMM not run if total detections of 
  individual < window size (default 23).}
 
-\item{writeRasterFormat}{Character. Output file type. ascii. TO DEPRECIATE.}
+\item{writeRasterFormat}{Character. Output file type for raster::writeRaster param format. 
+Default "ascii". TO DEPRECIATE.}
 
-\item{writeRasterExtension}{Character. Output file extension. Should match 
-character writeRasterFormat. TO DEPRECIATE.}
+\item{writeRasterExtension}{Character. Output file extension for raster::writeRaster param 
+extension. Default ".asc". TO DEPRECIATE.}
 
-\item{writeRasterDatatype}{Character. Data type for writing values to disk. 
-TO DEPRECIATE.}
+\item{writeRasterDatatype}{Character. Data type for writing values to disk for 
+raster::writeRaster param Datatype. Default "FLT4S". TO DEPRECIATE.}
 
-\item{absVolumeAreaSaveName}{File name plus extension where UD estimates are 
-saved. TO DEPRECIATE.}
+\item{absVolumeAreaSaveName}{File name plus extension where UD estimates are saved. Default 
+"VolumeArea_AbsoluteScale.csv".}
 
 \item{savedir}{Save outputs to a temporary directory (default) else change 
 to desired directory e.g. "/home/me/folder/". Do not use getwd() for this. 
-Include terminal slash. Directory must exist.}
+Include terminal slash. Directory must exist. Default tempdir().}
 
-\item{alerts}{Audio warning for failures.}
+\item{alerts}{Audio warning for failures. Default TRUE.}
 }
 \value{
 Individual-level utilization distributions, saved as rasters, as well
@@ -147,13 +149,19 @@ individuals simultaneously, via the 'brownian.bridge.dyn()' function in the 'mov
 }
 \details{
 Step 1. Filter individuals. 
-Remove those individuals for which there is insufficient data i.e. number of re-locations is smaller than the window size parameter value (default = 31). 
+Remove those individuals for which there are insufficient data i.e. number of re-locations is 
+smaller than the window size parameter value (default = 31). 
 
 Step 2. Generate universal raster. 
-Based on all remaining data, a universal raster is generated where the calculated UDs are plotted into. 
+Based on all remaining data, a universal raster is generated where the calculated UDs are plotted
+ into. 
 
 Step 3. Loop through individuals.
-Individuals are looped through to construct individual-level movement models (on an absolute scale). See www.GitHub.com/SimonDedman/movegroup for issues, feedback, and development suggestions.
+Individuals are looped through to construct individual-level movement models (on an absolute 
+scale).
+
+See www.GitHub.com/SimonDedman/movegroup for issues, feedback, and development 
+suggestions.
 
 Errors and their origins:
 

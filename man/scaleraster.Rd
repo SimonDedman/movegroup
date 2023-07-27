@@ -14,50 +14,56 @@ scaleraster(
   bylayer = TRUE,
   overwrite = TRUE,
   scalefolder = "Scaled",
-  weightedsummedname = "All_Rasters_Weighted_Summed",
   scaledweightedname = "All_Rasters_Scaled_Weighted",
   crsloc = NULL,
   returnObj = FALSE
 )
 }
 \arguments{
-\item{path}{Path to directory where the individual-level UDs are saved. Likely the same as savedir from movegroup.}
+\item{path}{Path to directory where the individual-level UDs are saved. Likely the same as 
+savedir from movegroup. Default NULL.}
 
-\item{pathsubsets}{Path to parent directory that contains all UDs across spatial groups or subsets If none are used, make same as path. Likely the same as savedir from movegroup.}
+\item{pathsubsets}{Path to parent directory that contains all UDs across spatial groups or 
+subsets. If none are used, make same as path. Likely the same as savedir from movegroup. Default 
+NULL.}
 
-\item{pattern}{Extension pattern used to read in all UDs in directory and pathsubsets directory. Default ".asc".}
+\item{pattern}{Extension pattern used to read in all UDs in directory and pathsubsets directory. 
+Default ".asc".}
 
-\item{weighting}{Addresses unbalanced receiver array design after receivers have first been partitioned into regions and group-level UDs estimated per region. Numeric. 
-Weights area-specific scaled group-level UD raster by value. This then means that estimated scaled individual-level volume areas also become weighted. 
-Default is 1 for no weighting.}
+\item{weighting}{Addresses unbalanced receiver array design after receivers have first been 
+partitioned into regions and group-level UDs estimated per region. Numeric. Weights area-specific
+ scaled group-level UD raster by value. This then means that estimated scaled individual-level 
+ volume areas also become weighted. Default is 1 for no weighting.}
 
-\item{format}{Character. Output file type. ascii. (Mo: i think we need to list options to choose from. what is default?).}
+\item{format}{Character. Output file type for raster::writeRaster param format. Default "ascii".}
 
-\item{datatype}{Character. Data type for writing values to disk. (Mo: should we mention FLT4S? Should we give choices? what is default?).}
+\item{datatype}{Character. Data type for writing values to disk for raster::writeRaster param 
+Datatype. Default "FLT4S".}
 
-\item{bylayer}{Default TRUE.}
+\item{bylayer}{For raster::writeRaster param bylayer. Default TRUE.}
 
-\item{overwrite}{Default TRUE.}
+\item{overwrite}{For raster::writeRaster param overwrite. Default TRUE.}
 
-\item{scalefolder}{Default "Scaled".}
+\item{scalefolder}{Folder to save outputs to. Default "Scaled".}
 
-\item{weightedsummedname}{Default "All_Rasters_Weighted_Summed".}
+\item{scaledweightedname}{Name of chunk for scaled and weighted output rasters. Default 
+"All_Rasters_Scaled_Weighted".}
 
-\item{scaledweightedname}{Default "All_Rasters_Scaled_Weighted".}
-
-\item{crsloc}{Location of saved CRS Rds file from dBBMM.build.R. Should be same as path.}
+\item{crsloc}{Location of saved CRS Rds file from movegroup.R. Should be same as path. Default 
+NULL.}
 
 \item{returnObj}{Logical. Return the scaled object to the parent environment? Default FALSE.}
 }
 \value{
-Scaled and weighted individual-level and group-level utilization distributions saved as rasters. Additionally, scaled 50 and 95pct 
-contour volume area estimates (in km2) for individuals and the group, saved in .csv format.
+Scaled and weighted individual-level and group-level utilization distributions saved as 
+rasters. Scaled 50 and 95pct contour volume area estimates (in km2) for individuals and the group
+, saved in .csv format. Latlon raster.
 }
 \description{
 Scales individual-level utilization distribution (UD) rasters from 0 to 1 to facilitate interpretation as relative 
 intensity of utilization (as opposed to absolute), making comparisons across individuals and interpretations at 
 the group level more straightforward. Subsequently, scaled individual-level rasters are aggregated to create a 
-single group-level UD raster. See www.GitHub.com/SimonDedman/dBBMMhomeRange for issues, feedback, and development 
+single group-level UD raster. See www.GitHub.com/SimonDedman/movegroup for issues, feedback, and development 
 suggestions. There is an option to account for bias in acoustic receiver array spatial representation (see Details).
 }
 \details{
@@ -74,14 +80,14 @@ The group-level raster is divided by its own maximum value.
 Step 4. Weight raster (optional).
 The scaled group-level UD raster is divided by the specified weighting factor(s). Note that this is only useful if you 
 want to account for an unbalanced listening station (e.g., acoustic receivers) array and have split up the study site and receivers in regions, and have 
-run the dBBMMhomeRange() for each regional data set separately. See van Zinnicq Bergmann et al. 2022 
+run the movegroup() for each regional data set separately. See van Zinnicq Bergmann et al. 2022 
 (https://doi.org/10.1016/j.biocon.2022.109469) for example. If not applicable, choose a value of "1".
 
 Step 5. Standardize raster.
 Standardize the potentially weighted and scaled group-level UD raster so that its values sum to 1.  (creates UDScaled, but is in .UD extension)
 
-Step 6. Change crs.
-Change its crs to latlon for plotting and calculation purposes (DO WE WANT TO INCLUDE THIS? CURRENTLY DOES NOTHING)
+Step 6. Export as latlon CRS.
+Change crs to latlon for plotting and calculation purposes, save file, continue.
 
 Step 7. Estimate 50 and 95pct contour volume areas.
 For each scaled individual-level UD raster, estimate 50 and 95pct contour volume areas, as well as their mean and standard
