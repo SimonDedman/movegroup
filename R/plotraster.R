@@ -35,7 +35,9 @@
 #' @param googlemap If pulling basemap from Google maps, this sets expansion factors since Google 
 #' Maps tiling zoom setup doesn't align to myLocation extents. Default FALSE.
 #' @param gmapsAPI Enter your google maps API here, quoted character string. Can leave NULL if 
-#' already registered with ggmap::register_google().
+#' already registered with ggmap::register_google(). See details for instructions. If you don't have
+#'  an API or don't want to get one, leave NULL, ensure mapsource is stamen, and maptype is 
+#'  stamen-compatible.
 #' @param expandfactor Extents expansion factor for basemap. 1.3 to 1.5 are the same zoom as 1. 1.6 
 #' is a big leap up in zoom out. 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using 
 #' Google Maps.
@@ -135,7 +137,11 @@ plotraster <- function(
     # 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
     mapzoom = 5, # google: 3 (continent) - 21 (building). stamen: 0-18
     mapsource = "google", # Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.
-    maptype = "satellite", # Type of map for ggmap::get_map.
+    maptype = "satellite", # Type of map for ggmap::get_map. Options: "terrain", 
+    # "terrain-background", "satellite", "roadmap", "hybrid", "toner", "terrain-labels",
+    # "terrain-lines", "toner-2010", "toner-2011", "toner-background", "toner-hybrid", 
+    # "toner-labels", "toner-lines", "toner-lite". Google options: “terrain”, “satellite”, 
+    # “roadmap”, “hybrid”.
     contour1colour = "red", # colour for contour 1, typically 95%.
     contour2colour = "orange", # colour for contour 2, typically 50%.
     plottitle = "Aggregated 95% and 50% UD contours",

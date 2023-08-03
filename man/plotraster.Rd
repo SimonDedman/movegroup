@@ -86,7 +86,9 @@ autocreated from data. Set this if you want to expand or crop your map to cover 
 Maps tiling zoom setup doesn't align to myLocation extents. Default FALSE.}
 
 \item{gmapsAPI}{Enter your google maps API here, quoted character string. Can leave NULL if 
-already registered with ggmap::register_google().}
+already registered with ggmap::register_google(). See details for instructions. If you don't have
+ an API or don't want to get one, leave NULL, ensure mapsource is stamen, and maptype is 
+ stamen-compatible.}
 
 \item{expandfactor}{Extents expansion factor for basemap. 1.3 to 1.5 are the same zoom as 1. 1.6 
 is a big leap up in zoom out. 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using 
