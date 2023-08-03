@@ -108,7 +108,7 @@
 #' 2. trying to read file: All_Rasters_Scaled_Weighted_UDScaled.asc: Error in CPL_read_gdal(
 #' as.character(x), as.character(options), as.character(driver),: file not found. Check x is correct.
 #' 
-#' How to get Google map basemaps:
+#' How to get Google map basemaps: https://www.youtube.com/watch?v=O5cUoVpVUjU
 #' 
 #' @examples
 #' \donttest{
@@ -405,7 +405,7 @@ plotraster <- function(
       guide = "colourbar",
       aesthetics = "fill",
       # name = waiver(),
-      name = "UD%",
+      name = "UD%", # should be legendtitle?
       # limits = NA,
       # position = "left"
       position = "right"

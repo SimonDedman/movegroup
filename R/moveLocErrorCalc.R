@@ -3,6 +3,15 @@
 #' Builds a dataframe of original locations plus rowmeans of mean distance of location extremities 
 #' ((lon975, lat), (lon025, lat), (lon, lat975), (lon, lat025)) from the centre point (lon, lat).
 #'
+#' @author Simon Dedman, \email{simondedman@@gmail.com}
+#' 
+#' @importFrom sf st_as_sf st_set_crs st_transform st_distance
+#' @importFrom dplyr select
+#' @importFrom tidyselect everything
+#' @importFrom purrr map_df
+#' 
+#' @export
+#' 
 #' @param x Data frame or tibble with lats and lons and their high and low confidence interval 
 #' counterparts.
 #' @param loncol Name of longitude column in x, character. Default "lon".
@@ -29,14 +38,6 @@
 #' # Not run
 #' }
 #'
-#' @author Simon Dedman, \email{simondedman@@gmail.com}
-
-#' @export
-
-#' @importFrom sf st_as_sf st_set_crs st_transform st_distance
-#' @importFrom dplyr select
-#' @importFrom tidyselect everything
-#' @importFrom purrr map_df
 
 # moveLocError calculator for ARGOS / state space models resulting in 95% latlon confidence intervals
 # Simon Dedman, simondedman@gmail.com, simondedman.com, 2023-07-26
