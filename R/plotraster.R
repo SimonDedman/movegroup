@@ -46,7 +46,7 @@
 #' , and "toner" (stamen maps).
 #' @param contour1colour Colour for contour 1, typically 95pct, default "red".
 #' @param contour2colour Colour for contour 2, typically 50pct, default "orange".
-#' @param plottitle Title of the resultant plot, default "Aggregated 95% and 50% UD contours".
+#' @param plottitle Title of the resultant plot, default "Aggregated 95pct and 50pct UD contours".
 #' @param plotsubtitle Plot subtitle, default "Scaled contours". Can add the n of your individuals.
 #' @param legendtitle Legend title, default "Percent UD Contours".
 #' @param plotcaption Plot caption, default "movegroup" + today's date.

@@ -104,7 +104,7 @@ Google Maps.}
 
 \item{contour2colour}{Colour for contour 2, typically 50pct, default "orange".}
 
-\item{plottitle}{Title of the resultant plot, default "Aggregated 95% and 50% UD contours".}
+\item{plottitle}{Title of the resultant plot, default "Aggregated 95pct and 50pct UD contours".}
 
 \item{plotsubtitle}{Plot subtitle, default "Scaled contours". Can add the n of your individuals.}
 
