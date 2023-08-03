@@ -2,7 +2,7 @@
 % Please edit documentation in R/moveLocErrorCalc.R
 \name{moveLocErrorCalc}
 \alias{moveLocErrorCalc}
-\title{moveLocError calculator for ARGOS / state space models resulting in 95% latlon confidence intervals}
+\title{moveLocError calculator for ARGOS or state space models resulting in 95percent latlon confidence intervals}
 \usage{
 moveLocErrorCalc(
   x,

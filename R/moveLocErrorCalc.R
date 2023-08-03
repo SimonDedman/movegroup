@@ -1,4 +1,4 @@
-#' moveLocError calculator for ARGOS / state space models resulting in 95% latlon confidence intervals
+#' moveLocError calculator for ARGOS or state space models resulting in 95percent latlon confidence intervals
 #'
 #' Builds a dataframe of original locations plus rowmeans of mean distance of location extremities 
 #' lon975, lat; lon025, lat; lon, lat975; lon, lat025 from the centre point lon, lat.
