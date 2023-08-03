@@ -1,7 +1,7 @@
 #' moveLocError calculator for ARGOS / state space models resulting in 95% latlon confidence intervals
 #'
 #' Builds a dataframe of original locations plus rowmeans of mean distance of location extremities 
-#' ((lon975, lat), (lon025, lat), (lon, lat975), (lon, lat025)) from the centre point (lon, lat).
+#' lon975, lat; lon025, lat; lon, lat975; lon, lat025 from the centre point lon, lat.
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #' 
@@ -50,7 +50,7 @@ moveLocErrorCalc <- function(x,
                              lon975 = "lon975",
                              lat025 = "lat025",
                              lat975 = "lat975"
-){ # open moveLocErrorCalc function
+) { # open moveLocErrorCalc function
   
   # build reproject function for later use
   reproject <- function(x,

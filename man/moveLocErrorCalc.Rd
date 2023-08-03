@@ -47,7 +47,7 @@ for use in movegroup::movegroup(moveLocError).
 }
 \description{
 Builds a dataframe of original locations plus rowmeans of mean distance of location extremities 
-((lon975, lat), (lon025, lat), (lon, lat975), (lon, lat025)) from the centre point (lon, lat).
+lon975, lat; lon025, lat; lon, lat975; lon, lat025 from the centre point lon, lat.
 }
 \details{
 Use on your data object from movegroup::movegroup(data).
