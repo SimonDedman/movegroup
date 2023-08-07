@@ -110,7 +110,27 @@
 #' 2. trying to read file: All_Rasters_Scaled_Weighted_UDScaled.asc: Error in CPL_read_gdal(
 #' as.character(x), as.character(options), as.character(driver),: file not found. Check x is correct.
 #' 
-#' How to get Google map basemaps: https://www.youtube.com/watch?v=O5cUoVpVUjU
+#' How to get Google map basemaps from (https://www.youtube.com/watch?v=O5cUoVpVUjU):
+#' 
+#'  1. Sign up with dev console: a. You must enter credit card details, but won’t be charged if your
+#'   daily API requests stay under the limit. b. Follow the link: 
+#'  https://console.cloud.google.com/projectselector2/apis/dashboard?supportedpurview=project c. 
+#'  Sign up for Google cloud account (it may auto populate your current gmail), click agree and 
+#'  continue. d. Click the navigation email in the top left corner and click on Billing. e. Create a
+#'   billing account – they will NOT auto charge after trial ends. f. Enter information, click on 
+#'   'start my free trial'. They may offer a free credit for trying out their service. More pricing 
+#'   details: https://mapsplatform.google.com/pricing/ . g. Click “Select a Project” then
+#'  “New project” in the top right corner. h. Enter Project Name, leave Location as is, click 
+#' “Create”. i. You should now see your project name at the top, where the drop-down menu is.
+#' 
+#' 2. Enable Maps and Places API: a. Click 'Library' on the left. b. In the search field type “Maps”
+#' . c. Scroll down, click “Maps Java Script API”. d. Click Enable. e. Click 'Library' again, search
+#'  “Places”, click on “Places API”. f. Click Enable.
+#'  
+#' 3. Create Credentials for API  Key: a. Return to 'APIs & Services' page. b. Click on Credentials.
+#' c. At the top click 'Create Credentials > API Key'. d. API key should pop up with option to copy 
+#' it. e. You can restrict the key if you want by following steps 4 & 5 here: 
+#' https://www.youtube.com/watch?v=O5cUoVpVUjU&t=232s
 #' 
 #' @examples
 #' \donttest{
