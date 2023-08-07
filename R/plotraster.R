@@ -216,7 +216,7 @@ plotraster <- function(
     reclabpad = 0, # Receiver label padding in lines.
     reclabrad = 0.15, # Receiver label radius in lines.
     reclabbord = 0, # Receiver label border in mm.
-    surface = TRUE # Plot complete UD surface as well as contours
+    surface = TRUE # Plot complete UD surface as well as contours.
 ) {
   # check receiver inputs are the correct lengths, if present.
   if (!is.null(receiverlats) & !is.null(receiverlons)) if (length(receiverlats) != length(receiverlons)) stop("length of receiverlats must equal length of receiverlons")
@@ -424,7 +424,8 @@ plotraster <- function(
     ggplot2::geom_sf(data = stars::st_contour(x = x,
                                               contour_lines = TRUE,
                                               breaks = max(x[[1]],
-                                                           na.rm = TRUE) * 0.05),
+                                                           na.rm = TRUE) * 0.05) |>
+                       sf::st_transform(3857),
                      fill = NA,
                      inherit.aes = FALSE,
                      ggplot2::aes(colour = "95% UD")) +
@@ -433,7 +434,8 @@ plotraster <- function(
     ggplot2::geom_sf(data = stars::st_contour(x = x,
                                               contour_lines = TRUE,
                                               breaks = max(x[[1]],
-                                                           na.rm = TRUE) * 0.5),
+                                                           na.rm = TRUE) * 0.5) |>
+                       sf::st_transform(3857),
                      fill = NA,
                      inherit.aes = FALSE,
                      ggplot2::aes(colour = "50% UD")) +

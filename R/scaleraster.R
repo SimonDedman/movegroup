@@ -78,6 +78,17 @@
 #' \donttest{
 #' # Having run the movegroup function example:
 #' scaleraster(path = mysavedir)
+#' 
+#' # Weighted by number of positions per ID, fewer locations = lower Weighting value = higher final 
+#' UD values after dividing by Weighting. This scales all IDs up to match the group max.
+#' Weighting <- TracksCleaned |>
+#'  dplyr::group_by(Shark) |>
+#'  dplyr::summarise(N = n()) |> 
+#'  dplyr::filter(N > 23) |> 
+#'  dplyr::mutate(N = N / max(N, na.rm = TRUE)) |> 
+#'  dplyr::pull(N)
+#'  
+#'  scaleraster(path = mysavedir, weighting = Weighting)
 #' }
 #'
 #' @export scaleraster
