@@ -74,7 +74,7 @@ occurring within the raster set.
 Step 2. Aggregate into a group-level raster.
 Scaled individual-level rasters are summed to create a single group-level UD raster. 
 
-Step 3. Re-scale from 0 to 1.
+Step 3. Re-scale to 0 to 1.
 The group-level raster is divided by its own maximum value.
 
 Step 4. Weight raster (optional).

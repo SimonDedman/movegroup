@@ -13,7 +13,7 @@
 #' Step 2. Aggregate into a group-level raster.
 #' Scaled individual-level rasters are summed to create a single group-level UD raster. 
 #' 
-#' Step 3. Re-scale from 0 to 1.
+#' Step 3. Re-scale to 0 to 1.
 #' The group-level raster is divided by its own maximum value.
 #' 
 #' Step 4. Weight raster (optional).
@@ -81,6 +81,7 @@
 #' @export
 
 #' @importFrom raster raster setMinMax res maxValue writeRaster stack stackApply nlayers projectExtent crs projectRaster values
+#' @importFrom purrr map2
 #' @importFrom stringr str_remove
 #' @importFrom sp CRS
 
@@ -147,7 +148,8 @@ scaleraster <- function(path = NULL,
   
   # Scale all raster values to max of maxes (maximum value becomes 1)
   rasterlist  <- lapply(rasterlist, function(x) x / scalemax)  |>  # scaling occurs here
-    lapply(function(x) x / weighting)  |>  # Weighting occurs here
+    # lapply(function(x) x / weighting)  |>  # Weighting occurs here
+    purrr::map2(.y = weighting, .f = `/`)  |>  # Weighting occurs here. .y will be recycled if length 1.
     lapply(function(x) raster::writeRaster(x = x, # save scaled individual rasters
                                            filename = paste0(path, "/", scalefolder, "/", names(x)),
                                            format = format,
