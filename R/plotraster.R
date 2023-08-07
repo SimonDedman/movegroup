@@ -40,9 +40,10 @@
 #' Google Maps.
 #' @param mapzoom Highest number = zoomed in. Google: 3 (continent) - 21 (building). stamen: 0-18.
 #' @param mapsource Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.
-#' @param maptype Type of map for ggmap::get_map param maptype. Options available are "terrain", 
-#' "terrain-background", "satellite", "roadmap", and "hybrid" (google maps), "terrain", "watercolor"
-#' , and "toner" (stamen maps).
+#' @param maptype Type of map for ggmap::get_map param maptype. Options: Google mapsource: "terrain", 
+#' "terrain-background", "satellite", "roadmap", "hybrid". Stamen mapsource: "terrain", 
+#' "terrain-background", "terrain-labels", "terrain-lines", "watercolor", "toner", "toner-2010", 
+#' "toner-2011", "toner-background", "toner-hybrid", "toner-labels", "toner-lines", "toner-lite".
 #' @param contour1colour Colour for contour 1, typically 95pct, default "red".
 #' @param contour2colour Colour for contour 2, typically 50pct, default "orange".
 #' @param plottitle Title of the resultant plot, default "Aggregated 95pct and 50pct UD contours".
@@ -103,6 +104,13 @@
 #' 
 #' 2. trying to read file: All_Rasters_Scaled_Weighted_UDScaled.asc: Error in CPL_read_gdal(
 #' as.character(x), as.character(options), as.character(driver),: file not found. Check x is correct.
+#' 
+#' 3. Error in grid.Call.graphics...: Empty raster: mapzoom likely set too low, returning no tiles. 
+#' Increase mapzoom number.
+#' 
+#' 4. Not Found (HTTP 404). Failed to acquire tile /...png: Tiles are unavailable for ocean, and may
+#'  be unavailable at the chosen zoom level for the specific region of interest. Inspect the output 
+#'  map and try a lower level (number) of mapzoom.
 #' 
 #' ## How to get Google map basemaps
 #' (from https://www.youtube.com/watch?v=O5cUoVpVUjU):
@@ -210,8 +218,11 @@ plotraster <- function(
   
   # Import raster
   x <- stars::read_stars(x)
-  # %>% sf::st_set_crs(4326) # 4326 2958
-  dataCRS <- readRDS(paste0(crsloc, "CRS.Rds")) # load CRS from file
+  # derive crsloc if not provided, assuming default folder and name of x
+  if (is.null(crsloc)) crsloc <- stringr::str_remove(x, pattern = "Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc")
+  # If crsloc has a terminal slash, remove it, it's added later
+  if (substr(x = crsloc, start = nchar(crsloc), stop = nchar(crsloc)) == "/") crsloc = substr(x = crsloc, start = 1, stop = nchar(crsloc) - 1)
+  dataCRS <- readRDS(paste0(crsloc, "/CRS.Rds")) # load CRS from file
   sf::st_crs(x) <- proj4string(dataCRS) # set CRS, function from sp
   
   # for plotting the surface UD on the map:

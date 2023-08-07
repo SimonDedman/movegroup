@@ -98,9 +98,10 @@ Google Maps.}
 
 \item{mapsource}{Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.}
 
-\item{maptype}{Type of map for ggmap::get_map param maptype. Options available are "terrain", 
-"terrain-background", "satellite", "roadmap", and "hybrid" (google maps), "terrain", "watercolor"
-, and "toner" (stamen maps).}
+\item{maptype}{Type of map for ggmap::get_map param maptype. Options: Google mapsource: "terrain", 
+"terrain-background", "satellite", "roadmap", "hybrid". Stamen mapsource: "terrain", 
+"terrain-background", "terrain-labels", "terrain-lines", "watercolor", "toner", "toner-2010", 
+"toner-2011", "toner-background", "toner-hybrid", "toner-labels", "toner-lines", "toner-lite".}
 
 \item{contour1colour}{Colour for contour 1, typically 95pct, default "red".}
 
@@ -202,6 +203,13 @@ API key help: https://github.com/dkahle/ggmap/issues/235 .
 
 2. trying to read file: All_Rasters_Scaled_Weighted_UDScaled.asc: Error in CPL_read_gdal(
 as.character(x), as.character(options), as.character(driver),: file not found. Check x is correct.
+
+3. Error in grid.Call.graphics...: Empty raster: mapzoom likely set too low, returning no tiles. 
+Increase mapzoom number.
+
+4. Not Found (HTTP 404). Failed to acquire tile /...png: Tiles are unavailable for ocean, and may
+ be unavailable at the chosen zoom level for the specific region of interest. Inspect the output 
+ map and try a lower level (number) of mapzoom.
 
 ## How to get Google map basemaps
 (from https://www.youtube.com/watch?v=O5cUoVpVUjU):
