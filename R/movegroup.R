@@ -96,7 +96,11 @@
 #'  as calculated volume area estimates for 50 and 95pct contours, saved in a 
 #'  .csv file. No processed object is returned, i.e. bad: "objectname <- movegroup()", good: 
 #'  "movegroup()"
-#' @details Errors and their origins:
+#' @details 
+#' When used together, the order of functions would be: movegroup, scaleraster, alignraster if 
+#' required, plotraster.
+#' 
+#' ## Errors and their origins:
 #' 
 #' 1. Error in .local(object, raster, location.error = location.error, ext = ext: Higher y grid not 
 #' large enough, consider extending the raster in that direction or enlarging the ext argument.
@@ -115,14 +119,13 @@
 #' 5. cannot allocate vector of size (BIG) Gb: Increase rasterResolution value.
 #' 
 #' @examples
-#' \donttest{
-#' # Not run
+#' \dontrun{
 #' }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
 #'
-#' @export
+#' @export movegroup
 
 # install_git('https://gitlab.com/bartk/move.git') #Installs 'move' development version
 #' @import utils

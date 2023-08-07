@@ -163,7 +163,11 @@ scale).
 See www.GitHub.com/SimonDedman/movegroup for issues, feedback, and development 
 suggestions.
 
-Errors and their origins:
+
+When used together, the order of functions would be: movegroup, scaleraster, alignraster if 
+required, plotraster.
+
+## Errors and their origins:
 
 1. Error in .local(object, raster, location.error = location.error, ext = ext: Higher y grid not 
 large enough, consider extending the raster in that direction or enlarging the ext argument.
@@ -182,8 +186,7 @@ large enough, consider extending the raster in that direction or enlarging the e
 5. cannot allocate vector of size (BIG) Gb: Increase rasterResolution value.
 }
 \examples{
-\donttest{
-# Not run
+\dontrun{
 }
 
 }

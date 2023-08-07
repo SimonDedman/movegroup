@@ -78,7 +78,7 @@
 #' # Not run
 #' }
 #'
-#' @export
+#' @export scaleraster
 
 #' @importFrom raster raster setMinMax res maxValue writeRaster stack stackApply nlayers projectExtent crs projectRaster values
 #' @importFrom purrr map2
@@ -121,6 +121,8 @@ scaleraster <- function(path = NULL,
   # NOTE: if pathsubsets = NULL, it will crash, ditto crsloc
   if (is.null(pathsubsets)) pathsubsets <- path
   if (is.null(crsloc)) crsloc <- path
+  # If crsloc has a terminal slash, remove it, it's added later
+  if (substr(x = crsloc, start = nchar(crsloc), stop = nchar(crsloc)) == "/") crsloc = substr(x = crsloc, start = 1, stop = nchar(crsloc) - 1)
   # If pathsubsets has a terminal slash, remove it, it's added later
   if (substr(x = pathsubsets, start = nchar(pathsubsets), stop = nchar(pathsubsets)) == "/") pathsubsets = substr(x = pathsubsets, start = 1, stop = nchar(pathsubsets) - 1)
   
@@ -187,7 +189,7 @@ scaleraster <- function(path = NULL,
   
   # Now weight the group-level UD raster
   # Change projection of All_Rasters_Scaled_Weighted to latlon for proper plotting
-  dataCRS <- readRDS(paste0(crsloc, "CRS.Rds"))
+  dataCRS <- readRDS(paste0(crsloc, "/CRS.Rds"))
   raster::crs(All_Rasters_Scaled_Weighted) <- dataCRS
   
   # If any NA present, replace by 0 (safety)

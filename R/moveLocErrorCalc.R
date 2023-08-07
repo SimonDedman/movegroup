@@ -10,7 +10,7 @@
 #' @importFrom tidyselect everything
 #' @importFrom purrr map_df
 #' 
-#' @export
+#' @export moveLocErrorCalc
 #' 
 #' @param x Data frame or tibble with lats and lons and their high and low confidence interval 
 #' counterparts.

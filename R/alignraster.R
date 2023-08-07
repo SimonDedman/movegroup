@@ -35,7 +35,7 @@
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
 
-#' @export
+#' @export alignraster
 
 #' @importFrom sp bbox
 #' @importFrom raster crs setMinMax raster extend writeRaster
