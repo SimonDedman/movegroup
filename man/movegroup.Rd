@@ -161,7 +161,9 @@ Individuals are looped through to construct individual-level movement models (on
 scale).
 
 See www.GitHub.com/SimonDedman/movegroup for issues, feedback, and development 
-suggestions.
+suggestions. 
+
+install_git('https://gitlab.com/bartk/move.git') #Installs 'move' development version
 
 
 When used together, the order of functions would be: movegroup, scaleraster, alignraster if 
@@ -187,6 +189,19 @@ large enough, consider extending the raster in that direction or enlarging the e
 }
 \examples{
 \dontrun{
+# load data
+data("TracksCleaned")
+# set save directory
+mysavedir <- "/your/directory/here/"
+# run function
+movegroup(
+data = TracksCleaned,
+ID = "Shark",
+Datetime = "Datetime",
+Lat = "Lat",
+Lon = "Lon",
+savedir = mysavedir
+)
 }
 
 }

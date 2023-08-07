@@ -17,6 +17,23 @@
 #' 
 #' See www.GitHub.com/SimonDedman/movegroup for issues, feedback, and development 
 #' suggestions. 
+#' 
+#' install_git('https://gitlab.com/bartk/move.git') #Installs 'move' development version
+#' @import utils
+#' @importFrom lubridate is.POSIXt
+#' @importFrom sp CRS SpatialPoints spTransform proj4string
+#' @importFrom beepr beep
+#' @importFrom dplyr mutate rename group_by summarise filter semi_join distinct ungroup arrange across bind_cols pull
+#' @importFrom tidyr drop_na
+#' @importFrom raster raster projectExtent res ncell setValues calc values writeRaster
+#' @importFrom move move timeLag burst brownian.bridge.dyn getVolumeUD
+#' @importFrom rlang .data
+#' @importFrom grDevices graphics.off
+#' @importFrom graphics par
+#' @importFrom methods new
+#' @importFrom stats setNames
+#' 
+#' @export movegroup
 #'
 #' @param data Data frame object containing the data. Requires columns Lat Lon DateTime ID and 
 #' optionally a grouping column. Names specified in later parameters. Grouping not currently 
@@ -120,27 +137,23 @@
 #' 
 #' @examples
 #' \dontrun{
+#' # load data
+#' data("TracksCleaned")
+#' # set save directory
+#' mysavedir <- "/your/directory/here/"
+#' # run function
+#' movegroup(
+#' data = TracksCleaned,
+#' ID = "Shark",
+#' Datetime = "Datetime",
+#' Lat = "Lat",
+#' Lon = "Lon",
+#' savedir = mysavedir
+#' )
 #' }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
-#'
-#' @export movegroup
-
-# install_git('https://gitlab.com/bartk/move.git') #Installs 'move' development version
-#' @import utils
-#' @importFrom lubridate is.POSIXt
-#' @importFrom sp CRS SpatialPoints spTransform proj4string
-#' @importFrom beepr beep
-#' @importFrom dplyr mutate rename group_by summarise filter semi_join distinct ungroup arrange across bind_cols pull
-#' @importFrom tidyr drop_na
-#' @importFrom raster raster projectExtent res ncell setValues calc values writeRaster
-#' @importFrom move move timeLag burst brownian.bridge.dyn getVolumeUD
-#' @importFrom rlang .data
-#' @importFrom grDevices graphics.off
-#' @importFrom graphics par
-#' @importFrom methods new
-#' @importFrom stats setNames
 
 movegroup <- function(
     data = NULL, # Data frame object containing the data. Requires columns Lat Lon DateTime ID and optionally a grouping column.
