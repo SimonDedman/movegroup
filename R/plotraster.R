@@ -370,8 +370,8 @@ plotraster <- function(
     # if pointsincontourssave wasn't entered, autogenerate
     if (is.null(pointsincontourssave)) pointsincontourssave <- paste0(savedir, "/pointsincontour.csv")
     write.csv(locationpoints, file = pointsincontourssave)
-    print(paste0(nrow(pointsin50) / nrow(locationpoints) * 100), "% of location points within 50% contour") # 72.16
-    print(paste0(nrow(pointsin95) / nrow(locationpoints) * 100), "% of location points within 95% contour") # 99.77
+    print(paste0(round(nrow(pointsin50) / nrow(locationpoints) * 100, 2), "% of location points within 50% contour")) # 72.16
+    print(paste0(round(nrow(pointsin95) / nrow(locationpoints) * 100, 2), "% of location points within 95% contour")) # 99.77
   } # close if (!is.null(xlatlon))
   
   
