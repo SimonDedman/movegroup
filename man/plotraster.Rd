@@ -236,7 +236,14 @@ https://www.youtube.com/watch?v=O5cUoVpVUjU&t=232s
 }
 \examples{
 \donttest{
-# Not run
+# Having run the movegroup and scaleraster function examples:
+plotraster(
+  x = paste0(mysavedir, "Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"),
+  mapzoom = 14,
+  mapsource = "stamen",
+  maptype = "terrain",
+  savedir = paste0(mysavedir, "Plot")
+)
 }
 }
 \author{

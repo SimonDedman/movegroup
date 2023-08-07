@@ -106,7 +106,8 @@ file or directory': crsloc is wrong. Try setting to same as path. NULL does this
 }
 \examples{
 \donttest{
-# Not run
+# Having run the movegroup function example:
+scaleraster(path = mysavedir)
 }
 
 }

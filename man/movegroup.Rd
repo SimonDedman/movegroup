@@ -195,12 +195,12 @@ data("TracksCleaned")
 mysavedir <- "/your/directory/here/"
 # run function
 movegroup(
-data = TracksCleaned,
-ID = "Shark",
-Datetime = "Datetime",
-Lat = "Lat",
-Lon = "Lon",
-savedir = mysavedir
+ data = TracksCleaned,
+ ID = "Shark",
+ Datetime = "Datetime",
+ Lat = "Lat",
+ Lon = "Lon",
+ savedir = mysavedir
 )
 }
 

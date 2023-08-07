@@ -29,7 +29,31 @@
 #' 
 #' @examples
 #' \donttest{
-#' # Not run
+#' # load data
+#' data("TracksCleaned")
+#' # set save directory
+#' mysavedir <- "/your/directory/here/"
+#' # loop movegroup and scaleraster through tide subsets
+#' tide <- c("H", "M", "L")
+#' for (i in tide) {
+#'   movegroup(
+#'     data = TracksCleaned[TracksCleaned$T.Ph == i, ],
+#'     ID = "Shark",
+#'     Datetime = "Datetime",
+#'     Lat = "Lat",
+#'     Lon = "Lon",
+#'     savedir = paste0(mysavedir, i),
+#'   )
+#'   
+#'   scaleraster(path = paste0(mysavedir, i),
+#'               crsloc = paste0(mysavedir, i)
+#'   )
+#' }
+#' 
+#' alignraster(folderroots = paste0(mysavedir, tide),
+#'             foldernames = tide,
+#'             savefolder = paste0(mysavedir, "Aligned")
+#' )
 #' }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}

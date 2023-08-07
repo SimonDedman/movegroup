@@ -75,7 +75,8 @@
 #' 
 #' @examples
 #' \donttest{
-#' # Not run
+#' # Having run the movegroup function example:
+#' scaleraster(path = mysavedir)
 #' }
 #'
 #' @export scaleraster

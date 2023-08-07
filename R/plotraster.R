@@ -143,7 +143,14 @@
 #' 
 #' @examples
 #' \donttest{
-#' # Not run
+#' # Having run the movegroup and scaleraster function examples:
+#' plotraster(
+#'   x = paste0(mysavedir, "Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"),
+#'   mapzoom = 14,
+#'   mapsource = "stamen",
+#'   maptype = "terrain",
+#'   savedir = paste0(mysavedir, "Plot")
+#' )
 #' }
 
 plotraster <- function(
@@ -466,6 +473,9 @@ plotraster <- function(
       legend.key = ggplot2::element_blank(), 
       text = ggplot2::element_text(size = fontsize,  family = fontfamily)
     ) # removed whitespace buffer around legend boxes which is nice
+  
+  # if savedir doesn't exist, can't save into it, therefore create it
+  if (!file.exists(savedir)) dir.create(savedir)
   
   ggplot2::ggsave(filename = filesavename, plot = ggplot2::last_plot(), device = "png", path = savedir, scale = 1,
                   #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
