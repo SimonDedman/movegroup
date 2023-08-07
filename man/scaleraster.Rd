@@ -24,16 +24,16 @@ scaleraster(
 savedir from movegroup. Default NULL.}
 
 \item{pathsubsets}{Path to parent directory that contains all UDs across spatial groups or 
-subsets. If none are used, make same as path. Likely the same as savedir from movegroup. Default 
-NULL.}
+subsets, i.e. if you ran movegroup multiple times for different areas in a connected system, this
+would be the parent folder within which all the movegroup savedir's are located. Default NULL.}
 
 \item{pattern}{Extension pattern used to read in all UDs in directory and pathsubsets directory. 
 Default ".asc".}
 
 \item{weighting}{Addresses unbalanced receiver array design after receivers have first been 
-partitioned into regions and group-level UDs estimated per region. Numeric. Weights area-specific
- scaled group-level UD raster by value. This then means that estimated scaled individual-level 
- volume areas also become weighted. Default is 1 for no weighting.}
+partitioned into regions, and group-level UDs estimated per region. Numeric. Weights 
+area-specific scaled group-level UD raster by value. This then means that estimated scaled 
+individual-level volume areas also become weighted. Default is 1 for no weighting.}
 
 \item{format}{Character. Output file type for raster::writeRaster param format. Default "ascii".}
 

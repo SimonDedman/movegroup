@@ -3,9 +3,6 @@
 #' Plots 50 and 95pct contours of a group-level utilization distribution raster on a spatial map 
 #' background. Contains functionality to also visualize geographic locations of individual listening
 #' stations (e.g., acoustic receivers) as well as the entire surface UD.
-#'
-#' @author Simon Dedman, \email{simondedman@@gmail.com}
-#' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
 #' 
 #' @import ggplot2
 #' @import ggmap
@@ -87,9 +84,6 @@
 #' @param reclabbord Receiver label border in mm. Default 0.
 #' @param surface Plot complete UD surface along with contours. Default TRUE.
 #' 
-#' @return Individual-level utilization distributions, saved as rasters, as well as calculated 
-#' volume area estimates for 50 and 95pct contours, saved in a .csv file.
-#' 
 #' @details
 #' 
 #' For plottitle, you can use the term 'home range' when an animal can be detected wherever it goes
@@ -110,7 +104,8 @@
 #' 2. trying to read file: All_Rasters_Scaled_Weighted_UDScaled.asc: Error in CPL_read_gdal(
 #' as.character(x), as.character(options), as.character(driver),: file not found. Check x is correct.
 #' 
-#' How to get Google map basemaps from (https://www.youtube.com/watch?v=O5cUoVpVUjU):
+#' ## How to get Google map basemaps
+#' (from https://www.youtube.com/watch?v=O5cUoVpVUjU):
 #' 
 #'  1. Sign up with dev console: a. You must enter credit card details, but won’t be charged if your
 #'   daily API requests stay under the limit. b. Follow the link: 
@@ -131,6 +126,12 @@
 #' c. At the top click 'Create Credentials > API Key'. d. API key should pop up with option to copy 
 #' it. e. You can restrict the key if you want by following steps 4 & 5 here: 
 #' https://www.youtube.com/watch?v=O5cUoVpVUjU&t=232s
+#' 
+#' @return Individual-level utilization distributions, saved as rasters, as well as calculated 
+#' volume area estimates for 50 and 95pct contours, saved in a .csv file.
+#' 
+#' @author Simon Dedman, \email{simondedman@@gmail.com}
+#' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
 #' 
 #' @examples
 #' \donttest{

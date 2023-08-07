@@ -35,14 +35,14 @@
 #' @param path Path to directory where the individual-level UDs are saved. Likely the same as 
 #' savedir from movegroup. Default NULL.
 #' @param pathsubsets Path to parent directory that contains all UDs across spatial groups or 
-#' subsets. If none are used, make same as path. Likely the same as savedir from movegroup. Default 
-#' NULL.
+#' subsets, i.e. if you ran movegroup multiple times for different areas in a connected system, this
+#' would be the parent folder within which all the movegroup savedir's are located. Default NULL.
 #' @param pattern Extension pattern used to read in all UDs in directory and pathsubsets directory. 
 #' Default ".asc".
 #' @param weighting Addresses unbalanced receiver array design after receivers have first been 
-#' partitioned into regions and group-level UDs estimated per region. Numeric. Weights area-specific
-#'  scaled group-level UD raster by value. This then means that estimated scaled individual-level 
-#'  volume areas also become weighted. Default is 1 for no weighting.
+#' partitioned into regions, and group-level UDs estimated per region. Numeric. Weights 
+#' area-specific scaled group-level UD raster by value. This then means that estimated scaled 
+#' individual-level volume areas also become weighted. Default is 1 for no weighting.
 #' @param format Character. Output file type for raster::writeRaster param format. Default "ascii".
 #' @param datatype Character. Data type for writing values to disk for raster::writeRaster param 
 #' Datatype. Default "FLT4S". 
@@ -55,10 +55,6 @@
 #' NULL.
 #' @param returnObj Logical. Return the scaled object to the parent environment? Default FALSE.
 #' 
-#' @return Scaled and weighted individual-level and group-level utilization distributions saved as 
-#' rasters. Scaled 50 and 95pct contour volume area estimates (in km2) for individuals and the group
-#' , saved in .csv format. Latlon raster.
-#' 
 #' @details Errors and their origins:
 #' 1. Error in (function (cond): error in evaluating the argument 'x' in selecting a method for 
 #' function 'res': subscript out of bounds. Probably path can't find any files of type=pattern:
@@ -70,13 +66,17 @@
 #' 3. Error in gzfile(file, "rb"): cannot open compressed file 'CRS.Rds', probable reason 'No such 
 #' file or directory': crsloc is wrong. Try setting to same as path. NULL does this.
 #'
+#' @return Scaled and weighted individual-level and group-level utilization distributions saved as 
+#' rasters. Scaled 50 and 95pct contour volume area estimates (in km2) for individuals and the group
+#' , saved in .csv format. Latlon raster.
+#'
+#' @author Simon Dedman, \email{simondedman@@gmail.com}
+#' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
+#' 
 #' @examples
 #' \donttest{
 #' # Not run
 #' }
-#'
-#' @author Simon Dedman, \email{simondedman@@gmail.com}
-#' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
 #'
 #' @export
 
@@ -84,17 +84,17 @@
 #' @importFrom stringr str_remove
 #' @importFrom sp CRS
 
-scaleraster <- function(path = NULL, # Location of files created by movegroup within a subset. No terminal slash.
-                        pathsubsets = NULL, # Location of parent folder that contains ALL files created by movegroup. No terminal slash.
+scaleraster <- function(path = NULL,
+                        pathsubsets = NULL,
                         pattern = ".asc",
-                        weighting = 1, # Weighting to divide summed-scaled rasters by, for unbalanced arrays
+                        weighting = 1,
                         format = "ascii",
                         datatype = "FLT4S",
                         bylayer = TRUE,
                         overwrite = TRUE,
                         scalefolder = "Scaled",
                         scaledweightedname = "All_Rasters_Scaled_Weighted",
-                        crsloc = NULL, # Location of saved CRS Rds file from movegroup.R. Should be same as path.
+                        crsloc = NULL,
                         returnObj = FALSE) {
   
   # 1. Scale individual-level UD rasters and aggregate into one group-level UD raster ####
