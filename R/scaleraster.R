@@ -56,6 +56,7 @@
 #' @param returnObj Logical. Return the scaled object to the parent environment? Default FALSE.
 #' 
 #' @details Errors and their origins:
+#' 
 #' 1. Error in (function (cond): error in evaluating the argument 'x' in selecting a method for 
 #' function 'res': subscript out of bounds. Probably path can't find any files of type=pattern:
 #' check you used a terminal slash in savedir in movegroup, and that path has files of type=pattern.
