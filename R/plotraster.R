@@ -351,7 +351,7 @@ plotraster <- function(
                                   breaks = max(xlatlon[[1]],
                                                na.rm = TRUE) * 0.5) |> 
       sf::st_cast("POLYGON")
-    sf::st_crs(UD50poly) <- sp::proj4string(UD50poly)# set CRS
+    sf::st_crs(UD50poly) <- sp::proj4string(dataCRS)# set CRS
     UD50poly <- UD50poly |> sf::st_set_crs(4326) # make 4326, doesn't match CRS of mypointssf otherwise
     
     # Import points
