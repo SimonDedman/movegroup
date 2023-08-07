@@ -59,7 +59,7 @@
 #' @param filesavename File savename, default today's date + "_dBBMM-contours.png".
 #' @param savedir Save outputs to a temporary directory (default) else change to current directory 
 #' e.g. "/home/me/folder". Do not use getwd() here. No terminal slash. E.g. 
-#' paste0(movegroupsavedir, "Plot/") .
+#' paste0(movegroupsavedir, "Plot/") . Auto-created if it doesn't exist.
 #' @param receiverlats Vector of latitudes for receivers to be plotted.
 #' @param receiverlons Vector of longitudes for receivers to be plotted. Same length as receiverlats.
 #' @param receivernames Vector of names for receivers to be plotted. Same length as receiverlats.

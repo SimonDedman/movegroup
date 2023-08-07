@@ -187,6 +187,9 @@ movegroup <- function(
     # directory e.g. "/home/me/folder". Do not use getwd() here.
     alerts = TRUE # audio warning for failures
 ) {
+  # if savedir doesn't exist, can't save or setwd into it, therefore create it
+  if (!file.exists(savedir)) dir.create(savedir)
+  
   oldpar <- par(no.readonly = TRUE) # defensive block, thanks to Gregor Sayer
   oldwd <- getwd()
   oldoptions <- options()

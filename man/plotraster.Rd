@@ -130,7 +130,7 @@ box from L to R, percent distance from Bottom to Top. Values 0 to 1. Default c(0
 
 \item{savedir}{Save outputs to a temporary directory (default) else change to current directory 
 e.g. "/home/me/folder". Do not use getwd() here. No terminal slash. E.g. 
-paste0(movegroupsavedir, "Plot/") .}
+paste0(movegroupsavedir, "Plot/") . Auto-created if it doesn't exist.}
 
 \item{receiverlats}{Vector of latitudes for receivers to be plotted.}
 

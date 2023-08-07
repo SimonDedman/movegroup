@@ -36,6 +36,7 @@
 #' # loop movegroup and scaleraster through tide subsets
 #' tide <- c("H", "M", "L")
 #' for (i in tide) {
+#' dir.create(paste0(mysavedir, i))
 #'   movegroup(
 #'     data = TracksCleaned[TracksCleaned$T.Ph == i, ],
 #'     ID = "Shark",
