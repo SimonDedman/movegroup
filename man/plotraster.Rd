@@ -8,12 +8,8 @@ plotraster(
   x = paste0("Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"),
   crsloc = NULL,
   xlatlon = NULL,
-  locationpoints =
-    paste0("/home/simon/Documents/Si Work/PostDoc Work/movegroup help/Liberty Boyd/Points in UD contours/",
-    "turtlehab_all.csv"),
-  pointsincontourssave =
-    paste0("/home/simon/Documents/Si Work/PostDoc Work/movegroup help/Liberty Boyd/Points in UD contours/",
-    "pointsincontours.csv"),
+  locationpoints = NULL,
+  pointsincontourssave = NULL,
   trim = TRUE,
   myLocation = NULL,
   googlemap = FALSE,
@@ -242,7 +238,10 @@ plotraster(
   mapzoom = 14,
   mapsource = "stamen",
   maptype = "terrain",
-  savedir = paste0(mysavedir, "Plot")
+  savedir = paste0(mysavedir, "Plot"),
+  xlatlon = paste0(mysavedir, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc"),
+  locationpoints = TracksCleaned |> dplyr::rename(lat = "Lat", lon = "Lon"),
+  pointsincontourssave = paste0(mysavedir, "Scaled/pointsincontours.csv"),
 )
 }
 }

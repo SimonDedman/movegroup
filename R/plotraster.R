@@ -149,7 +149,10 @@
 #'   mapzoom = 14,
 #'   mapsource = "stamen",
 #'   maptype = "terrain",
-#'   savedir = paste0(mysavedir, "Plot")
+#'   savedir = paste0(mysavedir, "Plot"),
+#'   xlatlon = paste0(mysavedir, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc"),
+#'   locationpoints = TracksCleaned |> dplyr::rename(lat = "Lat", lon = "Lon"),
+#'   pointsincontourssave = paste0(mysavedir, "Scaled/pointsincontours.csv"),
 #' )
 #' }
 
@@ -158,8 +161,8 @@ plotraster <- function(
     # dataCRS = 2958, # one of (i) character: a string accepted by GDAL, (ii) integer, a valid EPSG value (numeric), or (iii) an object of class crs.
     crsloc = NULL, # Location of saved CRS Rds file from movegroup.R. Should be same as path.
     xlatlon = NULL, # if you want to also return a csv of your original locations labelled with which UD contours they fall within, include the location of that here. Try paste0(crsloc, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc") .
-    locationpoints = paste0("/home/simon/Documents/Si Work/PostDoc Work/movegroup help/Liberty Boyd/Points in UD contours/", "turtlehab_all.csv"), # original input location points of animals, for xlatlon. MUST have columns labelkled "lat" and "lon".
-    pointsincontourssave = paste0("/home/simon/Documents/Si Work/PostDoc Work/movegroup help/Liberty Boyd/Points in UD contours/", "pointsincontours.csv"), # Location and name of location in countours csv, including the .csv.
+    locationpoints = NULL, # original input location points of animals, for xlatlon. MUST have columns labelled "lat" and "lon".
+    pointsincontourssave = NULL,  # Location and name of location in contours csv, including the .csv.
     trim = TRUE, # remove NA & 0 values and crop to remaining date extents? Default TRUE
     myLocation = NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
     # Default NULL, extents autocreated from data.
@@ -327,7 +330,7 @@ plotraster <- function(
   # Produce CSV of which points are within which UD contour
   if (!is.null(xlatlon)) {
     # Import raster
-    xlatlon <- stars::read_stars() # UDScaled
+    xlatlon <- stars::read_stars(xlatlon) # UDScaled
     sf::st_crs(xlatlon) <- sp::proj4string(dataCRS) # set CRS
     
     # Create contours & polygons for ggplot & polygon count objects
@@ -360,6 +363,10 @@ plotraster <- function(
     mypoints[mypoints$Index %in% pointsin50$Index, "UD50"] <- as.logical(TRUE)
     pointsin95 <- mypointssf[UD95,]
     mypoints[mypoints$Index %in% pointsin95$Index, "UD95"] <- as.logical(TRUE)
+    # if savedir doesn't exist, can't save into it, therefore create it
+    if (!file.exists(savedir)) dir.create(savedir)
+    # if pointsincontourssave wasn't entered, autogenerate
+    if (is.null(pointsincontourssave)) pointsincontourssave <- paste0(savedir, "/pointsincontour.csv")
     write.csv(mypoints, file = pointsincontourssave)
     print(paste0(nrow(pointsin50) / nrow(mypoints) * 100), "% of location points within 50% contour") # 72.16
     print(paste0(nrow(pointsin95) / nrow(mypoints) * 100), "% of location points within 95% contour") # 99.77
@@ -476,9 +483,6 @@ plotraster <- function(
       legend.key = ggplot2::element_blank(), 
       text = ggplot2::element_text(size = fontsize,  family = fontfamily)
     ) # removed whitespace buffer around legend boxes which is nice
-  
-  # if savedir doesn't exist, can't save into it, therefore create it
-  if (!file.exists(savedir)) dir.create(savedir)
   
   ggplot2::ggsave(filename = filesavename, plot = ggplot2::last_plot(), device = "png", path = savedir, scale = 1,
                   #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
