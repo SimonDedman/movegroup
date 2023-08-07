@@ -9,6 +9,7 @@
 #' @importFrom stars read_stars st_raster_type st_contour
 #' @importFrom lubridate today
 #' @importFrom sf st_set_crs st_bbox st_transform st_as_sfc st_as_sf
+#' @importFrom sp proj4string
 #' @importFrom starsExtra trim2
 #' @export plotraster
 #' 
@@ -234,7 +235,7 @@ plotraster <- function(
   # Import raster
   x <- stars::read_stars(x)
   # set CRS, function from sp
-  sf::st_crs(x) <- proj4string(dataCRS)
+  sf::st_crs(x) <- sp::proj4string(dataCRS)
   
   # for plotting the surface UD on the map:
   # surfaceUD <- x %>% sf::st_set_crs(3857) # 4326 = WGS84. Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: degree
