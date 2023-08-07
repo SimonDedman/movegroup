@@ -360,9 +360,10 @@ plotraster <- function(
     mypointssf <- sf::st_as_sf(locationpoints, coords = c("lon","lat")) |> sf::st_set_crs(4326) #points by day, # Convert points to sf
     
     # Assign points to contours/UDs
-    pointsin50 <- mypointssf[UD50,]
+    pointsin50 <- mypointssf[UD50poly, ]
+    # label those points TRUE
     locationpoints[locationpoints$Index %in% pointsin50$Index, "UD50"] <- as.logical(TRUE)
-    pointsin95 <- mypointssf[UD95,]
+    pointsin95 <- mypointssf[UD95poly, ]
     locationpoints[locationpoints$Index %in% pointsin95$Index, "UD95"] <- as.logical(TRUE)
     # if savedir doesn't exist, can't save into it, therefore create it
     if (!file.exists(savedir)) dir.create(savedir)
