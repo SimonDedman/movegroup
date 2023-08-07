@@ -79,7 +79,7 @@ dir.create(paste0(mysavedir, i))
     Datetime = "Datetime",
     Lat = "Lat",
     Lon = "Lon",
-    savedir = paste0(mysavedir, i),
+    savedir = paste0(mysavedir, i, "/"),
   )
   
   scaleraster(path = paste0(mysavedir, i),

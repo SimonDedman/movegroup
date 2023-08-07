@@ -223,14 +223,15 @@ plotraster <- function(
   if (!is.null(receiverlats) & !is.null(receivernames)) if (length(receiverlats) != length(receivernames)) stop("length of receivernames must equal length of receiverlats/lons")
   if (!is.null(receiverlats) & !is.null(receiverrange)) if (length(receiverrange) != length(receiverlons)) if (length(receiverrange) != 1) stop("length of receiverrange must equal length of receiverlats/lons, or 1")
   
-  # Import raster
-  x <- stars::read_stars(x)
   # derive crsloc if not provided, assuming default folder and name of x
   if (is.null(crsloc)) crsloc <- stringr::str_remove(x, pattern = "Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc")
   # If crsloc has a terminal slash, remove it, it's added later
   if (substr(x = crsloc, start = nchar(crsloc), stop = nchar(crsloc)) == "/") crsloc = substr(x = crsloc, start = 1, stop = nchar(crsloc) - 1)
   dataCRS <- readRDS(paste0(crsloc, "/CRS.Rds")) # load CRS from file
-  sf::st_crs(x) <- proj4string(dataCRS) # set CRS, function from sp
+  # Import raster
+  x <- stars::read_stars(x)
+  # set CRS, function from sp
+  sf::st_crs(x) <- proj4string(dataCRS)
   
   # for plotting the surface UD on the map:
   # surfaceUD <- x %>% sf::st_set_crs(3857) # 4326 = WGS84. Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: degree
