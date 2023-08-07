@@ -23,7 +23,7 @@
 #' the csv output.
 #' @param locationpoints If you want to also return a csv of your original locations labelled with which UD
 #'  contours they fall within, include the original input location points of animals, for xlatlon. 
-#'  MUST have columns labelled "lat" and "lon".
+#'  This should be a data frame which MUST have columns labelled "lat" and "lon".
 #' @param pointsincontourssave Location and name to save the 'location in contours' csv related to 
 #' xlatlon and locationpoints, including the ".csv".
 #' @param trim Remove NA & 0 UD values and crop the plot to remaining date extents? Shrinks lots of 
@@ -355,22 +355,22 @@ plotraster <- function(
     UD50poly <- UD50poly |> sf::st_set_crs(4326) # make 4326, doesn't match CRS of mypointssf otherwise
     
     # Import points
-    mypoints <- readr::read_csv(locationpoints) |>
+    locationpoints <- locationpoints |>
       dplyr::mutate(Index = 1:length(lat)) # add unique index for later
-    mypointssf <- sf::st_as_sf(mypoints, coords = c("lon","lat")) |> sf::st_set_crs(4326) #points by day, # Convert points to sf
+    mypointssf <- sf::st_as_sf(locationpoints, coords = c("lon","lat")) |> sf::st_set_crs(4326) #points by day, # Convert points to sf
     
     # Assign points to contours/UDs
     pointsin50 <- mypointssf[UD50,]
-    mypoints[mypoints$Index %in% pointsin50$Index, "UD50"] <- as.logical(TRUE)
+    locationpoints[locationpoints$Index %in% pointsin50$Index, "UD50"] <- as.logical(TRUE)
     pointsin95 <- mypointssf[UD95,]
-    mypoints[mypoints$Index %in% pointsin95$Index, "UD95"] <- as.logical(TRUE)
+    locationpoints[locationpoints$Index %in% pointsin95$Index, "UD95"] <- as.logical(TRUE)
     # if savedir doesn't exist, can't save into it, therefore create it
     if (!file.exists(savedir)) dir.create(savedir)
     # if pointsincontourssave wasn't entered, autogenerate
     if (is.null(pointsincontourssave)) pointsincontourssave <- paste0(savedir, "/pointsincontour.csv")
-    write.csv(mypoints, file = pointsincontourssave)
-    print(paste0(nrow(pointsin50) / nrow(mypoints) * 100), "% of location points within 50% contour") # 72.16
-    print(paste0(nrow(pointsin95) / nrow(mypoints) * 100), "% of location points within 95% contour") # 99.77
+    write.csv(locationpoints, file = pointsincontourssave)
+    print(paste0(nrow(pointsin50) / nrow(locationpoints) * 100), "% of location points within 50% contour") # 72.16
+    print(paste0(nrow(pointsin95) / nrow(locationpoints) * 100), "% of location points within 95% contour") # 99.77
   } # close if (!is.null(xlatlon))
   
   

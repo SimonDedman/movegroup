@@ -67,7 +67,7 @@ the csv output.}
 
 \item{locationpoints}{If you want to also return a csv of your original locations labelled with which UD
 contours they fall within, include the original input location points of animals, for xlatlon. 
-MUST have columns labelled "lat" and "lon".}
+This should be a data frame which MUST have columns labelled "lat" and "lon".}
 
 \item{pointsincontourssave}{Location and name to save the 'location in contours' csv related to 
 xlatlon and locationpoints, including the ".csv".}
