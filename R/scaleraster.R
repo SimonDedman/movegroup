@@ -133,10 +133,10 @@ scaleraster <- function(path = NULL,
   
   # NOTE: if pathsubsets = NULL, it will crash, ditto crsloc
   if (is.null(pathsubsets)) pathsubsets <- path
-  if (is.null(crsloc)) crsloc <- path
-  # If crsloc has a terminal slash, remove it, it's added later
+  # path can be left NULL by user if using pathsubsets. If using path and not pathsubsets, above line has already made pathsubsets = path anyway.
+  if (is.null(crsloc)) crsloc <- pathsubsets
+  # If crsloc & pathsubsets have a terminal slash, remove it, it's added later
   if (substr(x = crsloc, start = nchar(crsloc), stop = nchar(crsloc)) == "/") crsloc = substr(x = crsloc, start = 1, stop = nchar(crsloc) - 1)
-  # If pathsubsets has a terminal slash, remove it, it's added later
   if (substr(x = pathsubsets, start = nchar(pathsubsets), stop = nchar(pathsubsets)) == "/") pathsubsets = substr(x = pathsubsets, start = 1, stop = nchar(pathsubsets) - 1)
   
   filelist_subsets <- as.list(list.files(path = pathsubsets, pattern = pattern, recursive = TRUE))

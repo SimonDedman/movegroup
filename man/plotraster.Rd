@@ -82,7 +82,7 @@ autocreated from data. Set this if you want to expand or crop your map to cover 
 Maps tiling zoom setup doesn't align to myLocation extents. Default FALSE.}
 
 \item{gmapsAPI}{Enter your google maps API here, quoted character string. Can leave NULL if 
-already registered with ggmap::register_google(). See details for instructions. If you don't have
+already registered with ggmap::register_google(). See Details for instructions. If you don't have
  an API or don't want to get one, leave NULL, ensure mapsource is stamen, and maptype is 
  stamen-compatible.}
 
@@ -241,8 +241,7 @@ plotraster(
   savedir = paste0(mysavedir, "Plot"),
   xlatlon = paste0(mysavedir, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc"),
   locationpoints = TracksCleaned |> dplyr::rename(lat = "Lat", lon = "Lon"),
-  pointsincontourssave = paste0(mysavedir, "Scaled/pointsincontours.csv"),
-)
+  pointsincontourssave = paste0(mysavedir, "Scaled/pointsincontours.csv"))
 }
 }
 \author{

@@ -36,14 +36,14 @@
 #' @export movegroup
 #'
 #' @param data Data frame object containing the data. Requires columns Lat Lon DateTime ID and 
-#' optionally a grouping column. Names specified in later parameters. Grouping not currently 
-#' implemented 2023-07-26, see Group parameter below.
+#' potentially a grouping column (not currently implemented, email to request). Column names 
+#' specified in later parameters.
 #' @param ID Name of animal tag ID column in data. "Character".
 #' @param Datetime Column name in data that contains date/time stamps for each recorded detection. 
 #' Must be in POSIXct format. "Character".
 #' @param Lat Name of latitude column in data. "Character".
 #' @param Lon Name of longitude column in data. "Character".
-#' @param Group Name of grouping column in data. Unused 2023-07-26
+# #' @param Group Name of grouping column in data. Unused 2023-08-14.
 #' @param dat.TZ Timezone of data for as.POSIXct. Default "US/Eastern".
 #' @param proj CRS for move function. Default sp::CRS("+proj=longlat +datum=WGS84").
 #' @param projectedCRS EPSG code for CRS for initial transform of latlon points; corresponds to 
@@ -67,8 +67,9 @@
 #'  individual with a very large home range that is inadequately captured by a receiver array. 
 #'  Default 2.
 #' @param timeDiffUnits Character. Unit for timeDiffLong. Default "hours".
-#' @param center Do you want to center the move object within extent? See spTransform. Default TRUE.
-#' @param centre British ENglish alternate to center. Do you want to center the move object within 
+#' @param center US English alternate to centre. Do you want to center the move object within 
+#' extent? See spTransform. Default TRUE.
+#' @param centre British English alternate to center. Do you want to center the move object within 
 #' extent? See spTransform. Default NULL.
 #' @param buffpct Buffer extent for raster creation, proportion of 1. Default 0.3, can try e.g. 3 
 #' for a large buffer to avoid clipping, at the cost of file size, but later cropping in 
@@ -87,7 +88,9 @@
 #' @param dbblocationerror Location.error param in 'brownian.bridge.dyn' function in the 'move' 
 #' package. single numeric value or vector of the length of coordinates that describes the error of 
 #' the location (sender/receiver) system in map units. Or a character string with the name of the 
-#' column containing the location error can be provided. Default is moveLocError.
+#' column containing the location error can be provided. Default is moveLocError. See 
+#' MoveLocErrorCalc function for satellite data with state space modelled locations with 95% 
+#' confidence intervals for latlon i.e. lat and lon025 and 975.
 #' @param dbbext Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends 
 #' bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax)
 #' . Default 3. Excessive buffering will get cropped automatically.
@@ -148,8 +151,7 @@
 #'  Datetime = "Datetime",
 #'  Lat = "Lat",
 #'  Lon = "Lon",
-#'  savedir = mysavedir
-#' )
+#'  savedir = mysavedir)
 #' }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
@@ -161,7 +163,7 @@ movegroup <- function(
     Datetime = NULL, # Column name in data that contains date/time stamps for each recorded detection. Must be in POSIXct format.
     Lat = NULL, # name of Lat & Lon columns in data.
     Lon = NULL,
-    Group = NULL, # name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?
+    # Group = NULL, # name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?
     dat.TZ = "US/Eastern", # timezone for as.POSIXct.
     proj = sp::CRS("+proj=longlat +datum=WGS84"), # CRS for move function.
     projectedCRS = "+init=epsg:32617", # EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone. This is around Bimini, Bahamas.

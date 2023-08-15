@@ -43,18 +43,15 @@
 #'     Datetime = "Datetime",
 #'     Lat = "Lat",
 #'     Lon = "Lon",
-#'     savedir = paste0(mysavedir, i, "/"),
-#'   )
+#'     savedir = paste0(mysavedir, i, "/"))
 #'   
 #'   scaleraster(path = paste0(mysavedir, i),
-#'               crsloc = paste0(mysavedir, i)
-#'   )
+#'               crsloc = paste0(mysavedir, i))
 #' }
 #' 
 #' alignraster(folderroots = paste0(mysavedir, tide),
 #'             foldernames = tide,
-#'             savefolder = paste0(mysavedir, "Aligned")
-#' )
+#'             savefolder = paste0(mysavedir, "Aligned"))
 #' }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}

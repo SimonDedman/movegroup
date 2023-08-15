@@ -10,7 +10,6 @@ movegroup(
   Datetime = NULL,
   Lat = NULL,
   Lon = NULL,
-  Group = NULL,
   dat.TZ = "US/Eastern",
   proj = sp::CRS("+proj=longlat +datum=WGS84"),
   projectedCRS = "+init=epsg:32617",
@@ -37,8 +36,8 @@ movegroup(
 }
 \arguments{
 \item{data}{Data frame object containing the data. Requires columns Lat Lon DateTime ID and 
-optionally a grouping column. Names specified in later parameters. Grouping not currently 
-implemented 2023-07-26, see Group parameter below.}
+potentially a grouping column (not currently implemented, email to request). Column names 
+specified in later parameters.}
 
 \item{ID}{Name of animal tag ID column in data. "Character".}
 
@@ -48,8 +47,6 @@ Must be in POSIXct format. "Character".}
 \item{Lat}{Name of latitude column in data. "Character".}
 
 \item{Lon}{Name of longitude column in data. "Character".}
-
-\item{Group}{Name of grouping column in data. Unused 2023-07-26}
 
 \item{dat.TZ}{Timezone of data for as.POSIXct. Default "US/Eastern".}
 
@@ -81,9 +78,10 @@ Default 2.}
 
 \item{timeDiffUnits}{Character. Unit for timeDiffLong. Default "hours".}
 
-\item{center}{Do you want to center the move object within extent? See spTransform. Default TRUE.}
+\item{center}{US English alternate to centre. Do you want to center the move object within 
+extent? See spTransform. Default TRUE.}
 
-\item{centre}{British ENglish alternate to center. Do you want to center the move object within 
+\item{centre}{British English alternate to center. Do you want to center the move object within 
 extent? See spTransform. Default NULL.}
 
 \item{buffpct}{Buffer extent for raster creation, proportion of 1. Default 0.3, can try e.g. 3 
@@ -107,7 +105,9 @@ median of your moveLocError.}
 \item{dbblocationerror}{Location.error param in 'brownian.bridge.dyn' function in the 'move' 
 package. single numeric value or vector of the length of coordinates that describes the error of 
 the location (sender/receiver) system in map units. Or a character string with the name of the 
-column containing the location error can be provided. Default is moveLocError.}
+column containing the location error can be provided. Default is moveLocError. See 
+MoveLocErrorCalc function for satellite data with state space modelled locations with 95% 
+confidence intervals for latlon i.e. lat and lon025 and 975.}
 
 \item{dbbext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends 
 bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax)
@@ -200,8 +200,7 @@ movegroup(
  Datetime = "Datetime",
  Lat = "Lat",
  Lon = "Lon",
- savedir = mysavedir
-)
+ savedir = mysavedir)
 }
 
 }
