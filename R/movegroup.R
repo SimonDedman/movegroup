@@ -159,6 +159,13 @@
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
+#' 
+#' @references Kranstauber, B., Kays, R., LaPoint, S. D., Wikelski, M. and Safi, K. (2012), A 
+#' dynamic Brownian bridge movement model to estimate utilization distributions for heterogeneous 
+#' animal movement. Journal of Animal Ecology. doi: 10.1111/j.1365-2656.2012.01955.x
+#' 
+#' Kranstauber, B., M. Smolla & A. K. Scharf. 2019. Move: visualizing and analyzing animal track 
+#' data. R package version 4.2.4 (at 2023-08-15). https://CRAN.R-project.org/package=move.
 
 movegroup <- function(
     data = NULL, # Data frame object containing the data. Requires columns Lat Lon DateTime ID and optionally a grouping column.
