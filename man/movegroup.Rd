@@ -136,8 +136,11 @@ as calculated volume area estimates for 50 and 95pct contours, saved in a
 "movegroup()"
 }
 \description{
-Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple
-individuals simultaneously, via the 'brownian.bridge.dyn()' function in the 'move' package.
+Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD)
+estimation for multiple individuals simultaneously, using functions in the 'move' package. The
+authors are indebted to the move package authors Bart Kraunstauber, Marco Smolla, and Anne K
+Scharf, and to Sarah Becker for seed code which inspired the development of the
+movegroup::movegroup function.
 }
 \details{
 Step 1. Filter individuals.

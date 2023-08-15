@@ -1,7 +1,10 @@
 #' Automates dynamic Brownian bridge movement model construction across individuals
 #'
-#' Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple 
-#' individuals simultaneously, via the 'brownian.bridge.dyn()' function in the 'move' package. 
+#' Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) 
+#' estimation for multiple individuals simultaneously, using functions in the 'move' package. The 
+#' authors are indebted to the move package authors Bart Kraunstauber, Marco Smolla, and Anne K 
+#' Scharf, and to Sarah Becker for seed code which inspired the development of the 
+#' movegroup::movegroup function.
 #' 
 #' Step 1. Filter individuals. 
 #' Remove those individuals for which there are insufficient data i.e. number of re-locations is 
