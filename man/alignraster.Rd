@@ -23,10 +23,10 @@ alignraster(
 )
 }
 \arguments{
-\item{folderroots}{Character vector of locations of folder roots output by movegroup. Function 
+\item{folderroots}{Character vector of locations of folder roots output by movegroup. Function
 expects CRS.Rds file and a subfolder with the scaled raster.}
 
-\item{foldernames}{Character vector names of folders corresponding to files in folderroots, i.e. 
+\item{foldernames}{Character vector names of folders corresponding to files in folderroots, i.e.
 the names of the objects, arrays, regions, etc.}
 
 \item{pattern}{For input rasters from scaleraster. Default ".asc".}
@@ -37,10 +37,10 @@ the names of the objects, arrays, regions, etc.}
 
 \item{savefolder}{Single character entry of folder to save outputs, no trailing slash.}
 
-\item{format}{Character. Output file type for raster::writeRaster param format. Default ascii, 
+\item{format}{Character. Output file type for raster::writeRaster param format. Default ascii,
 other options have generally not worked well in SD's experience.}
 
-\item{datatype}{Character. Data type for writing values to disk for raster::writeRaster param 
+\item{datatype}{Character. Data type for writing values to disk for raster::writeRaster param
 datatype. Default FLT4S.}
 
 \item{bylayer}{For raster::writeRaster param bylayer. Default TRUE.}
@@ -54,13 +54,13 @@ object? Default FALSE.}
 Region-specific group-level UD rasters that share the same spatial extent.
 }
 \description{
-Extends the spatial extent of each area-specific group-level raster to the spatial extent shared by all rasters. 
-This will only be required if you have multiple individuals (e.g. different sharks) divided amongst a few discrete areas 
-(e.g. around different islands) and the effort (e.g. receiver coverage) is different among islands. 
+Extends the spatial extent of each area-specific group-level raster to the spatial extent shared by all rasters.
+This will only be required if you have multiple individuals (e.g. different sharks) divided amongst a few discrete areas
+(e.g. around different islands) and the effort (e.g. receiver coverage) is different among islands.
 Not required for multiple individuals all within the same region or sampling regime.
 }
 \details{
-When used in a movegroup pipeline, the order would be: movegroup.R, scaleraster.R, 
+When used in a movegroup pipeline, the order would be: movegroup.R, scaleraster.R,
 alignraster.R if required, plotraster.R.
 }
 \examples{

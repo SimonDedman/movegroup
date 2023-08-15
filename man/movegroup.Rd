@@ -23,7 +23,6 @@ movegroup(
   rasterExtent = NULL,
   rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"),
   rasterResolution = 50,
-  dbblocationerror = moveLocError,
   dbbext = 3,
   dbbwindowsize = 23,
   writeRasterFormat = "ascii",
@@ -35,13 +34,13 @@ movegroup(
 )
 }
 \arguments{
-\item{data}{Data frame object containing the data. Requires columns Lat Lon DateTime ID and 
-potentially a grouping column (not currently implemented, email to request). Column names 
+\item{data}{Data frame object containing the data. Requires columns Lat Lon DateTime ID and
+potentially a grouping column (not currently implemented, email to request). Column names
 specified in later parameters.}
 
 \item{ID}{Name of animal tag ID column in data. "Character".}
 
-\item{Datetime}{Column name in data that contains date/time stamps for each recorded detection. 
+\item{Datetime}{Column name in data that contains date/time stamps for each recorded detection.
 Must be in POSIXct format. "Character".}
 
 \item{Lat}{Name of latitude column in data. "Character".}
@@ -52,140 +51,129 @@ Must be in POSIXct format. "Character".}
 
 \item{proj}{CRS for move function. Default sp::CRS("+proj=longlat +datum=WGS84").}
 
-\item{projectedCRS}{EPSG code for CRS for initial transform of latlon points; corresponds to 
+\item{projectedCRS}{EPSG code for CRS for initial transform of latlon points; corresponds to
 rasterCRS zone. Default "+init=epsg:32617".}
 
-\item{sensor}{Sensor for move function. Single character or vector with length of the number of 
+\item{sensor}{Sensor for move function. Single character or vector with length of the number of
 coordinates. Optional. Default "VR2W".}
 
-\item{moveLocError}{Location error (m) in the 'brownian.bridge.dyn' function in the 'move' 
-package. Numeric. Either single or a vector of length nrow data. If using passive acoustic data 
-this is the detection range of the receiver(s). Default 1. See MoveLocErrorCalc function for 
-satellite data with state space modelled locations with 95% confidence intervals for latlon i.e. 
+\item{moveLocError}{Location error (m) in the 'brownian.bridge.dyn' function in the 'move'
+package. Numeric. Either single or a vector of length nrow data. If using passive acoustic data
+this is the detection range of the receiver(s). Default 1. See MoveLocErrorCalc function for
+satellite data with state space modelled locations with 95\% confidence intervals for latlon i.e.
 lat and lon025 and 975.}
 
 \item{timeDiffLong}{Single numeric value. Threshold value in timeDiffUnits designating the length
-of long breaks in re-locations. Used for bursting a movement track into segments, thereby 
+of long breaks in re-locations. Used for bursting a movement track into segments, thereby
 removing long breaks from the movement track. See ?move::bursted for details. Default 2 hours is
- arbitrary, looping through 18, 24, and 36 hours for satellite data on great hammerhead sharks 
-revealed volume areas for core and general use gradually rise with timeDiffLong increases, 
-multiple small dots of presence get blobbed together, and therefore sometimes this covers land. 
-Ideally one would not discard any data, in which case one should choose a value higher than the 
-largest between-detections gap in their dataset (or just pick a very large number). This 
-parameter is useful when the model would otherwise get stuck trying to calculate a UD for an 
-individual with a very large home range that is inadequately captured by a receiver array. 
+arbitrary, looping through 18, 24, and 36 hours for satellite data on great hammerhead sharks
+revealed volume areas for core and general use gradually rise with timeDiffLong increases,
+multiple small dots of presence get blobbed together, and therefore sometimes this covers land.
+Ideally one would not discard any data, in which case one should choose a value higher than the
+largest between-detections gap in their dataset (or just pick a very large number). This
+parameter is useful when the model would otherwise get stuck trying to calculate a UD for an
+individual with a very large home range that is inadequately captured by a receiver array.
 Default 2.}
 
 \item{timeDiffUnits}{Character. Unit for timeDiffLong. Default "hours".}
 
-\item{center}{US English alternate to centre. Do you want to center the move object within 
+\item{center}{US English alternate to centre. Do you want to center the move object within
 extent? See spTransform. Default TRUE.}
 
-\item{centre}{British English alternate to center. Do you want to center the move object within 
+\item{centre}{British English alternate to center. Do you want to center the move object within
 extent? See spTransform. Default NULL.}
 
-\item{buffpct}{Buffer extent for raster creation, proportion of 1. Default 0.3, can try e.g. 3 
-for a large buffer to avoid clipping, at the cost of file size, but later cropping in 
+\item{buffpct}{Buffer extent for raster creation, proportion of 1. Default 0.3, can try e.g. 3
+for a large buffer to avoid clipping, at the cost of file size, but later cropping in
 plotraster.R will remove extraneous blank space.}
 
-\item{rasterExtent}{Extent of raster created around data. If NULL (default), calculated from 
-data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon 
-degrees. Don't go to 90 (degrees) north or south for ymax or ymin. Doesn't prevent constraint to 
+\item{rasterExtent}{Extent of raster created around data. If NULL (default), calculated from
+data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon
+degrees. Don't go to 90 (degrees) north or south for ymax or ymin. Doesn't prevent constraint to
 data limits (in plot anyway), but prevents raster clipping crash.}
 
 \item{rasterCRS}{CRS for raster creation. Default sp::CRS("+proj=utm +zone=17 +datum=WGS84").}
 
-\item{rasterResolution}{Single numeric value to set raster resolution - cell 
-size in metres? 111000: 1 degree lat = 111km. Trade-off between small res = big file & processing 
-time. Should be a function of the spatial resolution of your receivers or positioning tags. 
-Higher resolution will lead to more precision in the volume areas calculations. Try using 
-2*dbblocationerror, if dbblocationerror is a single value. Default 50 = 50m. Try around the 
+\item{rasterResolution}{Single numeric value to set raster resolution - cell
+size in metres? 111000: 1 degree lat = 111km. Trade-off between small res = big file & processing
+time. Should be a function of the spatial resolution of your receivers or positioning tags.
+Higher resolution will lead to more precision in the volume areas calculations. Try using
+2*dbblocationerror, if dbblocationerror is a single value. Default 50 = 50m. Try around the
 median of your moveLocError.}
 
-\item{dbblocationerror}{Location.error param in 'brownian.bridge.dyn' function in the 'move' 
-package. single numeric value or vector of the length of coordinates that describes the error of 
-the location (sender/receiver) system in map units. Or a character string with the name of the 
-column containing the location error can be provided. Default is moveLocError. See 
-MoveLocErrorCalc function for satellite data with state space modelled locations with 95% 
-confidence intervals for latlon i.e. lat and lon025 and 975.}
-
-\item{dbbext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends 
+\item{dbbext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends
 bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax)
 . Default 3. Excessive buffering will get cropped automatically.}
 
-\item{dbbwindowsize}{The window.size param in the 'brownian.bridge.dyn' function 
+\item{dbbwindowsize}{The window.size param in the 'brownian.bridge.dyn' function
 in the 'move' package. The size of the moving window along the track. Larger windows provide more
- stable/accurate estimates of the brownian motion variance but are less well able to capture more
-  frequent changes in behaviour. Number must be odd. dBBMM not run if total detections of 
- individual < window size (default 23).}
+stable/accurate estimates of the brownian motion variance but are less well able to capture more
+frequent changes in behaviour. Number must be odd. dBBMM not run if total detections of
+individual < window size (default 23).}
 
-\item{writeRasterFormat}{Character. Output file type for raster::writeRaster param format. 
+\item{writeRasterFormat}{Character. Output file type for raster::writeRaster param format.
 Default "ascii". TO DEPRECIATE.}
 
-\item{writeRasterExtension}{Character. Output file extension for raster::writeRaster param 
+\item{writeRasterExtension}{Character. Output file extension for raster::writeRaster param
 extension. Default ".asc". TO DEPRECIATE.}
 
-\item{writeRasterDatatype}{Character. Data type for writing values to disk for 
+\item{writeRasterDatatype}{Character. Data type for writing values to disk for
 raster::writeRaster param Datatype. Default "FLT4S". TO DEPRECIATE.}
 
-\item{absVolumeAreaSaveName}{File name plus extension where UD estimates are saved. Default 
+\item{absVolumeAreaSaveName}{File name plus extension where UD estimates are saved. Default
 "VolumeArea_AbsoluteScale.csv".}
 
-\item{savedir}{Save outputs to a temporary directory (default) else change 
-to desired directory e.g. "/home/me/folder/". Do not use getwd() for this. 
+\item{savedir}{Save outputs to a temporary directory (default) else change
+to desired directory e.g. "/home/me/folder/". Do not use getwd() for this.
 Include terminal slash. Directory must exist. Default tempdir().}
 
 \item{alerts}{Audio warning for failures. Default TRUE.}
 }
 \value{
 Individual-level utilization distributions, saved as rasters, as well
- as calculated volume area estimates for 50 and 95pct contours, saved in a 
- .csv file. No processed object is returned, i.e. bad: "objectname <- movegroup()", good: 
- "movegroup()"
+as calculated volume area estimates for 50 and 95pct contours, saved in a
+.csv file. No processed object is returned, i.e. bad: "objectname <- movegroup()", good:
+"movegroup()"
 }
 \description{
-Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple 
+Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple
 individuals simultaneously, via the 'brownian.bridge.dyn()' function in the 'move' package.
 }
 \details{
-Step 1. Filter individuals. 
-Remove those individuals for which there are insufficient data i.e. number of re-locations is 
-smaller than the window size parameter value (default = 31). 
+Step 1. Filter individuals.
+Remove those individuals for which there are insufficient data i.e. number of re-locations is
+smaller than the window size parameter value (default = 31).
 
-Step 2. Generate universal raster. 
+Step 2. Generate universal raster.
 Based on all remaining data, a universal raster is generated where the calculated UDs are plotted
- into. 
+into.
 
 Step 3. Loop through individuals.
-Individuals are looped through to construct individual-level movement models (on an absolute 
+Individuals are looped through to construct individual-level movement models (on an absolute
 scale).
 
-See www.GitHub.com/SimonDedman/movegroup for issues, feedback, and development 
-suggestions. 
+See www.GitHub.com/SimonDedman/movegroup for issues, feedback, and development
+suggestions.
 
 install_git('https://gitlab.com/bartk/move.git') #Installs 'move' development version
 
-
-When used together, the order of functions would be: movegroup, scaleraster, alignraster if 
+When used together, the order of functions would be: movegroup, scaleraster, alignraster if
 required, plotraster.
-
-## Errors and their origins:
-
-1. Error in .local(object, raster, location.error = location.error, ext = ext: Higher y grid not 
+\subsection{Errors and their origins:}{
+\enumerate{
+\item Error in .local(object, raster, location.error = location.error, ext = ext: Higher y grid not
 large enough, consider extending the raster in that direction or enlarging the ext argument.
 Increase buffpct, e.g. to 3.
-
-2. Error in .data[[dttm]]: Must subset the data pronoun with a string, not a <POSIXct/POSIXt> 
+\item Error in .data[\link{dttm}]: Must subset the data pronoun with a string, not a <POSIXct/POSIXt>
 object. Use "ColName" not dataframe$ColName syntax for Datetime, ID, Lat, Lon.
-
-3. Error in splice(dot_call(capture_dots, frame_env = frame_env, named = named,: object 
+\item Error in splice(dot_call(capture_dots, frame_env = frame_env, named = named,: object
 'DateTime' not found. Use "ColName" not ColName syntax for Datetime, ID, Lat, Lon.
-
-4. Error in .local(object, raster, location.error = location.error, ext = ext: Higher x grid not 
-large enough, consider extending the raster in that direction or enlarging the ext argument. Try 
+\item Error in .local(object, raster, location.error = location.error, ext = ext: Higher x grid not
+large enough, consider extending the raster in that direction or enlarging the ext argument. Try
 "buffpct = 1," , then larger e.g. 3, if still getting the error.
-
-5. cannot allocate vector of size (BIG) Gb: Increase rasterResolution value.
+\item cannot allocate vector of size (BIG) Gb: Increase rasterResolution value.
+}
+}
 }
 \examples{
 \dontrun{

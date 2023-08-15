@@ -85,12 +85,12 @@
 #' Higher resolution will lead to more precision in the volume areas calculations. Try using 
 #' 2*dbblocationerror, if dbblocationerror is a single value. Default 50 = 50m. Try around the 
 #' median of your moveLocError.
-#' @param dbblocationerror Location.error param in 'brownian.bridge.dyn' function in the 'move' 
-#' package. single numeric value or vector of the length of coordinates that describes the error of 
-#' the location (sender/receiver) system in map units. Or a character string with the name of the 
-#' column containing the location error can be provided. Default is moveLocError. See 
-#' MoveLocErrorCalc function for satellite data with state space modelled locations with 95% 
-#' confidence intervals for latlon i.e. lat and lon025 and 975.
+# #' @param dbblocationerror Location.error param in 'brownian.bridge.dyn' function in the 'move'
+# #' package. single numeric value or vector of the length of coordinates that describes the error of
+# #' the location (sender/receiver) system in map units. Or a character string with the name of the
+# #' column containing the location error can be provided. Default is moveLocError. See
+# #' MoveLocErrorCalc function for satellite data with state space modelled locations with 95%
+# #' confidence intervals for latlon i.e. lat and lon025 and 975.
 #' @param dbbext Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends 
 #' bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax)
 #' . Default 3. Excessive buffering will get cropped automatically.
@@ -178,7 +178,7 @@ movegroup <- function(
     # Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash
     rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. This is around Bimini, Bahamas.
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
-    dbblocationerror = moveLocError, # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
+    # dbblocationerror = moveLocError, # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
     dbbext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 3.
     dbbwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 23).
     writeRasterFormat = "ascii",
@@ -234,7 +234,7 @@ movegroup <- function(
   # Add movelocationerror and dbblocationerror as columns if they're vectors, else their length
   # desyncs from nrow(data) if any IDs < windowsize
   if (nrow(data) == length(moveLocError)) data$moveLocError <- moveLocError
-  if (nrow(data) == length(dbblocationerror)) data$dbblocationerror <- dbblocationerror
+  # if (nrow(data) == length(dbblocationerror)) data$dbblocationerror <- dbblocationerror
   
   # Convert coordinate sets to SpatialPoints and project
   cord.dec <- sp::SpatialPoints(cbind(data$Lon, data$Lat),
@@ -461,28 +461,28 @@ movegroup <- function(
     rm(r.i)
     # There are 2 types of burst: "normal" and "long". You can select for these in the dbbmm by selecting the factor level in the burstType command.
     
-    if ("dbblocationerror" %in% colnames(data.i)) {
-      dbblocationerror.i <- data.i$dbblocationerror
+    if ("moveLocError" %in% colnames(data.i)) {
+      moveLocError.i <- data.i$moveLocError
     } else {
-      if (exists("dbblocationerror")) {
-        if (length(dbblocationerror) == 1) {
-          dbblocationerror.i <- dbblocationerror # single value, replicated down for each relocation
+      if (exists("moveLocError")) {
+        if (length(moveLocError) == 1) {
+          moveLocError.i <- moveLocError # single value, replicated down for each relocation
           # Robs: 1 m: gps loc of shark inferred from boat coord + bearing + distance estimate
         } else { # else if multiple values
-          if (length(dbblocationerror) == nrow(data)) { # should be same length as full dataset
-            dbblocationerror.i <- data  |>  # take the full dataset,
-              dplyr::bind_cols(dbblocationerror = dbblocationerror)  |>  # cbind the full movelocerror
+          if (length(moveLocError) == nrow(data)) { # should be same length as full dataset
+            moveLocError.i <- data  |>  # take the full dataset,
+              dplyr::bind_cols(moveLocError = moveLocError)  |>  # cbind the full movelocerror
               dplyr::filter(ID == i)  |>  # filter for just this ID
-              dplyr::pull(dbblocationerror) # and pull just the movelocerror for this ID
+              dplyr::pull(moveLocError) # and pull just the movelocerror for this ID
           } else { # if not length 1 and not length of nrow(data)
-            stop(print("dbblocationerror must be either length 1 or length(nrow(data))")) # if not stop and tell user
+            stop(print("moveLocError must be either length 1 or length(nrow(data))")) # if not stop and tell user
           } # close not length1 not same length as full dataset else
         } # close length1 or else
-      } # close if exists dbblocationerror
+      } # close if exists moveLocError
     }
     
     # location error needs to be a positive number. Replace zeroes with 0.00001
-    dbblocationerror.i[which(dbblocationerror.i == 0)] <- 0.00001
+    moveLocError.i[which(moveLocError.i == 0)] <- 0.00001
     
     # Construct the model. The time.step should reflect the ping frequency of the tag (in minutes)
     bursted_dbbmm <- move::brownian.bridge.dyn(bursted,
@@ -490,7 +490,7 @@ movegroup <- function(
                                                raster = xAEQD, # has to be AEQD for metre-based calculations, presuambly?
                                                # Error:The projection of the raster and the Move object are not equal.
                                                # Need bursted, r.i, to be the same projection as xAEQD
-                                               location.error = dbblocationerror.i, # dbblocationerror.i
+                                               location.error = moveLocError.i,
                                                ext = dbbext, # dbbext
                                                window.size = dbbwindowsize #  must be >=2*margin which is 11 so >=22, but odd so >=23
     )

@@ -20,24 +20,24 @@ scaleraster(
 )
 }
 \arguments{
-\item{path}{Path to directory where the individual-level UDs are saved. Likely the same as 
+\item{path}{Path to directory where the individual-level UDs are saved. Likely the same as
 savedir from movegroup. Default NULL.}
 
-\item{pathsubsets}{Path to parent directory that contains all UDs across spatial groups or 
+\item{pathsubsets}{Path to parent directory that contains all UDs across spatial groups or
 subsets, i.e. if you ran movegroup multiple times for different areas in a connected system, this
 would be the parent folder within which all the movegroup savedir's are located. Default NULL.}
 
-\item{pattern}{Extension pattern used to read in all UDs in directory and pathsubsets directory. 
+\item{pattern}{Extension pattern used to read in all UDs in directory and pathsubsets directory.
 Default ".asc".}
 
-\item{weighting}{Addresses unbalanced receiver array design after receivers have first been 
-partitioned into regions, and group-level UDs estimated per region. Numeric. Weights 
-area-specific scaled group-level UD raster by value. This then means that estimated scaled 
+\item{weighting}{Addresses unbalanced receiver array design after receivers have first been
+partitioned into regions, and group-level UDs estimated per region. Numeric. Weights
+area-specific scaled group-level UD raster by value. This then means that estimated scaled
 individual-level volume areas also become weighted. Default is 1 for no weighting.}
 
 \item{format}{Character. Output file type for raster::writeRaster param format. Default "ascii".}
 
-\item{datatype}{Character. Data type for writing values to disk for raster::writeRaster param 
+\item{datatype}{Character. Data type for writing values to disk for raster::writeRaster param
 Datatype. Default "FLT4S".}
 
 \item{bylayer}{For raster::writeRaster param bylayer. Default TRUE.}
@@ -46,24 +46,24 @@ Datatype. Default "FLT4S".}
 
 \item{scalefolder}{Folder to save outputs to. Default "Scaled".}
 
-\item{scaledweightedname}{Name of chunk for scaled and weighted output rasters. Default 
+\item{scaledweightedname}{Name of chunk for scaled and weighted output rasters. Default
 "All_Rasters_Scaled_Weighted".}
 
-\item{crsloc}{Location of saved CRS Rds file from movegroup.R. Should be same as path. Default 
+\item{crsloc}{Location of saved CRS Rds file from movegroup.R. Should be same as path. Default
 NULL.}
 
 \item{returnObj}{Logical. Return the scaled object to the parent environment? Default FALSE.}
 }
 \value{
-Scaled and weighted individual-level and group-level utilization distributions saved as 
+Scaled and weighted individual-level and group-level utilization distributions saved as
 rasters. Scaled 50 and 95pct contour volume area estimates (in km2) for individuals and the group
 , saved in .csv format. Latlon raster.
 }
 \description{
-Scales individual-level utilization distribution (UD) rasters from 0 to 1 to facilitate interpretation as relative 
-intensity of utilization (as opposed to absolute), making comparisons across individuals and interpretations at 
-the group level more straightforward. Subsequently, scaled individual-level rasters are aggregated to create a 
-single group-level UD raster. See www.GitHub.com/SimonDedman/movegroup for issues, feedback, and development 
+Scales individual-level utilization distribution (UD) rasters from 0 to 1 to facilitate interpretation as relative
+intensity of utilization (as opposed to absolute), making comparisons across individuals and interpretations at
+the group level more straightforward. Subsequently, scaled individual-level rasters are aggregated to create a
+single group-level UD raster. See www.GitHub.com/SimonDedman/movegroup for issues, feedback, and development
 suggestions. There is an option to account for bias in acoustic receiver array spatial representation (see Details).
 }
 \details{
@@ -72,15 +72,15 @@ Individual-level UD rasters are scaled from 0 to 1 by dividing each raster by th
 occurring within the raster set.
 
 Step 2. Aggregate into a group-level raster.
-Scaled individual-level rasters are summed to create a single group-level UD raster. 
+Scaled individual-level rasters are summed to create a single group-level UD raster.
 
 Step 3. Re-scale to 0 to 1.
 The group-level raster is divided by its own maximum value.
 
 Step 4. Weight raster (optional).
-The scaled group-level UD raster is divided by the specified weighting factor(s). Note that this is only useful if you 
-want to account for an unbalanced listening station (e.g., acoustic receivers) array and have split up the study site and receivers in regions, and have 
-run the movegroup() for each regional data set separately. See van Zinnicq Bergmann et al. 2022 
+The scaled group-level UD raster is divided by the specified weighting factor(s). Note that this is only useful if you
+want to account for an unbalanced listening station (e.g., acoustic receivers) array and have split up the study site and receivers in regions, and have
+run the movegroup() for each regional data set separately. See van Zinnicq Bergmann et al. 2022
 (https://doi.org/10.1016/j.biocon.2022.109469) for example. If not applicable, choose a value of "1".
 
 Step 5. Standardize raster.
@@ -94,16 +94,15 @@ For each scaled individual-level UD raster, estimate 50 and 95pct contour volume
 deviation. Additionally, the 50 and 95pct volume area is estimated for the group-level UD raster.
 
 Errors and their origins:
-
-1. Error in (function (cond): error in evaluating the argument 'x' in selecting a method for 
+\enumerate{
+\item Error in (function (cond): error in evaluating the argument 'x' in selecting a method for
 function 'res': subscript out of bounds. Probably path can't find any files of type=pattern:
 check you used a terminal slash in savedir in movegroup, and that path has files of type=pattern.
-
-2. Error in if (substr(x = pathsubsets, start = nchar(pathsubsets), stop = nchar(pathsubsets))==:
+\item Error in if (substr(x = pathsubsets, start = nchar(pathsubsets), stop = nchar(pathsubsets))==:
 argument is of length zero: pathsubsets is wrong. Try setting to same as path. NULL does this.
-
-3. Error in gzfile(file, "rb"): cannot open compressed file 'CRS.Rds', probable reason 'No such 
+\item Error in gzfile(file, "rb"): cannot open compressed file 'CRS.Rds', probable reason 'No such
 file or directory': crsloc is wrong. Try setting to same as path. NULL does this.
+}
 }
 \examples{
 \donttest{

@@ -1,6 +1,6 @@
 Package: movegroup
 Title: Visualizing and Quantifying Space Use Data for groups of animals
-Version: 2023.08.07
+Version: 2023.08.14
 Authors@R: c(
     person("Simon", "Dedman", email = "simondedman@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9108-972X")),
     person("Maurits", "van Zinnicq Bergmann", email = "mauritsvzb@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0002-8414-5025")))
@@ -33,5 +33,7 @@ Imports:
     stars (>= 0.5-5),
     starsExtra (>= 0.2.7),
     stringr (>= 1.4.0),
-    tidyr (>= 1.2.0)
+    tidyr (>= 1.2.0),
+    lifecycle
 RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)

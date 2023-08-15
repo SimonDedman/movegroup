@@ -17,7 +17,7 @@ moveLocErrorCalc(
 )
 }
 \arguments{
-\item{x}{Data frame or tibble with lats and lons and their high and low confidence interval 
+\item{x}{Data frame or tibble with lats and lons and their high and low confidence interval
 counterparts.}
 
 \item{loncol}{Name of longitude column in x, character. Default "lon".}
@@ -26,27 +26,27 @@ counterparts.}
 
 \item{latloncrs}{CRS of x, default 4326, numeric.}
 
-\item{projectedcrs}{CRS to project to, should match your region, default 32617, numeric. See 
+\item{projectedcrs}{CRS to project to, should match your region, default 32617, numeric. See
 movegroup projectedCRS.}
 
-\item{lon025}{Name of low 2.5% confidence interval longitude column in x, character. Default 
+\item{lon025}{Name of low 2.5\% confidence interval longitude column in x, character. Default
 "lon025".}
 
-\item{lon975}{Name of high 2.5% confidence interval longitude column in x, character. Default 
+\item{lon975}{Name of high 2.5\% confidence interval longitude column in x, character. Default
 "lon975".}
 
-\item{lat025}{Name of low 2.5% confidence interval latitude column in x, character. Default 
+\item{lat025}{Name of low 2.5\% confidence interval latitude column in x, character. Default
 "lat025".}
 
-\item{lat975}{Name of high 2.5% confidence interval latitude column in x, character. Default 
+\item{lat975}{Name of high 2.5\% confidence interval latitude column in x, character. Default
 "lat975".}
 }
 \value{
-Dataframe of original locations plus rowmeans of mean distance of location extremities, 
+Dataframe of original locations plus rowmeans of mean distance of location extremities,
 for use in movegroup::movegroup(moveLocError).
 }
 \description{
-Builds a dataframe of original locations plus rowmeans of mean distance of location extremities 
+Builds a dataframe of original locations plus rowmeans of mean distance of location extremities
 lon975, lat; lon025, lat; lon, lat975; lon, lat025 from the centre point lon, lat.
 }
 \details{
