@@ -40,3 +40,4 @@ vignettes/*.pdf
 
 # Output files
 /dBBMM ASCII/
+inst/doc
