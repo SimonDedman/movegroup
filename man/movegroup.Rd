@@ -23,6 +23,7 @@ movegroup(
   rasterExtent = NULL,
   rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"),
   rasterResolution = 50,
+  movemargin = 11,
   dbbext = 3,
   dbbwindowsize = 23,
   writeRasterFormat = "ascii",
@@ -101,6 +102,9 @@ Higher resolution will lead to more precision in the volume areas calculations. 
 2*dbblocationerror, if dbblocationerror is a single value. Default 50 = 50m. Try around the
 median of your moveLocError.}
 
+\item{movemargin}{Margin size for variance calc in move::brownian.motion.variance.dyn and
+behavioral change point analysis in move::brownian.bridge.dyn. Must be an odd number. Default 11.}
+
 \item{dbbext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends
 bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax)
 . Default 3. Excessive buffering will get cropped automatically.}
@@ -132,8 +136,8 @@ Include terminal slash. Directory must exist. Default tempdir().}
 \value{
 Individual-level utilization distributions, saved as rasters, as well
 as calculated volume area estimates for 50 and 95pct contours, saved in a
-.csv file. No processed object is returned, i.e. bad: "objectname <- movegroup()", good:
-"movegroup()"
+.csv file. Motion variance csvs per individual, see move::brownian.motion.variance.dyn. No
+processed object is returned, i.e. bad: "objectname <- movegroup()", good: "movegroup()".
 }
 \description{
 Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD)

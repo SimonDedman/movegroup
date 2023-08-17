@@ -29,7 +29,7 @@
 #' @importFrom dplyr mutate rename group_by summarise filter semi_join distinct ungroup arrange across bind_cols pull
 #' @importFrom tidyr drop_na
 #' @importFrom raster raster projectExtent res ncell setValues calc values writeRaster
-#' @importFrom move move timeLag burst brownian.bridge.dyn getVolumeUD
+#' @importFrom move move timeLag burst brownian.bridge.dyn brownian.motion.variance.dyn getVolumeUD
 #' @importFrom rlang .data
 #' @importFrom grDevices graphics.off
 #' @importFrom graphics par
@@ -94,6 +94,8 @@
 # #' column containing the location error can be provided. Default is moveLocError. See
 # #' MoveLocErrorCalc function for satellite data with state space modelled locations with 95%
 # #' confidence intervals for latlon i.e. lat and lon025 and 975.
+#' @param movemargin Margin size for variance calc in move::brownian.motion.variance.dyn and 
+#' behavioral change point analysis in move::brownian.bridge.dyn. Must be an odd number. Default 11.
 #' @param dbbext Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends 
 #' bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax)
 #' . Default 3. Excessive buffering will get cropped automatically.
@@ -117,8 +119,8 @@
 #' 
 #' @return Individual-level utilization distributions, saved as rasters, as well
 #'  as calculated volume area estimates for 50 and 95pct contours, saved in a 
-#'  .csv file. No processed object is returned, i.e. bad: "objectname <- movegroup()", good: 
-#'  "movegroup()"
+#'  .csv file. Motion variance csvs per individual, see move::brownian.motion.variance.dyn. No 
+#'  processed object is returned, i.e. bad: "objectname <- movegroup()", good: "movegroup()".
 #' @details 
 #' When used together, the order of functions would be: movegroup, scaleraster, alignraster if 
 #' required, plotraster.
@@ -189,6 +191,7 @@ movegroup <- function(
     rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. This is around Bimini, Bahamas.
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
     # dbblocationerror = moveLocError, # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
+    movemargin = 11, # Margin size for variance calc in move::brownian.motion.variance.dyn and behavioral change point analysis in move::brownian.bridge.dyn. Must be an odd number. Default 11.
     dbbext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 3.
     dbbwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 23).
     writeRasterFormat = "ascii",
@@ -502,9 +505,23 @@ movegroup <- function(
                                                # Need bursted, r.i, to be the same projection as xAEQD
                                                location.error = moveLocError.i,
                                                ext = dbbext, # dbbext
+                                               margin = movemargin,
                                                window.size = dbbwindowsize #  must be >=2*margin which is 11 so >=22, but odd so >=23
     )
+    
+    # Build dBMvarianceBurst object with brownian.motion.variance.dyn
+    bursted_motionvar <- move::brownian.motion.variance.dyn(bursted,
+                                                            location.error = moveLocError.i,
+                                                            window.size = dbbwindowsize, #  must be >=2*margin which is 11 so >=22, but odd so >=23
+                                                            margin = movemargin
+    )
+    mtnvar <- as.data.frame(bursted_motionvar) # extract the data
+    mtnvar$motionVariance <- move::getMotionVariance(bursted_motionvar) # add motionvariance
+    write.csv(mtnvar,
+              file = paste0(savedir, i, "_MotionVariance.csv"),
+              row.names = FALSE)
     rm(bursted)
+    rm(mtnvar)
     
     # Re-standardize (Dr. Kranstauber's trouble shooting solution).
     # Occurring errors are "due to limits of accuracy during calculations.
