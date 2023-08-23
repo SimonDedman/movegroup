@@ -5,16 +5,12 @@
 \title{Combines region-specific group-level UD rasters into a single raster.}
 \usage{
 alignraster(
-  folderroots =
-    c("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/H",
-    "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/L",
-    "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/M"),
+  folderroots = c("/myfolder/H", "/myfolder/L", "/myfolder/M"),
   foldernames = c("H", "L", "M"),
   pattern = ".asc",
   scalefolder = "Scaled",
   scaledweightedname = "All_Rasters_Scaled",
-  savefolder =
-    "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/Aligned",
+  savefolder = "/myfolder/Aligned",
   format = "ascii",
   datatype = "FLT4S",
   bylayer = TRUE,
@@ -64,11 +60,11 @@ When used in a movegroup pipeline, the order would be: movegroup.R, scaleraster.
 alignraster.R if required, plotraster.R.
 }
 \examples{
-\donttest{
+\dontrun{
 # load data
 data("TracksCleaned")
 # set save directory
-mysavedir <- "/your/directory/here/"
+mysavedir <- "/your-directory-here/"
 # loop movegroup and scaleraster through tide subsets
 tide <- c("H", "M", "L")
 for (i in tide) {

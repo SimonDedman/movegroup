@@ -5,10 +5,11 @@
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #' 
-#' @importFrom sf st_as_sf st_set_crs st_transform st_distance
 #' @importFrom dplyr select
-#' @importFrom tidyselect everything
 #' @importFrom purrr map_df
+#' @importFrom rlang set_names
+#' @importFrom sf st_as_sf st_set_crs st_transform st_distance
+#' @importFrom tidyselect everything
 #' 
 #' @export moveLocErrorCalc
 #' 
@@ -34,7 +35,7 @@
 #' @details Use on your data object from movegroup::movegroup(data).
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Not run
 #' }
 #'
@@ -83,7 +84,7 @@ moveLocErrorCalc <- function(x,
                                  latloncrs = latloncrs,
                                  projectedcrs = projectedcrs
     )) |>
-    set_names(c("U", "R", "D", "L")) |> # set names of list elements
+    rlang::set_names(c("U", "R", "D", "L")) |> # set names of list elements
     lapply(
       function(vertextrack) { # distance from vertices to centre
         sf::st_distance(

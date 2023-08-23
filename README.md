@@ -9,20 +9,35 @@
 <!-- badges: end -->
 <!-- badgeplacer(location = ".", status = "active", githubaccount = SimonDedman, githubrepo = gbm.auto, branch = master, name = "README.Rmd") -->
 
-Visualizing and Quantifying Space Use Data for groups of animals
+Especially on Linux systems it is recommended to type, in terminal:
 
-Especially on Linux systems it is recommended to type, in terminal: sudo
-apt install libgeos-dev sudo apt install libproj-dev sudo apt install
-libgdal-dev then manually install rgeos and rgdal in R/RStudio.
+``` r
+sudo apt install libgeos-dev
+sudo apt install libproj-dev
+sudo apt install libgdal-dev
+```
+
+then manually install rgeos and rgdal in R/RStudio.
 
 Also see each script’s Details section in the manual pages, as these
 frequently contain tips or common bugfixes.
 
-I strongly recommend that you download papers (…). Also it’s imperative
-you read the R help files for each function before you use them. In
-RStudio: Packages tab, scroll to movegroup, click its name, the click
-the function to see its man (manual) page. Read the whole thing.
-Function man pages can also be accessed from the console by typing
+I strongly recommend that you download papers:
+
+Kranstauber, B., Kays, R., LaPoint, S. D., Wikelski, M. and Safi, K.
+(2012), A dynamic Brownian bridge movement model to estimate utilization
+distributions for heterogeneous animal movement. Journal of Animal
+Ecology. doi: 10.1111/j.1365-2656.2012.01955.x
+
+Kranstauber, B., M. Smolla & A. K. Scharf. 2019. Move: visualizing and
+analyzing animal track data. R package version 4.2.4 (at 2023-08-15).
+<https://CRAN.R-project.org/package=move>.
+
+Also it’s imperative you read the R help files for each function before
+you use them. In RStudio: Packages tab, scroll to movegroup, click its
+name, the click the function to see its man (manual) page. Read the
+whole thing. Function man pages can also be accessed from the console by
+typing
 
 ``` r
 ?function

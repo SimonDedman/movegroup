@@ -230,7 +230,7 @@ https://www.youtube.com/watch?v=O5cUoVpVUjU&t=232s
 }
 }
 \examples{
-\donttest{
+\dontrun{
 # Having run the movegroup and scaleraster function examples:
 plotraster(
   x = paste0(mysavedir, "Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"),

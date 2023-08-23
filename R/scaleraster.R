@@ -75,12 +75,12 @@
 #' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Having run the movegroup function example:
 #' scaleraster(path = mysavedir)
 #' 
 #' # Weighted by number of positions per ID, fewer locations = lower Weighting value = higher final 
-#' UD values after dividing by Weighting. This scales all IDs up to match the group max.
+#' # UD values after dividing by Weighting. This scales all IDs up to match the group max.
 #' Weighting <- TracksCleaned |>
 #'  dplyr::group_by(Shark) |>
 #'  dplyr::summarise(N = n()) |> 
@@ -95,6 +95,7 @@
 
 #' @importFrom raster raster setMinMax res maxValue writeRaster stack stackApply nlayers projectExtent crs projectRaster values
 #' @importFrom purrr map2
+#' @importFrom stats sd
 #' @importFrom stringr str_remove
 #' @importFrom sp CRS
 
@@ -155,7 +156,7 @@ scaleraster <- function(path = NULL,
   # Get max of maxes across subsets 
   scalemax <-
     lapply(rasterlist_subsets, function(x) raster::maxValue(x))  |>  # extract maxes
-    unlist() %>% # to vector
+    unlist() |>  # to vector
     max(na.rm = TRUE) # extract max of maxes
   
   # Create new folder to save to
@@ -266,10 +267,10 @@ scaleraster <- function(path = NULL,
   
   # B. Mean and SD
   area.50.mean <- round(mean(area.50), 4) # 50% volume area mean
-  area.50.sd <- round(sd(area.50), 4) # 50% volume area SD
+  area.50.sd <- round(stats::sd(area.50), 4) # 50% volume area SD
   
   area.95.mean <- round(mean(area.95), 4) # 95% volume area mean
-  area.95.sd <- round(sd(area.95), 4) # 95% volume area SD
+  area.95.sd <- round(stats::sd(area.95), 4) # 95% volume area SD
   
   # 3. Group-level core and home range volume areas
   UDScaled <- new(".UD", All_Rasters_Scaled_Weighted) # This uses the aeqd raster for calculations

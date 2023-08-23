@@ -1,7 +1,6 @@
 #' @keywords internal
 "_PACKAGE"
-
+#' @aliases movegroup-package
 ## usethis namespace: start
-#' @importFrom lifecycle deprecated
 ## usethis namespace: end
 NULL

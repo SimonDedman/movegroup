@@ -28,11 +28,11 @@
 #' alignraster.R if required, plotraster.R.
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # load data
 #' data("TracksCleaned")
 #' # set save directory
-#' mysavedir <- "/your/directory/here/"
+#' mysavedir <- "/your-directory-here/"
 #' # loop movegroup and scaleraster through tide subsets
 #' tide <- c("H", "M", "L")
 #' for (i in tide) {
@@ -59,22 +59,23 @@
 
 #' @export alignraster
 
-#' @importFrom sp bbox
-#' @importFrom raster crs setMinMax raster extend writeRaster
+#' @importFrom methods as
 #' @importFrom purrr map2
+#' @importFrom raster crs setMinMax raster extend writeRaster
+#' @importFrom sp bbox
 #' @importFrom terra project
 
 
 
 # read in rasters & add to list####
-alignraster <- function(folderroots = c("/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/H", # character vector of locations of folder roots output by movegroup. Function expects CRS.Rds file and a subfolder with the scaled raster.
-                                        "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/L",
-                                        "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/M"),
+alignraster <- function(folderroots = c("/myfolder/H", # character vector of locations of folder roots output by movegroup. Function expects CRS.Rds file and a subfolder with the scaled raster.
+                                        "/myfolder/L", # these were /home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/H L M
+                                        "/myfolder/M"),
                         foldernames = c("H", "L", "M"), # character vector names of folders corresponding to files in folderroots, i.e. the names of the objects, arrays, regions, etc.
                         pattern = ".asc", # for input rasters from scaleraster
                         scalefolder = "Scaled", # for input rasters from scaleraster
                         scaledweightedname = "All_Rasters_Scaled", # for input rasters from scaleraster
-                        savefolder = "/home/simon/Dropbox/PostDoc Work/Rob Bullock accelerometer Lemons 2020.09/dBBMM ASCII/Aligned", # single character entry, no trailing slash
+                        savefolder = "/myfolder/Aligned", # single character entry, no trailing slash
                         format = "ascii", # save format
                         datatype = "FLT4S", # save format
                         bylayer = TRUE, # save format
@@ -116,7 +117,7 @@ alignraster <- function(folderroots = c("/home/simon/Dropbox/PostDoc Work/Rob Bu
   rasterlist <- lapply(rasterlist, function(x) raster::extend(x, sharedextent))
   
   # Convert to SpatRaster format to be used by {terra}
-  rasterlist <- lapply(rasterlist, function(x) as(x, "SpatRaster"))
+  rasterlist <- lapply(rasterlist, function(x) as(x, "SpatRaster")) # methods::as
   
   # Reproject all rasters simultaneously
   rasterlist <- lapply(rasterlist, function(x) project(x, y = rasterlist[[length(rasterlist)]]))

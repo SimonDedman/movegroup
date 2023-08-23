@@ -171,7 +171,7 @@ required, plotraster.
 \item Error in .local(object, raster, location.error = location.error, ext = ext: Higher y grid not
 large enough, consider extending the raster in that direction or enlarging the ext argument.
 Increase buffpct, e.g. to 3.
-\item Error in .data[\link{dttm}]: Must subset the data pronoun with a string, not a <POSIXct/POSIXt>
+\item Error in .data[[dttm]]: Must subset the data pronoun with a string, not a <POSIXct/POSIXt>
 object. Use "ColName" not dataframe$ColName syntax for Datetime, ID, Lat, Lon.
 \item Error in splice(dot_call(capture_dots, frame_env = frame_env, named = named,: object
 'DateTime' not found. Use "ColName" not ColName syntax for Datetime, ID, Lat, Lon.

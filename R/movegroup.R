@@ -131,7 +131,7 @@
 #' large enough, consider extending the raster in that direction or enlarging the ext argument.
 #' Increase buffpct, e.g. to 3.
 #' 
-#' 2. Error in .data[[dttm]]: Must subset the data pronoun with a string, not a <POSIXct/POSIXt> 
+#' 2. Error in .data\[\[dttm\]\]: Must subset the data pronoun with a string, not a <POSIXct/POSIXt> 
 #' object. Use "ColName" not dataframe$ColName syntax for Datetime, ID, Lat, Lon.
 #' 
 #' 3. Error in splice(dot_call(capture_dots, frame_env = frame_env, named = named,: object 
