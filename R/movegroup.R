@@ -119,8 +119,9 @@
 #' 
 #' @return Individual-level utilization distributions, saved as rasters, as well
 #'  as calculated volume area estimates for 50 and 95pct contours, saved in a 
-#'  .csv file. Motion variance csvs per individual, see move::brownian.motion.variance.dyn. No 
-#'  processed object is returned, i.e. bad: "objectname <- movegroup()", good: "movegroup()".
+#'  .csv file. Motion variance csvs per individual ("MotionVariance.csv"), see 
+#'  move::brownian.motion.variance.dyn. No processed object is returned, i.e. bad: "objectname <- 
+#'  movegroup()", good: "movegroup()".
 #' @details 
 #' When used together, the order of functions would be: movegroup, scaleraster, alignraster if 
 #' required, plotraster.
