@@ -36,7 +36,8 @@
 #' 
 #' @examples
 #' \dontrun{
-#' # Not run
+#' data(argosFiltered)
+#' myMoveLocError <- moveLocErrorCalc(argosFiltered)
 #' }
 #'
 
