@@ -68,7 +68,7 @@ moveLocErrorCalc <- function(x,
   }
   
   # fail testing
-  print(class(x))
+  print(class(x)) # these don't print, why?
   print(dim(x))
   
   tracksfmean <- reproject(x = x,
@@ -77,31 +77,31 @@ moveLocErrorCalc <- function(x,
                            latloncrs = latloncrs,
                            projectedcrs = projectedcrs)
   
-  meanMoveLocDist <- list(
-    c(x[,loncol], x[,lat975]), # U # were originally c(loncol, lat975), check format is right, 
-    c(x[,lon975], x[,latcol]), # R
-    c(x[,loncol], x[,lat025]), # D
-    c(x[,lon025], x[,latcol]) # L
-  ) |>
-    lapply(function(x) reproject(x = x,
-                                 loncol = x[1],
-                                 latcol = x[2],
-                                 latloncrs = latloncrs,
-                                 projectedcrs = projectedcrs
-    )) |>
-    rlang::set_names(c("U", "R", "D", "L")) |> # set names of list elements
-    lapply(
-      function(vertextrack) { # distance from vertices to centre
-        sf::st_distance(
-          x = tracksfmean,
-          y = vertextrack,
-          by_element = TRUE
-        )
-      }
-    ) |>
-    purrr::map_df(~.x) |> # collapse list to df of 4 columns
-    rowMeans()# make row means
-  
-  rm(tracksfmean)
-  return(meanMoveLocDist)
+  # meanMoveLocDist <- list(
+  #   c(x[,loncol], x[,lat975]), # U # were originally c(loncol, lat975), check format is right, 
+  #   c(x[,lon975], x[,latcol]), # R
+  #   c(x[,loncol], x[,lat025]), # D
+  #   c(x[,lon025], x[,latcol]) # L
+  # ) |>
+  #   lapply(function(x) reproject(x = x,
+  #                                loncol = x[1],
+  #                                latcol = x[2],
+  #                                latloncrs = latloncrs,
+  #                                projectedcrs = projectedcrs
+  #   )) |>
+  #   rlang::set_names(c("U", "R", "D", "L")) |> # set names of list elements
+  #   lapply(
+  #     function(vertextrack) { # distance from vertices to centre
+  #       sf::st_distance(
+  #         x = tracksfmean,
+  #         y = vertextrack,
+  #         by_element = TRUE
+  #       )
+  #     }
+  #   ) |>
+  #   purrr::map_df(~.x) |> # collapse list to df of 4 columns
+  #   rowMeans()# make row means
+  # 
+  # rm(tracksfmean)
+  # return(meanMoveLocDist)
 } # close moveLocErrorCalc function
