@@ -67,6 +67,10 @@ moveLocErrorCalc <- function(x,
     return(x)
   }
   
+  # fail testing
+  print(class(x))
+  print(dim(x))
+  
   tracksfmean <- reproject(x = x,
                            loncol = loncol,
                            latcol = latcol,
