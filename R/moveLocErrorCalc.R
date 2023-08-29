@@ -74,30 +74,30 @@ moveLocErrorCalc <- function(x,
                            projectedcrs = projectedcrs)
   
   meanMoveLocDist <- list(
-    c(x[,loncol], x[,lat975]), # U # were originally c(loncol, lat975), check format is right,
-    c(x[,lon975], x[,latcol]), # R
-    c(x[,loncol], x[,lat025]), # D
-    c(x[,lon025], x[,latcol]) # L
+    data.frame(x[,loncol], x[,lat975]), # U # were originally c(loncol, lat975), check format is right,
+    data.frame(x[,lon975], x[,latcol]), # R # this block should create a list of 4 dfs with 2 columns, instead has created 4 vectors of length 2n
+    data.frame(x[,loncol], x[,lat025]), # D
+    data.frame(x[,lon025], x[,latcol]) # L
   ) 
-  # |>
-  #   lapply(function(x) reproject(x = x,
-  #                                loncol = x[1],
-  #                                latcol = x[2],
-  #                                latloncrs = latloncrs,
-  #                                projectedcrs = projectedcrs
-  #   )) |>
-  #   rlang::set_names(c("U", "R", "D", "L")) |> # set names of list elements
-  #   lapply(
-  #     function(vertextrack) { # distance from vertices to centre
-  #       sf::st_distance(
-  #         x = tracksfmean,
-  #         y = vertextrack,
-  #         by_element = TRUE
-  #       )
-  #     }
-  #   ) |>
-  #   purrr::map_df(~.x) |> # collapse list to df of 4 columns
-  #   rowMeans()# make row means
+  |>
+    lapply(function(x) reproject(x = x,
+                                 loncol = x[1],
+                                 latcol = x[2],
+                                 latloncrs = latloncrs,
+                                 projectedcrs = projectedcrs
+    )) |>
+    rlang::set_names(c("U", "R", "D", "L")) |> # set names of list elements
+    lapply(
+      function(vertextrack) { # distance from vertices to centre
+        sf::st_distance(
+          x = tracksfmean,
+          y = vertextrack,
+          by_element = TRUE
+        )
+      }
+    ) |>
+    purrr::map_df(~.x) |> # collapse list to df of 4 columns
+    rowMeans()# make row means
 
   rm(tracksfmean)
   # return(tracksfmean)
