@@ -68,7 +68,7 @@ moveLocErrorCalc <- function(x,
   }
   
   # fail testing
-  print(class(x)) # these don't print, why?
+  print(class(x))
   print(dim(x))
   
   tracksfmean <- reproject(x = x,
@@ -103,5 +103,6 @@ moveLocErrorCalc <- function(x,
   #   rowMeans()# make row means
   # 
   # rm(tracksfmean)
+  return(tracksfmean)
   # return(meanMoveLocDist)
 } # close moveLocErrorCalc function
