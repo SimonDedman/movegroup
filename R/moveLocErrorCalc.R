@@ -78,8 +78,7 @@ moveLocErrorCalc <- function(x,
     data.frame(x[,lon975], x[,latcol]), # R # this block should create a list of 4 dfs with 2 columns, instead has created 4 vectors of length 2n
     data.frame(x[,loncol], x[,lat025]), # D
     data.frame(x[,lon025], x[,latcol]) # L
-  ) 
-  |>
+  ) |>
     lapply(function(x) reproject(x = x,
                                  loncol = x[1],
                                  latcol = x[2],
