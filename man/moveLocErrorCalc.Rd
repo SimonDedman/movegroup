@@ -54,7 +54,7 @@ Use on your data object from movegroup::movegroup(data).
 }
 \examples{
 \dontrun{
-tmp <- data(argosFiltered)
+data(argosFiltered)
 myMoveLocError <- moveLocErrorCalc(argosFiltered)
 }
 
