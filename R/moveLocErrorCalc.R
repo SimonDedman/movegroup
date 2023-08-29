@@ -67,22 +67,19 @@ moveLocErrorCalc <- function(x,
     return(x)
   }
   
-  # fail testing
-  print(class(x))
-  print(dim(x))
-  
   tracksfmean <- reproject(x = x,
                            loncol = loncol,
                            latcol = latcol,
                            latloncrs = latloncrs,
                            projectedcrs = projectedcrs)
   
-  # meanMoveLocDist <- list(
-  #   c(x[,loncol], x[,lat975]), # U # were originally c(loncol, lat975), check format is right, 
-  #   c(x[,lon975], x[,latcol]), # R
-  #   c(x[,loncol], x[,lat025]), # D
-  #   c(x[,lon025], x[,latcol]) # L
-  # ) |>
+  meanMoveLocDist <- list(
+    c(x[,loncol], x[,lat975]), # U # were originally c(loncol, lat975), check format is right,
+    c(x[,lon975], x[,latcol]), # R
+    c(x[,loncol], x[,lat025]), # D
+    c(x[,lon025], x[,latcol]) # L
+  ) 
+  # |>
   #   lapply(function(x) reproject(x = x,
   #                                loncol = x[1],
   #                                latcol = x[2],
@@ -101,8 +98,8 @@ moveLocErrorCalc <- function(x,
   #   ) |>
   #   purrr::map_df(~.x) |> # collapse list to df of 4 columns
   #   rowMeans()# make row means
-  # 
-  # rm(tracksfmean)
-  return(tracksfmean)
-  # return(meanMoveLocDist)
+
+  rm(tracksfmean)
+  # return(tracksfmean)
+  return(meanMoveLocDist)
 } # close moveLocErrorCalc function
