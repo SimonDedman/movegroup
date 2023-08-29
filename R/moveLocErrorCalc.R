@@ -74,18 +74,18 @@ moveLocErrorCalc <- function(x,
                            projectedcrs = projectedcrs)
   
   meanMoveLocDist <- list(
-    data.frame(x[,loncol], x[,lat975]), # U # were originally c(loncol, lat975), check format is right,
-    data.frame(x[,lon975], x[,latcol]), # R # this block should create a list of 4 dfs with 2 columns, instead has created 4 vectors of length 2n
-    data.frame(x[,loncol], x[,lat025]), # D
-    data.frame(x[,lon025], x[,latcol]) # L
+    data.frame(loncol = x[,loncol], latcol = x[,lat975]), # U # were originally c(loncol, lat975), check format is right,
+    data.frame(loncol = x[,lon975], latcol = x[,latcol]), # R # this block should create a list of 4 dfs with 2 columns, instead has created 4 vectors of length 2n
+    data.frame(loncol = x[,loncol], latcol = x[,lat025]), # D # now created static names since this is only internal use
+    data.frame(loncol = x[,lon025], latcol = x[,latcol]) # L # allows static name call in reproject function below
   ) |>
+    rlang::set_names(c("U", "R", "D", "L")) |> # set names of list elements
     lapply(function(x) reproject(x = x,
-                                 loncol = x[1],
-                                 latcol = x[2],
+                                 loncol = "loncol", # x[1]
+                                 latcol = "latcol", # x[2]
                                  latloncrs = latloncrs,
                                  projectedcrs = projectedcrs
     )) |>
-    rlang::set_names(c("U", "R", "D", "L")) |> # set names of list elements
     lapply(
       function(vertextrack) { # distance from vertices to centre
         sf::st_distance(
@@ -96,7 +96,7 @@ moveLocErrorCalc <- function(x,
       }
     ) |>
     purrr::map_df(~.x) |> # collapse list to df of 4 columns
-    rowMeans()# make row means
+    rowMeans() # make row means
 
   rm(tracksfmean)
   # return(tracksfmean)
