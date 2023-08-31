@@ -50,7 +50,7 @@
 #' @param dat.TZ Timezone of data for as.POSIXct. Default "US/Eastern".
 #' @param proj CRS for move function. Default sp::CRS("+proj=longlat +datum=WGS84").
 #' @param projectedCRS EPSG code for CRS for initial transform of latlon points; corresponds to 
-#' rasterCRS zone. Default "+init=epsg:32617".
+#' rasterCRS zone. Default "+init=epsg:32617" corresponding to The Bahamas.
 #' @param sensor Sensor for move function. Single character or vector with length of the number of 
 #' coordinates. Optional. Default "VR2W".
 #' @param moveLocError Location error (m) in the 'brownian.bridge.dyn' function in the 'move' 
@@ -148,8 +148,6 @@
 #' \dontrun{
 #' # load data
 #' data("TracksCleaned")
-#' # set save directory
-#' mysavedir <- "/your/directory/here/"
 #' # run function
 #' movegroup(
 #'  data = TracksCleaned,
@@ -157,7 +155,7 @@
 #'  Datetime = "Datetime",
 #'  Lat = "Lat",
 #'  Lon = "Lon",
-#'  savedir = mysavedir)
+#'  savedir = "/your/directory/here/")
 #' }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}

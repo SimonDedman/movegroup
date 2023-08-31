@@ -84,7 +84,7 @@ run the movegroup() for each regional data set separately. See van Zinnicq Bergm
 (https://doi.org/10.1016/j.biocon.2022.109469) for example. If not applicable, choose a value of "1".
 
 Step 5. Standardize raster.
-Standardize the potentially weighted and scaled group-level UD raster so that its values sum to 1.  (creates UDScaled, but is in .UD extension)
+Standardize the potentially weighted and scaled group-level UD raster so that its values sum to 1.
 
 Step 6. Export as latlon CRS.
 Change crs to latlon for plotting and calculation purposes, save file, continue.
@@ -92,6 +92,8 @@ Change crs to latlon for plotting and calculation purposes, save file, continue.
 Step 7. Estimate 50 and 95pct contour volume areas.
 For each scaled individual-level UD raster, estimate 50 and 95pct contour volume areas, as well as their mean and standard
 deviation. Additionally, the 50 and 95pct volume area is estimated for the group-level UD raster.
+
+Step 8. Export the projected-CRS group-level raster.
 
 Errors and their origins:
 \enumerate{

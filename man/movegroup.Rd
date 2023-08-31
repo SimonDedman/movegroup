@@ -53,7 +53,7 @@ Must be in POSIXct format. "Character".}
 \item{proj}{CRS for move function. Default sp::CRS("+proj=longlat +datum=WGS84").}
 
 \item{projectedCRS}{EPSG code for CRS for initial transform of latlon points; corresponds to
-rasterCRS zone. Default "+init=epsg:32617".}
+rasterCRS zone. Default "+init=epsg:32617" corresponding to The Bahamas.}
 
 \item{sensor}{Sensor for move function. Single character or vector with length of the number of
 coordinates. Optional. Default "VR2W".}
@@ -187,8 +187,6 @@ large enough, consider extending the raster in that direction or enlarging the e
 \dontrun{
 # load data
 data("TracksCleaned")
-# set save directory
-mysavedir <- "/your/directory/here/"
 # run function
 movegroup(
  data = TracksCleaned,
@@ -196,7 +194,7 @@ movegroup(
  Datetime = "Datetime",
  Lat = "Lat",
  Lon = "Lon",
- savedir = mysavedir)
+ savedir = "/your/directory/here/")
 }
 
 }

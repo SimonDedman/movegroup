@@ -14,6 +14,227 @@ knitr::opts_chunk$set(
 )
 ```
 
+
+### Install, help, background reading
+
+To install on Linux systems it may be required to type, in terminal:
+``` r
+sudo apt install libgeos-dev
+sudo apt install libproj-dev
+sudo apt install libgdal-dev
+```
+then manually install `rgeos` and `rgdal` in R/RStudio. However be advised these packages are being depreciated in late-2023.
+
+Also see each script's Details section in the manual pages, as these frequently contain tips or common bugfixes.
+
+***
+
+### Academic background and rationale
+
+**Add academic background here, how they work, what the brownian motian variance is, example studies. And why we made this package: move is great and we use it as th engine here but it doesn't account for multiple individuals, grouping all together is biolgically unrealistic, etc.**
+
+We strongly recommend that you download papers:
+
+[Kranstauber](https://doi.org/10.1111/j.1365-2656.2012.01955.x), B., Kays, R., LaPoint, S. D., Wikelski, M. and Safi, K. (2012) A dynamic Brownian bridge movement model to estimate utilization distributions for heterogeneous animal movement. Journal of Animal Ecology.
+
+[Kranstauber](https://CRAN.R-project.org/package=move), B., M. Smolla & A. K. Scharf. (2019) Move: visualizing and analyzing animal track data. R package version 4.2.4 (at 2023-08-15).
+
+[van Zinnicq Bergmann](https://doi.org/10.1016/j.biocon.2022.109469), M. P. M., Guttridge, T. L., Smukall, M. J., Adams, V. M., Bond, M. E., Burke, P. J., Fuentes, M. M. P. B., Heinrich, D. D. U., Huveneers, C., Gruber, S. H., and Papastamatiou, Y. P. (2022) Using movement models and systematic conservation planning to inform marine protected area design for a multi-species predator community. Biological Conservation.
+
+[Strickland](https://doi.org/10.1007/s10750-021-04764-x), B. A., Gastrich, K., Beauchamp, J. S., Mazzotti, F. J. and Heithaus, M. R. (2021) Effects of hydrology on the movements of a large-bodied predator in a managed freshwater marsh. Hydrobiologia
+
+Also it's imperative you read the R help files for each function before you use them. In RStudio: Packages tab, scroll to movegroup, click its name, the click the function to see its man (manual) page. Read the whole thing. Function man pages can also be accessed from the console by typing `?function`.
+
+***
+
+### movegroup
+
+Visualizing and Quantifying Space Use Data for groups of animals
+
+Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple individuals simultaneously, using functions in the 'move' package. The authors are indebted to the move package authors Bart Kraunstauber, Marco Smolla, and Anne K Scharf, and to Sarah Becker for seed code which inspired the development of this function.
+
+The movegroup function takes a dataframe of positions, datetimes, and IDs, e.g. from marine species, such as sharks or turtles being tracked by satellite or acoustic tags. These data are filtered to remove individuals with too few data to process, a group-level basemap raster is created upon which to calculate and later plot dBBMM utilisation distribution hotspots, then each individual has a movement track calculated using the move package, data gaps are assessed and the track split into multiple sections if gaps are too long, those sections have a dynamic Brownian Bridge Movement Model and variance calculated on them again using the move package, then the 50 and 95% utilisation distribution volume areas are calculated. Finally the outputs are saved on a per-unique-ID basis.
+
+For this and all functions, see the function's help for specifics on the function parameters, as well as errors and their origins.
+
+Running the function is as simple as:
+``` r
+data("TracksCleaned")
+mysavedir <- "/your/directory/here/"
+movegroup(
+ data = TracksCleaned,
+ ID = "Shark",
+ Datetime = "Datetime",
+ Lat = "Lat",
+ Lon = "Lon",
+ savedir = mysavedir)
+``` 
+However please appraise yourself of the meaning of the various parameters as they pertain to your data, most notably movement error distance (see moveLocErrorCalc below), and variously buffpct, rasterExtent, rasterResolution, centre for sizing your data and rasters, which has implications for later plotting. It might be that you need to adjust these elements after later seeing the resulting plots from `plotraster`, or if an overly large raster has caused a crash.
+
+***
+
+### scaleraster
+
+Scales individual utilization distribution rasters and volume area estimates
+
+Scales individual-level utilization distribution (UD) rasters from 0 to 1 to facilitate interpretation as relative intensity of utilization (as opposed to absolute), making comparisons across individuals and interpretations at the group level more straightforward. Subsequently, scaled individual-level rasters are aggregated to create a single group-level UD raster. See http://www.gitHub.com/SimonDedman/movegroup for issues, feedback, and development suggestions. There is an option to account for bias in acoustic receiver array spatial representation (see Details).
+
+The process employed by the function is:
+
+1. Scale rasters: Individual-level UD rasters are scaled from 0 to 1 by dividing each raster by the maximum probability density value occurring within the raster set.
+
+2. Aggregate into a group-level raster: Scaled individual-level rasters are summed to create a single group-level UD raster.
+
+3. Re-scale to 0 to 1: The group-level raster is divided by its own maximum value.
+
+4. Weight raster (optional): The scaled group-level UD raster is divided by the specified weighting factor(s). Note that this is only useful if you want to account for an unbalanced listening station (e.g., acoustic receivers) array and have split up the study site and receivers in regions, and have run `movegroup` for each regional dataset separately. See [van Zinnicq Bergmann et al. 2022](https://doi.org/10.1016/j.biocon.2022.109469) for example. If not applicable, leave as `1`, the default.
+
+5. Standardize raster: Standardize the potentially weighted and scaled group-level UD raster so that its values sum to 1.
+
+6. Export as geographical (latlon) CRS file: Change crs to latlon for plotting and calculation purposes, save file, continue.
+
+7. Estimate 50 and 95pct contour volume areas: For each scaled individual-level UD raster, estimate 50 and 95pct contour volume areas, as well as their mean and standard deviation. Additionally, the 50 and 95pct volume area is estimated for the group-level UD raster.
+
+8. Export the projected-CRS group-level raster.
+
+Having run the `movegroup` function above, `scaleraster` is run with:
+
+``` r
+scaleraster(path = mysavedir)
+``` 
+
+To weigh by number of positions per ID, fewer locations = lower weighting value = higher final values after dividing by weighting. This scales all IDs up to match the group max.
+``` r
+Weighting <- TracksCleaned |>
+   dplyr::group_by(Shark) |>
+   dplyr::summarise(N = n()) |> 
+   dplyr::filter(N > 23) |> 
+   dplyr::mutate(N = N / max(N, na.rm = TRUE)) |> 
+   dplyr::pull(N)
+scaleraster(path = mysavedir, weighting = Weighting)
+``` 
+
+***
+
+### alignraster
+
+Combines region-specific group-level UD rasters into a single raster.
+
+Extends the spatial extent of each area-specific group-level raster to the spatial extent shared by all rasters. This will only be required if you have multiple individuals (e.g. different sharks) divided amongst a few discrete areas (e.g. around different islands) and the effort (e.g. receiver coverage) is different among islands. Not required for multiple individuals all within the same region or sampling regime.
+
+To loop `movegroup` and `scaleraster` through `tide` subsets:
+``` r
+tide <- c("H", "M", "L")
+for (i in tide) {
+ dir.create(paste0(mysavedir, i))
+  movegroup(
+    data = TracksCleaned[TracksCleaned$T.Ph == i, ],
+    ID = "Shark",
+    Datetime = "Datetime",
+    Lat = "Lat",
+    Lon = "Lon",
+    savedir = paste0(mysavedir, i, "/"))
+  
+  scaleraster(path = paste0(mysavedir, i),
+              crsloc = paste0(mysavedir, i))
+}
+
+alignraster(folderroots = paste0(mysavedir, tide),
+            foldernames = tide,
+            savefolder = paste0(mysavedir, "Aligned"))
+``` 
+***
+
+### plotraster
+
+Plots a group-level utilization distribution
+
+Plots 50 and 95pct contours of a group-level utilization distribution raster on a spatial map background. Contains functionality to also visualize geographic locations of individual listening stations (e.g., acoustic receivers) as well as the entire surface UD.
+
+This function plots the outputs of `scaleraster`, and individual `movegroup` rasters if desired.
+
+For plottitle, you can use the term 'home range' when an animal can be detected wherever it goes i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic receivers cover the entire home range of the study species. This term is problematic when applied to a passive acoustic telemetry setting where an array of non-overlapping receivers are used to assess local space use patterns i.e. the home range is bigger than the coverage by the acoustic array.
+
+See the function's help for specifics on the function parameters, as well as errors and their origins.
+
+*To get Google map basemaps:*
+
+(from [here](https://www.youtube.com/watch?v=O5cUoVpVUjU)):
+
+1. Sign up with dev console
+    a. You must enter credit card details, but won’t be charged if your daily API requests stay under the limit.
+    b. Follow the [link](https://console.cloud.google.com/projectselector2/apis/dashboard?supportedpurview=project).
+    c. Sign up for Google cloud account (it may auto populate your current gmail), click agree and continue.
+    d. Click the navigation email in the top left corner and click on Billing.
+    e. Create a billing account – they will NOT auto charge after trial ends.
+    f. Enter information, click on 'start my free trial'. They may offer a free credit for trying out their service. More pricing details [here](https://mapsplatform.google.com/pricing/).
+    g. Click “Select a Project” then “New project” in the top right corner.
+    h. Enter Project Name, leave Location as is, click “Create”.
+    i. You should now see your project name at the top, where the drop-down menu is.
+
+2. Enable Maps and Places API
+    a. Click 'Library' on the left.
+    b. In the search field type “Maps”.
+    c. Scroll down, click “Maps Java Script API”.
+    d. Click Enable.
+    e. Click 'Library' again, search “Places”, click on “Places API”.
+    f. Click Enable.
+
+3. Create Credentials for API Key
+     a. Return to 'APIs & Services' page.
+     b. Click on Credentials.
+     c. At the top click 'Create Credentials > API Key'.
+     d. API key should pop up with option to copy it.
+     e. You can restrict the key if you want by following steps 4 & 5 [here](https://www.youtube.com/watch?v=O5cUoVpVUjU&t=232s).
+
+Having run the movegroup and scaleraster function examples:
+``` r
+plotraster(
+ x = paste0(mysavedir, "Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"),
+ mapsource = "stamen",
+ maptype = "terrain",
+ savedir = paste0(mysavedir, "Plot"),
+ xlatlon = paste0(mysavedir, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc"),
+ locationpoints = TracksCleaned |> dplyr::rename(lat = "Lat", lon = "Lon"),
+ pointsincontourssave = paste0(mysavedir, "Scaled/pointsincontours.csv"))
+```
+If you've setup your Google maps API, you can expect graphics such as:
+
+![plotraster-output](../figures/plotrasterVignette.png)
+***
+
+### moveLocErrorCalc
+
+moveLocError calculator for ARGOS or state space models resulting in 95percent latlon confidence intervals
+
+Builds a dataframe of original locations plus rowmeans of mean distance of location extremities lon975, lat; lon025, lat; lon, lat975; lon, lat025 from the centre point lon, lat.
+
+`movegroup`'s `moveLocError` parameter allows a vector of error distances corresponding to the same-length vector of positions supplied in your dataset. For acoustic data, the error is likely static, in which case one can use a single value which is repeated for all positions. For satellite data, each position can have a different error based on changing strength of satellite uplink connection, number of satelllites for triangulation, etc. If you have positions possibly filtered by `argosfilter::sdafilter` and with state space models applied using the `aniMotum` package (a process you can follow thanks to scripts [1](https://github.com/SimonDedman/SavingTheBlue/blob/main/R/06A_Filter_SPOT_data.R) & [2](https://github.com/SimonDedman/SavingTheBlue/blob/main/R/06B_CTCRW_SPOT_data_usin_animotum.R) by Vital Heim), this function converts those 95% confidence interval latitude and longitude locations into a mean error distance per position.
+
+***
+
+## Installation
+
+You can install the released version of movegroup from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("movegroup")
+```
+
+And the development version from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+remotes::install_github("SimonDedman/movegroup")
+```
+
+***
+
+## ToDo List
+
+See GitHub issues section https://github.com/SimonDedman/movegroup/issues
+Feel free to contribute to this!
+
 ```{r setup}
 library(movegroup)
 ```

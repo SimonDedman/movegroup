@@ -26,7 +26,7 @@ plotraster(
   plotcaption = paste0("movegroup, ", lubridate::today()),
   axisxlabel = "Longitude",
   axisylabel = "Latitude",
-  legendposition = c(0.11, 0.85),
+  legendposition = c(0.105, 0.8),
   fontsize = 12,
   fontfamily = "Times New Roman",
   filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),

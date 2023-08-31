@@ -197,7 +197,7 @@ plotraster <- function(
     plotcaption = paste0("movegroup, ", lubridate::today()),
     axisxlabel = "Longitude",
     axisylabel = "Latitude",
-    legendposition = c(0.11, 0.85), # Percent distance (of middle? of legend box) from L to R, percent distance from Bottom to Top.
+    legendposition = c(0.105, 0.8), # Percent distance (of middle? of legend box) from L to R, percent distance from Bottom to Top.
     fontsize = 12,
     fontfamily = "Times New Roman",
     filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
