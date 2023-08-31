@@ -578,8 +578,8 @@ movegroup <- function(
   md <- dplyr::bind_rows(bb.list,
                          .id = "column_label"
   )  |> 
-    dplyr::select(!column_label) # remove column_label column
-  
+    dplyr::select(!"column_label") # remove column_label column
+  # 2023-08-30 quoted column_label to hopefully address gbm.factorplot: no visible binding for global variable ‘column_label’
   md$core.use <- (rasterres * md$core.use) / 1000000 # convert from cells/pixels to metres squared area based on cell size, then to kilometres squared area
   md$general.use <- (rasterres * md$general.use) / 1000000
   

@@ -49,6 +49,7 @@
 #' "toner-2011", "toner-background", "toner-hybrid", "toner-labels", "toner-lines", "toner-lite".
 #' @param contour1colour Colour for contour 1, typically 95pct, default "red".
 #' @param contour2colour Colour for contour 2, typically 50pct, default "orange".
+#' @param animalpositionscolour Colour for original animal locations, if xlatlon not NULL. Default "white".
 #' @param plottitle Title of the resultant plot, default "Aggregated 95pct and 50pct UD contours".
 #' @param plotsubtitle Plot subtitle, default "Scaled contours". Can add the n of your individuals.
 #' @param legendtitle Legend title, default "Percent UD Contours".
@@ -185,6 +186,7 @@ plotraster <- function(
     # “roadmap”, “hybrid”.
     contour1colour = "red", # colour for contour 1, typically 95%.
     contour2colour = "orange", # colour for contour 2, typically 50%.
+    animalpositionscolour = "white", # colour for original animal locations, if xlatlon not NULL.
     plottitle = "Aggregated 95% and 50% UD contours",
     # Can use the term 'home range' when an animal can be detected wherever it goes
     # i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic
@@ -414,7 +416,7 @@ plotraster <- function(
     
     # Import points
     locationpoints <- locationpoints |>
-      dplyr::mutate(Index = 1:length(lat)) # add unique index for later
+      dplyr::mutate(Index = 1:length("lat")) # add unique index for later
     mypointssf <- sf::st_as_sf(locationpoints, coords = c("lon","lat")) |> sf::st_set_crs(4326) #points by day, # Convert points to sf
     
     # Assign points to contours/UDs
@@ -507,6 +509,15 @@ plotraster <- function(
                      inherit.aes = FALSE,
                      ggplot2::aes(colour = "50% UD")) +
     
+    # overlay original animal position points
+    if (!is.null(xlatlon)) {
+      ggplot2::geom_sf(data = mypointssf |>
+                         sf::st_transform(3857),
+                       inherit.aes = FALSE,
+                       ggplot2::aes(colour = "animalpositions")
+                       )
+    } +
+    
     # UD surface colours
     viridis::scale_fill_viridis(
       alpha = 1, # 0:1
@@ -527,7 +538,9 @@ plotraster <- function(
     ) +
     
     # UD contour colours
-    ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour, "95% UD" = contour1colour)) +
+    ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour,
+                                                                "95% UD" = contour1colour,
+                                                                "animalpositions" = animalpositionscolour)) +
     ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
     ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
     ggplot2::theme_minimal() +

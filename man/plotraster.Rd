@@ -20,6 +20,7 @@ plotraster(
   maptype = "satellite",
   contour1colour = "red",
   contour2colour = "orange",
+  animalpositionscolour = "white",
   plottitle = "Aggregated 95\% and 50\% UD contours",
   plotsubtitle = "Scaled contours",
   legendtitle = "Percent UD Contours",
@@ -103,6 +104,8 @@ Default NULL is calculated based on your data.}
 \item{contour1colour}{Colour for contour 1, typically 95pct, default "red".}
 
 \item{contour2colour}{Colour for contour 2, typically 50pct, default "orange".}
+
+\item{animalpositionscolour}{Colour for original animal locations, if xlatlon not NULL. Default "white".}
 
 \item{plottitle}{Title of the resultant plot, default "Aggregated 95pct and 50pct UD contours".}
 
