@@ -497,7 +497,7 @@ plotraster <- function(
                        inherit.aes = FALSE,
                        size = 0.1,
                        alpha = positionsalpha,
-                       ggplot2::aes(colour = "positions")
+                       ggplot2::aes(colour = "Positions")
       )
     } +
 
@@ -544,7 +544,7 @@ plotraster <- function(
     # UD contour colours
     ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour,
                                                                 "95% UD" = contour1colour,
-                                                                "positions" = positionscolour)) +
+                                                                "Positions" = positionscolour)) +
 
   ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
   ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
