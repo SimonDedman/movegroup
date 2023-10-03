@@ -35,7 +35,15 @@ An animal's home range can be defined as the area traversed by an animal within 
 
 The UD is an improvement upon the MCP-derived home range estimation because this definition not only quantifies the size of a tracked animal's home range, but also the intensity with which subareas within the home range are used (Worton, 1989). The kernel utilization distribution (KUD) is the first method that incorporated UDs for home range estimation. This method applies a bivariate kernel function over each location fix, after which resulting values are averaged. However, the KUD assumes no spatial and temporal autocorrelation in the data, which is of course unrealistic in the context of animal movement data that are inherently spatially and temporarily autocorrelated.
 
-Horne et al. (2007) describe the use of movement models that incorporate Brownian motion (Brownian bridge moment model, BBMM), which offers a more sophisticated way to estimate space use. The traditional BBMM integrates the temporal component of tracking data by explicitly modeling movements between consecutive relocations. This is achieved by accounting for both the order of subsequent relocations as well as the travel time between them. The BBMM reconstructs the movement path by computing biased random walk iterations, creating a probability density distribution or “bridge” between two consecutive relocations where the animal could have been when it was not detected. A minimal time difference among relocations is then suggestive of a straight-line movement, and therefore the variance in Brownian motion (the associated error of the movement path) would be small; conversely, a larger time difference is suggestive of a tortuous movement path, which would result in a larger Brownian motion variance of the bridge.
+![Relocations and UD](../figures/relocationsUDvignette.png)
+
+Horne et al. (2007) describe the use of movement models that incorporate Brownian motion (Brownian bridge moment model, BBMM), which offers a more sophisticated way to estimate space use. The traditional BBMM integrates the temporal component of tracking data by explicitly modeling movements between consecutive relocations. This is achieved by accounting for both the order of subsequent relocations as well as the travel time between them. The BBMM reconstructs the movement path by computing biased random walk iterations, creating a probability density distribution or “bridge” between two consecutive relocations where the animal could have been when it was not detected.
+
+![KUD vs BBKUD](../figures/BBtrajectoryvignette.png)
+
+A minimal time difference among relocations is then suggestive of a straight-line movement, and therefore the variance in Brownian motion (the associated error of the movement path) would be small; conversely, a larger time difference is suggestive of a tortuous movement path, which would result in a larger Brownian motion variance of the bridge.
+
+![Variances](../figures/BBvariancesvignette.png)
 
 Kranstauber et al. (2012) later introduced the dynamic BBMM (dBBMM), which improves upon the traditiional BBMM in its calculation of utilization distribution (UD) statistics. While the Brownian motion variance in the BBMM is static i.e., constant throughout the movement track, the dBBMM allows this variance to vary to allow for changes in in behavior along the movement trajectory (e.g., foraging, traveling, resting, etc.). The result is improved performance in predicting animal locations. The dBBMM is also better equipped in dealing with irregular sampling of tracks, and would therefore be applied more appropriately to telemetry data for which you can anticipate gaps in detection (e.g., due to tags requiring to breach the ocean surface to transmit their location to a satellite ('Smart Position Only Tag' or SPOT), which depends on the animal's behavior, or tag-equipped aquatic animals leaving a fixed acoustic receiver array, or a tag's line of sight with a satellite being obstructed by physical structures, etc.).
 
@@ -209,6 +217,7 @@ plotraster(
 If you've setup your Google maps API, you can expect graphics such as:
 
 ![plotraster-output](../figures/plotrasterVignette.png)
+
 ***
 
 ### moveLocErrorCalc
