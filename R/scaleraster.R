@@ -68,6 +68,9 @@
 #' 
 #' 3. Error in gzfile(file, "rb"): cannot open compressed file 'CRS.Rds', probable reason 'No such 
 #' file or directory': crsloc is wrong. Try setting to same as path. NULL does this.
+#' 
+#' 4. In min/max: No non-missing arguments to min; returning Inf: likely not enough memory, increase
+#'  rasterResolution value.
 #'
 #' @return Scaled and weighted individual-level and group-level utilization distributions saved as 
 #' rasters. Scaled 50 and 95pct contour volume area estimates (in km2) for individuals and the group
@@ -318,6 +321,9 @@ scaleraster <- function(path = NULL,
                      group_area.95,
                      "Group-level_UD")
   )
+  
+  # 2023-10-04 Vital memory bug warning
+  if ((round(area.50.sd, 1) == 0) | (round(area.95.sd, 1) == 0)) print("No standard deviation: all individual UDs identical. Possibly due to insufficient memory for raster calculations. Check rasterResolution in movegroup")
   
   write.csv(area.ct,
             file = paste0(path, "/", scalefolder, "/","VolumeAreas_ScaledAllFish.csv"),

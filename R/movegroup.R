@@ -144,6 +144,9 @@
 #' 
 #' 5. cannot allocate vector of size (BIG) Gb: Increase rasterResolution value.
 #' 
+#' 6. In min/max: No non-missing arguments to min; returning Inf: likely not enough memory, increase
+#'  rasterResolution value.
+#' 
 #' @examples
 #' \dontrun{
 #' # load data
@@ -589,4 +592,14 @@ movegroup <- function(
             file = file.path(savedir, absVolumeAreaSaveName),
             row.names = FALSE
   )
+  
+  # 2023-10-04 Vital memory bug warning
+  if (all.equal(md$core.use)) print("All core UDs identical. Possibly due to insufficient memory for raster calculations. Check rasterResolution")
+  if (all.equal(md$general.use)) print("All general UDs identical. Possibly due to insufficient memory for raster calculations. Check rasterResolution")
+  if (length(which(md$core.use == max(md$core.use, na.rm = TRUE))) > 1) print("More than 1 individual share exactly the same max value for core use, possibly due to insufficient memory for raster calculations. Check rasterResolution")
+  if (length(which(md$general.use == max(md$general.use, na.rm = TRUE))) > 1) print("More than 1 individual share exactly the same max value for general use, possibly due to insufficient memory for raster calculations. Check rasterResolution")
+  
+  
+  
+  
 } # close function

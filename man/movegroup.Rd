@@ -180,6 +180,8 @@ object. Use "ColName" not dataframe$ColName syntax for Datetime, ID, Lat, Lon.
 large enough, consider extending the raster in that direction or enlarging the ext argument. Try
 "buffpct = 1," , then larger e.g. 3, if still getting the error.
 \item cannot allocate vector of size (BIG) Gb: Increase rasterResolution value.
+\item In min/max: No non-missing arguments to min; returning Inf: likely not enough memory, increase
+rasterResolution value.
 }
 }
 }

@@ -104,6 +104,8 @@ check you used a terminal slash in savedir in movegroup, and that path has files
 argument is of length zero: pathsubsets is wrong. Try setting to same as path. NULL does this.
 \item Error in gzfile(file, "rb"): cannot open compressed file 'CRS.Rds', probable reason 'No such
 file or directory': crsloc is wrong. Try setting to same as path. NULL does this.
+\item In min/max: No non-missing arguments to min; returning Inf: likely not enough memory, increase
+rasterResolution value.
 }
 }
 \examples{
