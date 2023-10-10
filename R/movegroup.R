@@ -546,8 +546,8 @@ movegroup <- function(
     # these seem to produce very plausible estimates!"
     # This change creates unnaturally small areas.
     # Changed back to previous calcs 2023-02-24. Added rounding
-    area.50new <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.5)), 4)
-    area.95new <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.05)), 4)
+    area.50.new <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.5)), 4)
+    area.95.new <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.05)), 4)
     
     # Combine in single df
     area.ct <- data.frame(
