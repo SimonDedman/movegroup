@@ -151,7 +151,6 @@ movegroup::movegroup function.
 Step 1. Filter individuals.
 Remove those individuals for which there are insufficient data i.e. number of re-locations is
 smaller than the window size parameter value (default = 31).
-
 Step 2. Generate universal raster.
 Based on all remaining data, a universal raster is generated where the calculated UDs are plotted
 into.

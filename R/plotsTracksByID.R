@@ -3,8 +3,8 @@
 # Plot all tracks
 #https://jmlondon.github.io/crwexampleakbs/analysis.html
 
-library(sf)
-library(ggspatial)
+# library(sf)
+# library(ggspatial)
 # library(devtools)
 # devtools::install_github('jmlondon/ptolemy')
 # after install, load and follow prompts to download source data
