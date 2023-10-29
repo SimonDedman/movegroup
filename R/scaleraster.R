@@ -127,7 +127,7 @@ scaleraster <- function(path = NULL,
   
   # Read in rasters and add to list
   rasterlist <-
-    lapply(filelist, function(x) raster::raster(paste0(path, "/", x)))  |>  # Read in rasters
+    lapply(filelist, function(x) raster::raster(file.path(path, x)))  |>  # Read in rasters
     lapply(function(x) raster::setMinMax(x)) # Set minmax values
   names(rasterlist) <- stringr::str_remove(filelist, pattern = pattern) # Name the list object (raster); need to get rid of extension e.g. ".asc"
   
@@ -155,7 +155,7 @@ scaleraster <- function(path = NULL,
   
   # Read in appropriate rasters and add to list
   rasterlist_subsets <- 
-    lapply(filelist_subsets, function(x) raster::raster(paste0(pathsubsets, "/", x)))  |>  # Read in only rasters that occur in the filtered list
+    lapply(filelist_subsets, function(x) raster::raster(file.path(pathsubsets, x)))  |>  # Read in only rasters that occur in the filtered list
     lapply(function(x) raster::setMinMax(x)) # Reintroduce values
   
   # Get max of maxes across subsets 
@@ -165,14 +165,14 @@ scaleraster <- function(path = NULL,
     max(na.rm = TRUE) # extract max of maxes
   
   # Create new folder to save to
-  dir.create(paste0(path, "/", scalefolder))
+  dir.create(file.path(path, scalefolder))
   
   # Scale all raster values to max of maxes (maximum value becomes 1)
   rasterlist  <- lapply(rasterlist, function(x) x / scalemax)  |>  # scaling occurs here
     # lapply(function(x) x / weighting)  |>  # Weighting occurs here
     purrr::map2(.y = weighting, .f = `/`)  |>  # Weighting occurs here. .y will be recycled if length 1.
     lapply(function(x) raster::writeRaster(x = x, # save scaled individual rasters
-                                           filename = paste0(path, "/", scalefolder, "/", names(x)),
+                                           filename = file.path(path, scalefolder, "/", names(x)),
                                            format = format,
                                            datatype = datatype,
                                            if (format != "CDF") bylayer = bylayer,
@@ -200,7 +200,7 @@ scaleraster <- function(path = NULL,
   
   # Save this raster
   raster::writeRaster(x = All_Rasters_Scaled_Weighted,
-                      filename = paste0(path, "/", scalefolder, "/", scaledweightedname, pattern),
+                      filename = file.path(path, scalefolder, paste0(scaledweightedname, pattern)),
                       format = format,
                       datatype = datatype,
                       bylayer = bylayer,
@@ -208,7 +208,7 @@ scaleraster <- function(path = NULL,
   
   # Now weight the group-level UD raster
   # Change projection of All_Rasters_Scaled_Weighted to latlon for proper plotting
-  dataCRS <- readRDS(paste0(crsloc, "/CRS.Rds"))
+  dataCRS <- readRDS(file.path(crsloc, "CRS.Rds"))
   raster::crs(All_Rasters_Scaled_Weighted) <- dataCRS
   
   # If any NA present, replace by 0 (safety)
@@ -238,7 +238,7 @@ scaleraster <- function(path = NULL,
   
   # Save the raster
   raster::writeRaster(x = All_Rasters_Scaled_Weighted_LatLon, 
-                      filename = paste0(path, "/", scalefolder, "/", scaledweightedname, "_LatLon", pattern),
+                      filename = file.path(path, scalefolder, paste0(scaledweightedname, "_LatLon", pattern)),
                       format = format,
                       datatype = datatype,
                       bylayer = bylayer,
@@ -284,7 +284,7 @@ scaleraster <- function(path = NULL,
   
   # Save the raster
   raster::writeRaster(x = UDScaled, 
-                      filename = paste0(path, "/", scalefolder, "/", scaledweightedname, "_UDScaled", pattern),
+                      filename = file.path(path, scalefolder, paste0(scaledweightedname, "_UDScaled", pattern)),
                       format = format,
                       datatype = datatype,
                       bylayer = bylayer,
@@ -326,7 +326,7 @@ scaleraster <- function(path = NULL,
   if ((round(area.50.sd, 1) == 0) | (round(area.95.sd, 1) == 0)) print("No standard deviation: all individual UDs identical. Possibly due to insufficient memory for raster calculations. Check rasterResolution in movegroup")
   
   write.csv(area.ct,
-            file = paste0(path, "/", scalefolder, "/","VolumeAreas_ScaledAllFish.csv"),
+            file = file.path(path, scalefolder, "VolumeAreas_ScaledAllFish.csv"),
             row.names = FALSE)
   
   if (returnObj) return(All_Rasters_Scaled_Weighted)
