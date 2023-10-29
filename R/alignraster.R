@@ -98,7 +98,7 @@ alignraster <- function(folderroots = c("/myfolder/H", # character vector of loc
   names(crslist) <- foldernames # unnecessary?
   
   rasterlist <- 
-    as.list(paste0(file.path(folderroots, scalefolder, scaledweightedname), pattern))  |> # Pull all raster names from folderroots into a list
+    as.list(file.path(folderroots, scalefolder, paste0(scaledweightedname, pattern)))  |> # Pull all raster names from folderroots into a list
     lapply(function(x) raster::raster(x))  |>  # read in rasters
     lapply(function(x) raster::setMinMax(x))  |>  # set minmax values
     # https://stackoverflow.com/questions/72063819/use-an-arrow-assignment-function-as-r-purrr-map2
