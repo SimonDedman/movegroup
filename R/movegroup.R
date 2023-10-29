@@ -369,8 +369,8 @@ movegroup <- function(
   sp::proj4string(rall) # "+proj=aeqd +lat_0=44.99489997 +lon_0=-17.48575004 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
   rallCRS <- sp::CRS(sp::proj4string(rall))
   class(rallCRS) # CRS
-  write.csv(sp::proj4string(rall), paste0(savedir, "CRS.csv"), row.names = FALSE)
-  saveRDS(rallCRS, file = paste0(savedir, "CRS.Rds"))
+  write.csv(sp::proj4string(rall), file.path(savedir, "CRS.csv"), row.names = FALSE)
+  saveRDS(rallCRS, file = file.path(savedir, "CRS.Rds"))
   rm(moveall)
   rm(alldata)
   
@@ -401,7 +401,7 @@ movegroup <- function(
   rasterres <- (raster::res(xAEQD)[1]) ^ 2
   write.csv(x = data.frame(rasterres = rasterres,
                            rasterResolution = rasterResolution),
-            file = paste0(savedir, "Resolutions.csv"))
+            file = file.path(savedir, "Resolutions.csv"))
   
   # Loop through all unique tags
   counter <- 0
@@ -519,7 +519,7 @@ movegroup <- function(
     mtnvar <- as.data.frame(bursted_motionvar) # extract the data
     mtnvar$motionVariance <- move::getMotionVariance(bursted_motionvar) # add motionvariance
     write.csv(mtnvar,
-              file = paste0(savedir, i, "_MotionVariance.csv"),
+              file = file.path(savedir, i, "_MotionVariance.csv"),
               row.names = FALSE)
     rm(bursted)
     rm(mtnvar)
@@ -570,7 +570,7 @@ movegroup <- function(
     # Export aggregated individual UDs to as ascii files for further exploration/spatial analysis in GIS software.
     # Needed for when the aim is to plot population-level and normalized UDs per species.
     raster::writeRaster(bb, # x has unequal horizontal and vertical resolutions. Such data cannot be stored in arc-ascii format
-                        paste0(savedir, filename = i, writeRasterExtension),
+                        file.path(savedir, filename = i, writeRasterExtension),
                         format = writeRasterFormat, # "ascii"
                         datatype = writeRasterDatatype, # "FLT4S"
                         if (writeRasterFormat != "CDF") bylayer = TRUE, # bylayer kills ncdf4
