@@ -519,7 +519,7 @@ movegroup <- function(
     mtnvar <- as.data.frame(bursted_motionvar) # extract the data
     mtnvar$motionVariance <- move::getMotionVariance(bursted_motionvar) # add motionvariance
     write.csv(mtnvar,
-              file = file.path(savedir, i, "_MotionVariance.csv"),
+              file = file.path(savedir, paste0(i, "_MotionVariance.csv")),
               row.names = FALSE)
     rm(bursted)
     rm(mtnvar)
@@ -570,7 +570,7 @@ movegroup <- function(
     # Export aggregated individual UDs to as ascii files for further exploration/spatial analysis in GIS software.
     # Needed for when the aim is to plot population-level and normalized UDs per species.
     raster::writeRaster(bb, # x has unequal horizontal and vertical resolutions. Such data cannot be stored in arc-ascii format
-                        file.path(savedir, filename = i, writeRasterExtension),
+                        file.path(savedir, paste0(i, writeRasterExtension)),
                         format = writeRasterFormat, # "ascii"
                         datatype = writeRasterDatatype, # "FLT4S"
                         if (writeRasterFormat != "CDF") bylayer = TRUE, # bylayer kills ncdf4
