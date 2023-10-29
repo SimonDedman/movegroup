@@ -237,7 +237,7 @@ plotraster <- function(
   if (is.null(crsloc)) crsloc <- stringr::str_remove(x, pattern = "Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc")
   # If crsloc has a terminal slash, remove it, it's added later
   if (substr(x = crsloc, start = nchar(crsloc), stop = nchar(crsloc)) == "/") crsloc = substr(x = crsloc, start = 1, stop = nchar(crsloc) - 1)
-  dataCRS <- readRDS(paste0(crsloc, "/CRS.Rds")) # load CRS from file
+  dataCRS <- readRDS(file.path(crsloc, "CRS.Rds")) # load CRS from file
   # Import raster
   x <- stars::read_stars(x)
   # set CRS, function from sp
@@ -431,7 +431,7 @@ plotraster <- function(
     # if savedir doesn't exist, can't save into it, therefore create it
     if (!file.exists(savedir)) dir.create(savedir)
     # if pointsincontourssave wasn't entered, autogenerate
-    if (is.null(pointsincontourssave)) pointsincontourssave <- paste0(savedir, "/pointsincontour.csv")
+    if (is.null(pointsincontourssave)) pointsincontourssave <- file.path(savedir, "pointsincontour.csv")
     write.csv(locationpoints, file = pointsincontourssave)
     print(paste0(round(nrow(pointsin50) / nrow(locationpoints) * 100, 2), "% of location points within 50% contour")) # 72.16
     print(paste0(round(nrow(pointsin95) / nrow(locationpoints) * 100, 2), "% of location points within 95% contour")) # 99.77
