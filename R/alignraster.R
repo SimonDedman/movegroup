@@ -93,12 +93,12 @@ alignraster <- function(folderroots = c("/myfolder/H", # character vector of loc
   foldernames <- as.list(foldernames)
   
   # Read in CRS files as list
-  crslist <- as.list(paste0(folderroots, "/CRS.Rds"))  |> 
+  crslist <- as.list(file.path(folderroots, "CRS.Rds"))  |> 
     lapply(function(x) readRDS(x))
   names(crslist) <- foldernames # unnecessary?
   
   rasterlist <- 
-    as.list(paste0(folderroots, "/", scalefolder, "/", scaledweightedname, pattern))  |> # Pull all raster names from folderroots into a list
+    as.list(paste0(file.path(folderroots, scalefolder, scaledweightedname), pattern))  |> # Pull all raster names from folderroots into a list
     lapply(function(x) raster::raster(x))  |>  # read in rasters
     lapply(function(x) raster::setMinMax(x))  |>  # set minmax values
     # https://stackoverflow.com/questions/72063819/use-an-arrow-assignment-function-as-r-purrr-map2
@@ -128,11 +128,11 @@ alignraster <- function(folderroots = c("/myfolder/H", # character vector of loc
   # Save CRS
   rasterlistCRS <- sp::CRS(sp::proj4string(rasterlist[[1]]))
   class(rasterlistCRS) # CRS
-  write.csv(sp::proj4string(rasterlistCRS), paste0(savefolder, "/", "CRS.csv"), row.names = FALSE)
-  saveRDS(rasterlistCRS, file = paste0(savefolder, "/", "CRS.Rds"))
+  write.csv(sp::proj4string(rasterlistCRS), file.path(savefolder, "CRS.csv"), row.names = FALSE)
+  saveRDS(rasterlistCRS, file = file.path(savefolder, "CRS.Rds"))
   
   rasterlist <- lapply(rasterlist, function(x) raster::writeRaster(x = x, # resave individual rasters
-                                                         filename = paste0(savefolder, "/", names(x)), # , pattern: removed ability to resave as different format
+                                                         filename = file.path(savefolder, names(x)), # , pattern: removed ability to resave as different format
                                                          # error: adds X to start of numerical named objects####
                                                          format = format,
                                                          datatype = datatype,
