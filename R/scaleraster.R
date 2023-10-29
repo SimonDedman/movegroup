@@ -186,7 +186,7 @@ scaleraster <- function(path = NULL,
                                                     indices = rep(1, raster::nlayers(rasterstack)), # Vector of length nlayers(x), performs the function (sum) PER UNIQUE index, i.e. 1:5 = 5 unique sums.
                                                     fun = sum, # returns a single value, e.g. mean or min, and that takes a na.rm argument
                                                     na.rm = TRUE, # If TRUE, NA cells are removed from calculations
-                                                    # filename = paste0(path, "/", scalefolder, "/", summedname, pattern), # character. Optional output filename, causes file to be written
+                                                    # filename = file.path(path, scalefolder, paste0(summedname, pattern)), # character. Optional output filename, causes file to be written
                                                     format = format,
                                                     datatype = datatype,
                                                     bylayer = bylayer,
