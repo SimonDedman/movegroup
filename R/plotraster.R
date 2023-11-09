@@ -537,6 +537,9 @@ plotraster <- function(
       # name = waiver(),
       name = "UD%", # should be legendtitle?
       # limits = NA,
+      labels = 100 - waiver(), # values are 0-100 with 100=max in the centre but for proportion of time in UD we
+      # use % of max with 95% being 0.05 of max. So we need to reverse the labels to convert usage
+      # density into proportion of time.
       # position = "left"
       position = "right"
     ) +
