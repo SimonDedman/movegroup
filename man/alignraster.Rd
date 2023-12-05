@@ -64,26 +64,26 @@ alignraster.R if required, plotraster.R.
 # load data
 data("TracksCleaned")
 # set save directory
-mysavedir <- "/your-directory-here/"
+mysavedir <- "/your-directory-here"
 # loop movegroup and scaleraster through tide subsets
 tide <- c("H", "M", "L")
 for (i in tide) {
-dir.create(paste0(mysavedir, i))
+dir.create(file.path(mysavedir, i))
   movegroup(
     data = TracksCleaned[TracksCleaned$T.Ph == i, ],
     ID = "Shark",
     Datetime = "Datetime",
     Lat = "Lat",
     Lon = "Lon",
-    savedir = paste0(mysavedir, i, "/"))
+    savedir = file.path(mysavedir, i, "/"))
   
-  scaleraster(path = paste0(mysavedir, i),
-              crsloc = paste0(mysavedir, i))
+  scaleraster(path = file.path(mysavedir, i),
+              crsloc = file.path(mysavedir, i))
 }
 
-alignraster(folderroots = paste0(mysavedir, tide),
+alignraster(folderroots = file.path(mysavedir, tide),
             foldernames = tide,
-            savefolder = paste0(mysavedir, "Aligned"))
+            savefolder = file.path(mysavedir, "Aligned"))
 }
 
 }

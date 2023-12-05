@@ -12,7 +12,6 @@ movegroup(
   Lon = NULL,
   dat.TZ = "US/Eastern",
   proj = sp::CRS("+proj=longlat +datum=WGS84"),
-  projectedCRS = "+init=epsg:32617",
   sensor = "VR2W",
   moveLocError = 1,
   timeDiffLong = 2,
@@ -51,9 +50,6 @@ Must be in POSIXct format. "Character".}
 \item{dat.TZ}{Timezone of data for as.POSIXct. Default "US/Eastern".}
 
 \item{proj}{CRS for move function. Default sp::CRS("+proj=longlat +datum=WGS84").}
-
-\item{projectedCRS}{EPSG code for CRS for initial transform of latlon points; corresponds to
-rasterCRS zone. Default "+init=epsg:32617" corresponding to The Bahamas.}
 
 \item{sensor}{Sensor for move function. Single character or vector with length of the number of
 coordinates. Optional. Default "VR2W".}
@@ -128,10 +124,14 @@ raster::writeRaster param Datatype. Default "FLT4S". TO DEPRECIATE.}
 "VolumeArea_AbsoluteScale.csv".}
 
 \item{savedir}{Save outputs to a temporary directory (default) else change
-to desired directory e.g. "/home/me/folder/". Do not use getwd() for this.
-Include terminal slash. Directory must exist. Default tempdir().}
+to desired directory e.g. "/home/me/folder". Do not use getwd() for this.
+Do NOT include terminal slash. Directory must exist. Default tempdir().}
 
 \item{alerts}{Audio warning for failures. Default TRUE.}
+
+\item{projectedCRS}{EPSG code for CRS for initial transform of latlon points; corresponds to
+rasterCRS zone. Default "+init=epsg:32617" corresponding to The Bahamas. 2023-12-04 depreciation
+test, using rasterCRS value.}
 }
 \value{
 Individual-level utilization distributions, saved as rasters, as well
@@ -195,7 +195,7 @@ movegroup(
  Datetime = "Datetime",
  Lat = "Lat",
  Lon = "Lon",
- savedir = "/your/directory/here/")
+ savedir = "/your/directory/here")
 }
 
 }

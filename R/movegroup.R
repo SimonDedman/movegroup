@@ -49,7 +49,8 @@
 #' @param dat.TZ Timezone of data for as.POSIXct. Default "US/Eastern".
 #' @param proj CRS for move function. Default sp::CRS("+proj=longlat +datum=WGS84").
 #' @param projectedCRS EPSG code for CRS for initial transform of latlon points; corresponds to 
-#' rasterCRS zone. Default "+init=epsg:32617" corresponding to The Bahamas.
+#' rasterCRS zone. Default "+init=epsg:32617" corresponding to The Bahamas. 2023-12-04 depreciation 
+#' test, using rasterCRS value.
 #' @param sensor Sensor for move function. Single character or vector with length of the number of 
 #' coordinates. Optional. Default "VR2W".
 #' @param moveLocError Location error (m) in the 'brownian.bridge.dyn' function in the 'move' 
@@ -179,7 +180,7 @@ movegroup <- function(
     # Group = NULL, # name of grouping column in data. CURRENTLY UNUSED; MAKE USER DO THIS?
     dat.TZ = "US/Eastern", # timezone for as.POSIXct.
     proj = sp::CRS("+proj=longlat +datum=WGS84"), # CRS for move function.
-    projectedCRS = "+init=epsg:32617", # EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone. This is around Bimini, Bahamas.
+    # projectedCRS = "+init=epsg:32617", # EPSG code for CRS for initial transform of latlon points; corresponds to rasterCRS zone. This is around Bimini, Bahamas.
     sensor = "VR2W", # sensor for move function. Single character or vector with length of the number of coordinates. Optional.
     moveLocError = 1, # location error in metres for move function. Numeric. Either single or a vector of length nrow data.
     timeDiffLong = 2, # threshold length of time in timeDiffUnits designating long breaks in relocations.
@@ -260,7 +261,8 @@ movegroup <- function(
   )
   
   # Transform to UTM by setting the EPSG to local UTM zone for the data.
-  cord.UTM <- as.data.frame(sp::spTransform(cord.dec, sp::CRS(projectedCRS)))
+  # cord.UTM <- as.data.frame(sp::spTransform(cord.dec, sp::CRS(projectedCRS)))
+  cord.UTM <- as.data.frame(sp::spTransform(cord.dec, rasterCRS)) # 2023-12-04 depreciate projectedCRS
   colnames(cord.UTM) <- c("NewEastingUTM", "NewNorthingUTM")
   data <- cbind(data, cord.UTM) # 1308 x 7
   
@@ -326,7 +328,7 @@ movegroup <- function(
   # make buffpct larger
   if (!is.null(rasterExtent)) { # if xUTM object exists
     xUTM <- sp::SpatialPoints(cbind(c(rasterExtent[1], rasterExtent[2]), c(rasterExtent[3], rasterExtent[4])), proj4string = sp::CRS("+proj=longlat"))
-    xUTM <- as.data.frame(sp::spTransform(xUTM, sp::CRS(projectedCRS))) # Transform to UTM
+    xUTM <- as.data.frame(sp::spTransform(xUTM, rasterCRS)) # Transform to UTM  # 2023-12-04 depreciate projectedCRS
     xUTM <- raster::raster( # create a raster
       xmn = xUTM[1,1] - ((xUTM[2,1] - xUTM[1,1]) * buffpct), # with xUTM's values as extents
       xmx = xUTM[2,1] + ((xUTM[2,1] - xUTM[1,1]) * buffpct),
