@@ -9,6 +9,7 @@ plotraster(
   crsloc = NULL,
   xlatlon = NULL,
   locationpoints = NULL,
+  calcCOA = FALSE,
   pointsincontourssave = NULL,
   trim = TRUE,
   myLocation = NULL,
@@ -22,6 +23,8 @@ plotraster(
   contour2colour = "orange",
   positionscolour = "white",
   positionsalpha = 0.33,
+  COAcolour = "black",
+  COAalpha = 1,
   plottitle = "Aggregated 95\% and 50\% UD contours",
   plotsubtitle = "Scaled contours",
   legendtitle = "Percent UD Contours",
@@ -71,6 +74,9 @@ the csv output.}
 contours they fall within, include the original input location points of animals, for xlatlon.
 This should be a data frame which MUST have columns labelled "lat" and "lon".}
 
+\item{calcCOA}{Calculate the centre of activity i.e. mean lat & lon point. Requires
+locationpoints. Default FALSE.}
+
 \item{pointsincontourssave}{Location and name to save the 'location in contours' csv related to
 xlatlon and locationpoints, including the ".csv".}
 
@@ -109,6 +115,11 @@ Default NULL is calculated based on your data.}
 \item{positionscolour}{Colour for original animal locations, if xlatlon not NULL. Default "white".}
 
 \item{positionsalpha}{Alpha value for positions, default 0.33, values from 0 (fully transparent)
+to 1 (fully parent).}
+
+\item{COAcolour}{Colour for Centre of Activity marker, if plotted. Default "black".}
+
+\item{COAalpha}{Alpha value for Centre of Activity point, default 1, values from 0 (fully transparent)
 to 1 (fully parent).}
 
 \item{plottitle}{Title of the resultant plot, default "Aggregated 95pct and 50pct UD contours".}
@@ -241,14 +252,14 @@ https://www.youtube.com/watch?v=O5cUoVpVUjU&t=232s
 \dontrun{
 # Having run the movegroup and scaleraster function examples:
 plotraster(
-  x = paste0(mysavedir, "Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"),
+  x = file.path(mysavedir, "Scaled", "All_Rasters_Scaled_Weighted_UDScaled.asc"),
   mapzoom = 14,
   mapsource = "stamen",
   maptype = "terrain",
-  savedir = paste0(mysavedir, "Plot"),
-  xlatlon = paste0(mysavedir, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc"),
+  savedir = file.path(mysavedir, "Plot"),
+  xlatlon = file.path(mysavedir, "Scaled", "All_Rasters_Scaled_Weighted_LatLon.asc"),
   locationpoints = TracksCleaned |> dplyr::rename(lat = "Lat", lon = "Lon"),
-  pointsincontourssave = paste0(mysavedir, "Scaled/pointsincontours.csv"))
+  pointsincontourssave = file.path(mysavedir, "Scaled", "pointsincontours.csv"))
 }
 }
 \author{

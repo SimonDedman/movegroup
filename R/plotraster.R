@@ -25,6 +25,8 @@
 #' @param locationpoints If you want to also return a csv of your original locations labelled with which UD
 #'  contours they fall within, include the original input location points of animals, for xlatlon.
 #'  This should be a data frame which MUST have columns labelled "lat" and "lon".
+#' @param calcCOA Calculate the centre of activity i.e. mean lat & lon point. Requires 
+#' locationpoints. Default FALSE.
 #' @param pointsincontourssave Location and name to save the 'location in contours' csv related to
 #' xlatlon and locationpoints, including the ".csv".
 #' @param trim Remove NA & 0 UD values and crop the plot to remaining date extents? Shrinks lots of
@@ -51,6 +53,9 @@
 #' @param contour2colour Colour for contour 2, typically 50pct, default "orange".
 #' @param positionscolour Colour for original animal locations, if xlatlon not NULL. Default "white".
 #' @param positionsalpha Alpha value for positions, default 0.33, values from 0 (fully transparent)
+#' to 1 (fully parent).
+#' @param COAcolour Colour for Centre of Activity marker, if plotted. Default "black".
+#' @param COAalpha Alpha value for Centre of Activity point, default 1, values from 0 (fully transparent)
 #' to 1 (fully parent).
 #' @param plottitle Title of the resultant plot, default "Aggregated 95pct and 50pct UD contours".
 #' @param plotsubtitle Plot subtitle, default "Scaled contours". Can add the n of your individuals.
@@ -151,14 +156,14 @@
 #' \dontrun{
 #' # Having run the movegroup and scaleraster function examples:
 #' plotraster(
-#'   x = paste0(mysavedir, "Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc"),
+#'   x = file.path(mysavedir, "Scaled", "All_Rasters_Scaled_Weighted_UDScaled.asc"),
 #'   mapzoom = 14,
 #'   mapsource = "stamen",
 #'   maptype = "terrain",
-#'   savedir = paste0(mysavedir, "Plot"),
-#'   xlatlon = paste0(mysavedir, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc"),
+#'   savedir = file.path(mysavedir, "Plot"),
+#'   xlatlon = file.path(mysavedir, "Scaled", "All_Rasters_Scaled_Weighted_LatLon.asc"),
 #'   locationpoints = TracksCleaned |> dplyr::rename(lat = "Lat", lon = "Lon"),
-#'   pointsincontourssave = paste0(mysavedir, "Scaled/pointsincontours.csv"))
+#'   pointsincontourssave = file.path(mysavedir, "Scaled", "pointsincontours.csv"))
 #' }
 
 plotraster <- function(
@@ -167,6 +172,7 @@ plotraster <- function(
     crsloc = NULL, # Location of saved CRS Rds file from movegroup.R. Should be same as path.
     xlatlon = NULL, # if you want to also return a csv of your original locations labelled with which UD contours they fall within, include the location of that here. Try paste0(crsloc, "Scaled/All_Rasters_Scaled_Weighted_LatLon.asc") .
     locationpoints = NULL, # original input location points of animals, for xlatlon. MUST have columns labelled "lat" and "lon".
+    calcCOA = FALSE, # calculate the centre of activity i.e. mean lat & lon point. Requires locationpoints.
     pointsincontourssave = NULL,  # Location and name of location in contours csv, including the .csv.
     trim = TRUE, # remove NA & 0 values and crop to remaining date extents? Default TRUE
     myLocation = NULL, # location for extents, format c(xmin, ymin, xmax, ymax).
@@ -190,6 +196,8 @@ plotraster <- function(
     contour2colour = "orange", # colour for contour 2, typically 50%.
     positionscolour = "white", # colour for original locations, if xlatlon not NULL.
     positionsalpha = 0.33, # alpha value for positions, default 0.33, values from 0 (fully transparent) to 1 (fully parent).
+    COAcolour = "black", # colour for Centre of Activity marker, if plotted.
+    COAalpha  = 1, # Alpha value for Centre of Activity point, default 1, values from 0 (fully transparent) to 1 (fully parent).
     plottitle = "Aggregated 95% and 50% UD contours",
     # Can use the term 'home range' when an animal can be detected wherever it goes
     # i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic
@@ -232,7 +240,7 @@ plotraster <- function(
   if (!is.null(receiverlats) & !is.null(receiverlons)) if (length(receiverlats) != length(receiverlons)) stop("length of receiverlats must equal length of receiverlons")
   if (!is.null(receiverlats) & !is.null(receivernames)) if (length(receiverlats) != length(receivernames)) stop("length of receivernames must equal length of receiverlats/lons")
   if (!is.null(receiverlats) & !is.null(receiverrange)) if (length(receiverrange) != length(receiverlons)) if (length(receiverrange) != 1) stop("length of receiverrange must equal length of receiverlats/lons, or 1")
-
+  
   # derive crsloc if not provided, assuming default folder and name of x
   if (is.null(crsloc)) crsloc <- stringr::str_remove(x, pattern = "Scaled/All_Rasters_Scaled_Weighted_UDScaled.asc")
   # If crsloc or savedir has a terminal slash, remove it, it's added later
@@ -243,15 +251,15 @@ plotraster <- function(
   x <- stars::read_stars(x)
   # set CRS, function from sp
   sf::st_crs(x) <- sp::proj4string(dataCRS)
-
+  
   # for plotting the surface UD on the map:
   # surfaceUD <- x %>% sf::st_set_crs(3857) # 4326 = WGS84. Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: degree
   # %>% sf::st_transform(3857)
-
+  
   # if (stars::st_raster_type(x) == "curvilinear") stop(print("x is curvilinear; first reproject to planar"))
   # Warning message: object ‘is_curvilinear’ is not exported by 'namespace:stars'
   # https://github.com/r-spatial/stars/issues/464
-
+  
   # Trim data to plot surface
   y <- x # make dupe object else removing all data < 0.05 means the 0.05 contour doesn't work in ggplot
   if (trim) { # trim raster extent to data?
@@ -260,18 +268,18 @@ plotraster <- function(
   }
   y <- starsExtra::trim2(y) # remove NA columns, which were all zero columns. This changes the bbox accordingly
   y[[1]] <- (y[[1]] / max(y[[1]], na.rm = TRUE)) * 100 # convert from raw values to 0:100 scale so legend is 0:100%
-
+  
   # if (is.null(myLocation)) myLocation <- y %>% sf::st_transform(4326) %>% sf::st_bbox() %>% as.vector() # trimmer raster extents are smaller than UD95 contours
   # if (is.null(myLocation)) myLocation <- sf_95 %>% sf::st_transform(4326) %>% sf::st_bbox() %>% as.vector() # not using sf_95 any more
   if (is.null(myLocation)) myLocation <- stars::st_contour(x = x, contour_lines = TRUE, breaks = max(x[[1]], na.rm = TRUE) * 0.05)  |>
     sf::st_transform(4326) |>  sf::st_bbox()  |>  as.vector()
-
+  
   if (!is.null(gmapsAPI)) ggmap::register_google(key = gmapsAPI, # an api key
                                                  account_type = "standard",
                                                  write = TRUE)
-
+  
   if (mapsource != "google") googlemap <- FALSE # in case user forgot to set both
-
+  
   if (expandfactor != 0) { # grow bounds extents if requested
     xmid <- mean(myLocation[c(1,3)])
     ymid <- mean(myLocation[c(2,4)])
@@ -281,7 +289,7 @@ plotraster <- function(
     ymin <- ymid - ((ymid - myLocation[2]) * expandfactor)
     myLocation <- c(xmin, ymin, xmax, ymax)
   }
-
+  
   if (mapsource == "google" & is.null(mapzoom)) {
     # Created lookup table for degrees to mapzoom by eye at all zoom levels
     lonvec <- c(0.00042724609375,
@@ -338,9 +346,9 @@ plotraster <- function(
     # Do MIN zoom i.e. least zoomed in since otherwise it will cut off one dimension's data
     mapzoom <- min(mapzoomlon, mapzoomlat)
   }
-
+  
   if (googlemap) myLocation <- c(mean(c(myLocation[1], myLocation[3])), mean(c(myLocation[2], myLocation[4]))) # googlemap needs a center lon lat
-
+  
   myMap <- ggmap::get_map(
     location = myLocation, # -62.57564  28.64368  33.78889  63.68533 # stamen etc want a bounding box
     zoom = mapzoom, # 3 (continent) - 21 (building). Stamen: 0-18
@@ -350,7 +358,7 @@ plotraster <- function(
     maptype = maptype, # "satellite"
     crop = TRUE # google maps crs = 4326
   )
-
+  
   # Define a function to fix the bbox to be in EPSG:3857
   # https://stackoverflow.com/a/50844502/1736291 Fixes "error no lon value" in ggmap below
   ggmap_bbox <- function(map) {
@@ -369,14 +377,14 @@ plotraster <- function(
     map
   }
   myMap <- ggmap_bbox(myMap) # Use the function. Resulting map is CRS 3857
-
+  
   # Automate width * height adjustments for different map extent / ratio
   # 6 (manually chosen width, below), divided by width range times by height range
   # Maintains ratio by scales height to width(6). Then *1.2 because it still wasn't perfect.
   # attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]] # longitude, x, width, bind as 6
   # attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]] # latitude, y, height
   autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]]) * 1.2
-
+  
   # Create receiver objects
   if (!is.null(receiverlats) & !is.null(receiverlons)) {
     receiver <- data.frame(lon = receiverlons,
@@ -391,24 +399,24 @@ plotraster <- function(
       receiver <- cbind(receiver, receiverrange)
     }
   }
-
+  
   # Produce CSV of which points are within which UD contour
   if (!is.null(xlatlon)) {
     # Import raster
     xlatlon <- stars::read_stars(xlatlon) # UDScaled
     sf::st_crs(xlatlon) <- sp::proj4string(dataCRS) # set CRS
-
+    
     # Create contours & polygons for ggplot & polygon count objects
     # 95% UD
     UD95poly <- stars::st_contour(x = xlatlon,
                                   contour_lines = TRUE,
                                   breaks = max(xlatlon[[1]],
                                                na.rm = TRUE) * 0.05) |>
-
+      
       sf::st_cast("POLYGON")
     sf::st_crs(UD95poly) <- sp::proj4string(dataCRS)# set CRS
     UD95poly <- UD95poly |> sf::st_set_crs(4326) # make 4326, doesn't match CRS of mypointssf otherwise
-
+    
     # 50% UD
     UD50poly <- stars::st_contour(x = xlatlon,
                                   contour_lines = TRUE,
@@ -417,12 +425,20 @@ plotraster <- function(
       sf::st_cast("POLYGON")
     sf::st_crs(UD50poly) <- sp::proj4string(dataCRS)# set CRS
     UD50poly <- UD50poly |> sf::st_set_crs(4326) # make 4326, doesn't match CRS of mypointssf otherwise
-
+    
     # Import points
     locationpoints <- locationpoints |>
       dplyr::mutate(Index = 1:length("lat")) # add unique index for later
     mypointssf <- sf::st_as_sf(locationpoints, coords = c("lon","lat")) |> sf::st_set_crs(4326) #points by day, # Convert points to sf
-
+    
+    if (calcCOA) { # Calculate central place / centre of activity
+      COA <- locationpoints |> 
+        summarise(lat = mean(lat, na.rm = TRUE),
+                  lon = mean(lon, na.rm = TRUE)) |> 
+        sf::st_as_sf(coords = c("lon","lat")) |>
+        sf::st_set_crs(4326)
+    }
+    
     # Assign points to contours/UDs
     pointsin50 <- mypointssf[UD50poly, ]
     # label those points TRUE
@@ -437,17 +453,17 @@ plotraster <- function(
     print(paste0(round(nrow(pointsin50) / nrow(locationpoints) * 100, 2), "% of location points within 50% contour")) # 72.16
     print(paste0(round(nrow(pointsin95) / nrow(locationpoints) * 100, 2), "% of location points within 95% contour")) # 99.77
   } # close if (!is.null(xlatlon))
-
-
-
+  
+  
+  
   # plot map ####
   ggmap::ggmap(myMap) + # basemap CRS = 3857
-
+    
     # UD surface
     {if (surface)
       stars::geom_stars(data = y  |>  sf::st_transform(3857), inherit.aes = FALSE)
     } +
-
+    
     # receiver centrepoints
     {if (!is.null(receiverlats) & !is.null(receiverlons))
       ggplot2::geom_sf(data = receiver  |>
@@ -461,7 +477,7 @@ plotraster <- function(
                        inherit.aes = FALSE,
       )
     } +
-
+    
     # receiver buffer circles
     {if (!is.null(receiverlats) & !is.null(receiverlons) & !is.null(receiverrange))
       ggplot2::geom_sf(data = sf::st_buffer(receiver, dist = receiverrange)  |>
@@ -473,7 +489,7 @@ plotraster <- function(
                        inherit.aes = FALSE
       )
     } +
-
+    
     # receiver labels
     {if (!is.null(receiverlats) & !is.null(receiverlons) & !is.null(receivernames))
       ggplot2::geom_sf_label(data = receiver  |>
@@ -490,7 +506,7 @@ plotraster <- function(
                              ggplot2::aes(label = receivernames)
       )
     } +
-
+    
     # overlay original animal position points
     { if (!is.null(xlatlon))
       ggplot2::geom_sf(data = mypointssf |>
@@ -501,18 +517,29 @@ plotraster <- function(
                        ggplot2::aes(colour = "Positions")
       )
     } +
-
-    # 95% UD
-    # ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
-    ggplot2::geom_sf(data = stars::st_contour(x = x,
-                                              contour_lines = TRUE,
-                                              breaks = max(x[[1]],
-                                                           na.rm = TRUE) * 0.05) |>
-                       sf::st_transform(3857),
-                     fill = NA,
-                     inherit.aes = FALSE,
-                     ggplot2::aes(colour = "95% UD")) +
-
+    
+    # Plot central place / centre of activity
+    { if (calcCOA)
+      ggplot2::geom_sf(data = COA |>
+                         sf::st_transform(3857),
+                       inherit.aes = FALSE,
+                       size = 0.2,
+                       alpha = COAalpha,
+                       ggplot2::aes(colour = "Centre of Activity")
+      )
+    } +
+  
+  # 95% UD
+  # ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
+  ggplot2::geom_sf(data = stars::st_contour(x = x,
+                                            contour_lines = TRUE,
+                                            breaks = max(x[[1]],
+                                                         na.rm = TRUE) * 0.05) |>
+                     sf::st_transform(3857),
+                   fill = NA,
+                   inherit.aes = FALSE,
+                   ggplot2::aes(colour = "95% UD")) +
+    
     # 50% UD
     ggplot2::geom_sf(data = stars::st_contour(x = x,
                                               contour_lines = TRUE,
@@ -522,7 +549,7 @@ plotraster <- function(
                      fill = NA,
                      inherit.aes = FALSE,
                      ggplot2::aes(colour = "50% UD")) +
-
+    
     # UD surface colours
     viridis::scale_fill_viridis(
       alpha = 1, # 0:1
@@ -544,29 +571,30 @@ plotraster <- function(
       # position = "left"
       position = "right"
     ) +
-
+    
     # UD contour colours
     ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour,
                                                                 "95% UD" = contour1colour,
-                                                                "Positions" = positionscolour)) +
-
-  ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
-  ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
-  ggplot2::theme_minimal() +
-  ggplot2::theme(
-    legend.position = legendposition, #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
-    legend.spacing.x = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
-    legend.spacing.y = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
-    legend.title = ggplot2::element_text(size = 8),
-    legend.text = ggplot2::element_text(size = 8),
-    legend.background = ggplot2::element_rect(fill = "white", colour = NA), # element_blank(),
-    panel.background = ggplot2::element_rect(fill = "#99b3cc", colour = "grey50"), # Stamen ocean blue background
-    plot.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
-    legend.key = ggplot2::element_blank(),
-    text = ggplot2::element_text(size = fontsize,  family = fontfamily)
-  ) # removed whitespace buffer around legend boxes which is nice
-
-ggplot2::ggsave(filename = filesavename, plot = ggplot2::last_plot(), device = "png", path = savedir, scale = 1,
-                #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
-                width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)
+                                                                "Positions" = positionscolour,
+                                                                "Centre of Activity" = COAcolour)) +
+    
+    ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
+    ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      legend.position = legendposition, #%dist (of middle? of legend box) from L to R, %dist from Bot to Top
+      legend.spacing.x = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
+      legend.spacing.y = ggplot2::unit(0, 'cm'), #compress spacing between legend items, this is min
+      legend.title = ggplot2::element_text(size = 8),
+      legend.text = ggplot2::element_text(size = 8),
+      legend.background = ggplot2::element_rect(fill = "white", colour = NA), # element_blank(),
+      panel.background = ggplot2::element_rect(fill = "#99b3cc", colour = "grey50"), # Stamen ocean blue background
+      plot.background = ggplot2::element_rect(fill = "white", colour = "grey50"), # white background
+      legend.key = ggplot2::element_blank(),
+      text = ggplot2::element_text(size = fontsize,  family = fontfamily)
+    ) # removed whitespace buffer around legend boxes which is nice
+  
+  ggplot2::ggsave(filename = filesavename, plot = ggplot2::last_plot(), device = "png", path = savedir, scale = 1,
+                  #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
+                  width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)
 } # close function
