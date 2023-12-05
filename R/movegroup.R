@@ -112,8 +112,8 @@
 #' @param absVolumeAreaSaveName File name plus extension where UD estimates are saved. Default 
 #' "VolumeArea_AbsoluteScale.csv".
 #' @param savedir Save outputs to a temporary directory (default) else change 
-#' to desired directory e.g. "/home/me/folder/". Do not use getwd() for this. 
-#' Include terminal slash. Directory must exist. Default tempdir().
+#' to desired directory e.g. "/home/me/folder". Do not use getwd() for this. 
+#' Do NOT include terminal slash. Directory must exist. Default tempdir().
 #' @param alerts Audio warning for failures. Default TRUE.
 #' 
 #' @return Individual-level utilization distributions, saved as rasters, as well
@@ -157,7 +157,7 @@
 #'  Datetime = "Datetime",
 #'  Lat = "Lat",
 #'  Lon = "Lon",
-#'  savedir = "/your/directory/here/")
+#'  savedir = "/your/directory/here")
 #' }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
@@ -203,6 +203,10 @@ movegroup <- function(
     # directory e.g. "/home/me/folder". Do not use getwd() here.
     alerts = TRUE # audio warning for failures
 ) {
+  
+  # If savedir has a terminal slash, remove it, it's added later
+  if (substr(x = savedir, start = nchar(savedir), stop = nchar(savedir)) == "/") savedir = substr(x = savedir, start = 1, stop = nchar(savedir) - 1)
+  
   # if savedir doesn't exist, can't save or setwd into it, therefore create it
   if (!file.exists(savedir)) dir.create(savedir)
   
