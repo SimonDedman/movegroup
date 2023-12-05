@@ -172,7 +172,7 @@ scaleraster <- function(path = NULL,
     # lapply(function(x) x / weighting)  |>  # Weighting occurs here
     purrr::map2(.y = weighting, .f = `/`)  |>  # Weighting occurs here. .y will be recycled if length 1.
     lapply(function(x) raster::writeRaster(x = x, # save scaled individual rasters
-                                           filename = file.path(path, scalefolder, names(x)),
+                                           filename = file.path(path, scalefolder, names(x)), # should have "/", before names() ?
                                            format = format,
                                            datatype = datatype,
                                            if (format != "CDF") bylayer = bylayer,
@@ -186,7 +186,7 @@ scaleraster <- function(path = NULL,
                                                     indices = rep(1, raster::nlayers(rasterstack)), # Vector of length nlayers(x), performs the function (sum) PER UNIQUE index, i.e. 1:5 = 5 unique sums.
                                                     fun = sum, # returns a single value, e.g. mean or min, and that takes a na.rm argument
                                                     na.rm = TRUE, # If TRUE, NA cells are removed from calculations
-                                                    # filename = file.path(path, scalefolder, summedname, pattern), # character. Optional output filename, causes file to be written
+                                                    # filename = file.path(path, scalefolder, paste0(summedname, pattern)), # character. Optional output filename, causes file to be written
                                                     format = format,
                                                     datatype = datatype,
                                                     bylayer = bylayer,
@@ -200,7 +200,7 @@ scaleraster <- function(path = NULL,
   
   # Save this raster
   raster::writeRaster(x = All_Rasters_Scaled_Weighted,
-                      filename = file.path(path, scalefolder, scaledweightedname, pattern),
+                      filename = file.path(path, scalefolder, paste0(scaledweightedname, pattern)),
                       format = format,
                       datatype = datatype,
                       bylayer = bylayer,
@@ -238,7 +238,7 @@ scaleraster <- function(path = NULL,
   
   # Save the raster
   raster::writeRaster(x = All_Rasters_Scaled_Weighted_LatLon, 
-                      filename = file.path(path, scalefolder, scaledweightedname, "_LatLon", pattern),
+                      filename = file.path(path, scalefolder, paste0(scaledweightedname, "_LatLon", pattern)),
                       format = format,
                       datatype = datatype,
                       bylayer = bylayer,
@@ -284,7 +284,7 @@ scaleraster <- function(path = NULL,
   
   # Save the raster
   raster::writeRaster(x = UDScaled, 
-                      filename = file.path(path, scalefolder, scaledweightedname, "_UDScaled", pattern),
+                      filename = file.path(path, scalefolder, paste0(scaledweightedname, "_UDScaled", pattern)),
                       format = format,
                       datatype = datatype,
                       bylayer = bylayer,
