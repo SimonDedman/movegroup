@@ -538,23 +538,23 @@ plotraster <- function(
       ggplot2::geom_sf(data = COA |>
                          sf::st_transform(3857),
                        inherit.aes = FALSE,
-                       size = COAsize,
-                       alpha = COAalpha,
-                       shape = COAshape,
-                       ggplot2::aes(colour = "Centre of Activity")
+                       ggplot2::aes(colour = "Centre of Activity",
+                                    size = "COAsize",
+                                    alpha = "COAalpha",
+                                    shape = "COAshape")
       )
     } +
-  
-  # 95% UD
-  # ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
-  ggplot2::geom_sf(data = stars::st_contour(x = x,
-                                            contour_lines = TRUE,
-                                            breaks = max(x[[1]],
-                                                         na.rm = TRUE) * 0.05) |>
-                     sf::st_transform(3857),
-                   fill = NA,
-                   inherit.aes = FALSE,
-                   ggplot2::aes(colour = "95% UD")) +
+    
+    # 95% UD
+    # ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
+    ggplot2::geom_sf(data = stars::st_contour(x = x,
+                                              contour_lines = TRUE,
+                                              breaks = max(x[[1]],
+                                                           na.rm = TRUE) * 0.05) |>
+                       sf::st_transform(3857),
+                     fill = NA,
+                     inherit.aes = FALSE,
+                     ggplot2::aes(colour = "95% UD")) +
     
     # 50% UD
     ggplot2::geom_sf(data = stars::st_contour(x = x,
@@ -566,7 +566,23 @@ plotraster <- function(
                      inherit.aes = FALSE,
                      ggplot2::aes(colour = "50% UD")) +
     
-    # UD surface colours
+    # UD contour & COA colours
+    ggplot2::scale_colour_manual(name = legendtitle,
+                                 values = c("50% UD" = contour2colour,
+                                            "95% UD" = contour1colour,
+                                            "Positions" = positionscolour,
+                                            "Centre of Activity" = COAcolour)) +
+    
+    # COA size
+    ggplot2::scale_size_manual(values = c("COAsize" = COAsize)) +
+
+    # COA alpha
+    ggplot2::scale_alpha_manual(values = c("COAalpha" = COAalpha)) +
+    
+    # COA COAshape
+    ggplot2::scale_shape_manual(values = c("COAshape" = COAshape)) +
+    
+    # UD surface colour scale
     viridis::scale_fill_viridis(
       alpha = 1, # 0:1
       begin = 0, # hue
@@ -581,19 +597,17 @@ plotraster <- function(
       # name = waiver(),
       name = "UD%", # should be legendtitle?
       # limits = NA,
-      # labels = 100 - ggplot2::waiver(), # values are 0-100 with 100=max in the centre but for proportion of time in UD we
-      # Error in 100 - ggplot2::waiver() : non-numeric argument to binary operator
+      labels = ~ 100 - .x, # https://stackoverflow.com/questions/77609884/how-to-reverse-legend-labels-only-so-high-value-starts-at-bottom
+      # values are 0-100 with 100=max in the centre but for proportion of time in UD we
       # use % of max with 95% being 0.05 of max. So we need to reverse the labels to convert usage
       # density into proportion of time.
       # position = "left"
       position = "right"
     ) +
     
-    # UD contour colours
-    ggplot2::scale_colour_manual(name = legendtitle, values = c("50% UD" = contour2colour,
-                                                                "95% UD" = contour1colour,
-                                                                "Positions" = positionscolour,
-                                                                "Centre of Activity" = COAcolour)) +
+    # Enforce the order of the legend
+    ggplot2::guides(colour = ggplot2::guide_legend(order = 1), 
+                    shape = ggplot2::guide_legend(order = 2)) +
     
     ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
     ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
