@@ -533,7 +533,7 @@ plotraster <- function(
                                     alpha = "positionsalpha")
       )
     } +
-    
+
     # Plot central place / centre of activity
     { if (calcCOA)
       ggplot2::geom_sf(data = COA |>
@@ -585,7 +585,7 @@ plotraster <- function(
                                            "PositionsShape" = 20)
                                 ) + # guide = "none" does nothing?
     
-    # ggplot2::guides(shape = FALSE) + # does nothing
+    ggplot2::guides(shape = FALSE) + # does nothing # "none"
     
     # COA alpha
     ggplot2::scale_alpha_manual(values = c("COAalpha" = COAalpha,
@@ -612,8 +612,9 @@ plotraster <- function(
     ) +
     
     # Enforce the order of the legend
-    ggplot2::guides(colour = ggplot2::guide_legend(order = 1), 
-                    shape = ggplot2::guide_legend(order = 2)) +
+    ggplot2::guides(colour = ggplot2::guide_legend(order = 1), # makes contour lines legend first
+                    # fill = ggplot2::guide_legend(order = 2) # makes fill binned for some reason
+                    ) +
     
     ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
     ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
