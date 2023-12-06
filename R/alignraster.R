@@ -74,7 +74,7 @@ alignraster <- function(folderroots = c("/myfolder/H", # character vector of loc
                         foldernames = c("H", "L", "M"), # character vector names of folders corresponding to files in folderroots, i.e. the names of the objects, arrays, regions, etc.
                         pattern = ".asc", # for input rasters from scaleraster
                         scalefolder = "Scaled", # for input rasters from scaleraster
-                        scaledweightedname = "All_Rasters_Scaled", # for input rasters from scaleraster
+                        scaledweightedname = "All_Rasters_Scaled_Weighted", # for input rasters from scaleraster
                         savefolder = "/myfolder/Aligned", # single character entry, no trailing slash
                         format = "ascii", # save format
                         datatype = "FLT4S", # save format
@@ -128,6 +128,9 @@ alignraster <- function(folderroots = c("/myfolder/H", # character vector of loc
   # Save CRS
   rasterlistCRS <- sp::CRS(sp::proj4string(rasterlist[[1]]))
   class(rasterlistCRS) # CRS
+  
+  # if savefolder doesn't exist, create it
+  if (!file.exists(savefolder)) dir.create(savefolder)
   write.csv(sp::proj4string(rasterlistCRS), file.path(savefolder, "CRS.csv"), row.names = FALSE)
   saveRDS(rasterlistCRS, file = file.path(savefolder, "CRS.Rds"))
   

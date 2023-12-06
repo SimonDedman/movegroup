@@ -44,11 +44,13 @@
 #' Google Maps.
 #' @param mapzoom Highest number = zoomed in. Google: 3 (continent) - 21 (building). stamen: 0-18.
 #' Default NULL is calculated based on your data.
-#' @param mapsource Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.
+#' @param mapsource Source for ggmap::get_map; google needs Google Maps API present. Options 
+#' “google”, “osm”, “stadia”.
 #' @param maptype Type of map for ggmap::get_map param maptype. Options: Google mapsource: "terrain",
-#' "terrain-background", "satellite", "roadmap", "hybrid". Stamen mapsource: "terrain",
-#' "terrain-background", "terrain-labels", "terrain-lines", "watercolor", "toner", "toner-2010",
-#' "toner-2011", "toner-background", "toner-hybrid", "toner-labels", "toner-lines", "toner-lite".
+#' "terrain-background", "satellite", "roadmap", "hybrid". Stadia mapsource: "stamen_terrain", 
+#' "stamen_toner", "stamen_toner_lite", "stamen_watercolor", "stamen_terrain_background", 
+#' "stamen_toner_background", "stamen_terrain_lines", "stamen_terrain_labels", "stamen_toner_lines",
+#'  "stamen_toner_labels".
 #' @param contour1colour Colour for contour 1, typically 95pct, default "red".
 #' @param contour2colour Colour for contour 2, typically 50pct, default "orange".
 #' @param positionscolour Colour for original animal locations, if xlatlon not NULL. Default "white".
@@ -186,12 +188,13 @@ plotraster <- function(
     # 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out).
     # 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
     mapzoom = NULL, # google: 3 (continent) - 21 (building). stamen: 0-18
-    mapsource = "google", # Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.
-    maptype = "satellite", # Type of map for ggmap::get_map. Options: "terrain",
-    # "terrain-background", "satellite", "roadmap", "hybrid", "toner", "terrain-labels",
-    # "terrain-lines", "toner-2010", "toner-2011", "toner-background", "toner-hybrid",
-    # "toner-labels", "toner-lines", "toner-lite". Google options: “terrain”, “satellite”,
-    # “roadmap”, “hybrid”.
+    mapsource = "google", # Source for ggmap::get_map; google needs Google Maps API present. Options 
+    # “google”, “osm”, “stadia”.
+    maptype = "satellite", # Type of map for ggmap::get_map. Options: Google mapsource: "terrain",
+    # "terrain-background", "satellite", "roadmap", "hybrid". Stadia mapsource: "stamen_terrain", 
+    # "stamen_toner", "stamen_toner_lite", "stamen_watercolor", "stamen_terrain_background", 
+    # "stamen_toner_background", "stamen_terrain_lines", "stamen_terrain_labels", "stamen_toner_lines",
+    #  "stamen_toner_labels".
     contour1colour = "red", # colour for contour 1, typically 95%.
     contour2colour = "orange", # colour for contour 2, typically 50%.
     positionscolour = "white", # colour for original locations, if xlatlon not NULL.
@@ -456,6 +459,14 @@ plotraster <- function(
   
   
   
+  
+  
+  
+  
+  
+  
+  
+  
   # plot map ####
   ggmap::ggmap(myMap) + # basemap CRS = 3857
     
@@ -565,7 +576,8 @@ plotraster <- function(
       # name = waiver(),
       name = "UD%", # should be legendtitle?
       # limits = NA,
-      labels = 100 - waiver(), # values are 0-100 with 100=max in the centre but for proportion of time in UD we
+      # labels = 100 - ggplot2::waiver(), # values are 0-100 with 100=max in the centre but for proportion of time in UD we
+      # Error in 100 - ggplot2::waiver() : non-numeric argument to binary operator
       # use % of max with 95% being 0.05 of max. So we need to reverse the labels to convert usage
       # density into proportion of time.
       # position = "left"
@@ -598,3 +610,4 @@ plotraster <- function(
                   #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
                   width = 6, height = autoheight, units = "in", dpi = 600, limitsize = TRUE)
 } # close function
+

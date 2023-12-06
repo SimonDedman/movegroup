@@ -323,7 +323,7 @@ scaleraster <- function(path = NULL,
   )
   
   # 2023-10-04 Vital memory bug warning
-  if ((round(area.50.sd, 1) == 0) | (round(area.95.sd, 1) == 0)) print("No standard deviation: all individual UDs identical. Possibly due to insufficient memory for raster calculations. Check rasterResolution in movegroup")
+  if ((round(area.50.sd, 2) == 0) | (round(area.95.sd, 2) == 0)) print("No or low standard deviation: all individual UDs may be identical, possibly due to insufficient memory for raster calculations. Check VolumeAreas_ScaledAllFish.csv, then if so, try editing rasterResolution in movegroup")
   
   write.csv(area.ct,
             file = file.path(path, scalefolder, "VolumeAreas_ScaledAllFish.csv"),
