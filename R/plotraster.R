@@ -527,10 +527,10 @@ plotraster <- function(
       ggplot2::geom_sf(data = mypointssf |>
                          sf::st_transform(3857),
                        inherit.aes = FALSE,
-                       size = 0.1,
-                       alpha = positionsalpha,
                        ggplot2::aes(colour = "Positions",
-                                    shape = "PositionsShape")
+                                    shape = "PositionsShape",
+                                    size = "PositionsSize",
+                                    alpha = "positionsalpha")
       )
     } +
     
@@ -575,7 +575,8 @@ plotraster <- function(
                                             "Centre of Activity" = COAcolour)) +
     
     # COA size
-    ggplot2::scale_size_manual(values = c("COAsize" = COAsize),
+    ggplot2::scale_size_manual(values = c("COAsize" = COAsize,
+                                          "PositionsSize" = 0.1),
                                guide = "none") + # works here
 
     # COA COAshape
@@ -587,7 +588,8 @@ plotraster <- function(
     # ggplot2::guides(shape = FALSE) + # does nothing
     
     # COA alpha
-    ggplot2::scale_alpha_manual(values = c("COAalpha" = COAalpha),
+    ggplot2::scale_alpha_manual(values = c("COAalpha" = COAalpha,
+                                           "positionsalpha" = positionsalpha),
                                 guide = "none") + # works here
     
     # UD surface colour scale
