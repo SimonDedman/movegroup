@@ -529,7 +529,8 @@ plotraster <- function(
                        inherit.aes = FALSE,
                        size = 0.1,
                        alpha = positionsalpha,
-                       ggplot2::aes(colour = "Positions")
+                       ggplot2::aes(colour = "Positions",
+                                    shape = "PositionsShape")
       )
     } +
     
@@ -574,13 +575,20 @@ plotraster <- function(
                                             "Centre of Activity" = COAcolour)) +
     
     # COA size
-    ggplot2::scale_size_manual(values = c("COAsize" = COAsize)) +
+    ggplot2::scale_size_manual(values = c("COAsize" = COAsize),
+                               guide = "none") + # works here
 
-    # COA alpha
-    ggplot2::scale_alpha_manual(values = c("COAalpha" = COAalpha)) +
-    
     # COA COAshape
-    ggplot2::scale_shape_manual(values = c("COAshape" = COAshape)) +
+    ggplot2::scale_shape_manual(name = "Shapes", # setting as legendtitle doesn't collapse them
+                                values = c("COAshape" = COAshape,
+                                           "PositionsShape" = 20)
+                                ) + # guide = "none" does nothing?
+    
+    # ggplot2::guides(shape = FALSE) + # does nothing
+    
+    # COA alpha
+    ggplot2::scale_alpha_manual(values = c("COAalpha" = COAalpha),
+                                guide = "none") + # works here
     
     # UD surface colour scale
     viridis::scale_fill_viridis(
@@ -594,14 +602,10 @@ plotraster <- function(
       na.value = "grey50",
       guide = "colourbar",
       aesthetics = "fill",
-      # name = waiver(),
-      name = "UD%", # should be legendtitle?
-      # limits = NA,
+      name = "UD%",
       labels = ~ 100 - .x, # https://stackoverflow.com/questions/77609884/how-to-reverse-legend-labels-only-so-high-value-starts-at-bottom
-      # values are 0-100 with 100=max in the centre but for proportion of time in UD we
-      # use % of max with 95% being 0.05 of max. So we need to reverse the labels to convert usage
-      # density into proportion of time.
-      # position = "left"
+      # values are 0-100 with 100=max in the centre but for proportion of time in UD we use % of max with 95% being 0.05 of max.
+      # So we need to reverse the labels to convert usage density into proportion of time.
       position = "right"
     ) +
     
