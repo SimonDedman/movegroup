@@ -59,6 +59,8 @@
 #' @param COAcolour Colour for Centre of Activity marker, if plotted. Default "black".
 #' @param COAalpha Alpha value for Centre of Activity point, default 1, values from 0 (fully transparent)
 #' to 1 (fully parent).
+#' @param COAshape Shape of Centre of Activity marker, default 4, an X. Permissible values 0 to 25.
+#' @param COAsize Size of COA point, default 1.
 #' @param plottitle Title of the resultant plot, default "Aggregated 95pct and 50pct UD contours".
 #' @param plotsubtitle Plot subtitle, default "Scaled contours". Can add the n of your individuals.
 #' @param legendtitle Legend title, default "Percent UD Contours".
@@ -201,6 +203,8 @@ plotraster <- function(
     positionsalpha = 0.33, # alpha value for positions, default 0.33, values from 0 (fully transparent) to 1 (fully parent).
     COAcolour = "black", # colour for Centre of Activity marker, if plotted.
     COAalpha  = 1, # Alpha value for Centre of Activity point, default 1, values from 0 (fully transparent) to 1 (fully parent).
+    COAshape  = 4, # Shape of Centre of Activity marker, default 4, an X. Permissible values 0 to 25.
+    COAsize = 1, # Size of COA point
     plottitle = "Aggregated 95% and 50% UD contours",
     # Can use the term 'home range' when an animal can be detected wherever it goes
     # i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic
@@ -534,8 +538,9 @@ plotraster <- function(
       ggplot2::geom_sf(data = COA |>
                          sf::st_transform(3857),
                        inherit.aes = FALSE,
-                       size = 0.2,
+                       size = COAsize,
                        alpha = COAalpha,
+                       shape = COAshape,
                        ggplot2::aes(colour = "Centre of Activity")
       )
     } +

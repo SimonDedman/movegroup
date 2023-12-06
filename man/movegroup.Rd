@@ -128,10 +128,6 @@ to desired directory e.g. "/home/me/folder". Do not use getwd() for this.
 Do NOT include terminal slash. Directory must exist. Default tempdir().}
 
 \item{alerts}{Audio warning for failures. Default TRUE.}
-
-\item{projectedCRS}{EPSG code for CRS for initial transform of latlon points; corresponds to
-rasterCRS zone. Default "+init=epsg:32617" corresponding to The Bahamas. 2023-12-04 depreciation
-test, using rasterCRS value.}
 }
 \value{
 Individual-level utilization distributions, saved as rasters, as well

@@ -25,6 +25,8 @@ plotraster(
   positionsalpha = 0.33,
   COAcolour = "black",
   COAalpha = 1,
+  COAshape = 4,
+  COAsize = 1,
   plottitle = "Aggregated 95\% and 50\% UD contours",
   plotsubtitle = "Scaled contours",
   legendtitle = "Percent UD Contours",
@@ -101,12 +103,14 @@ Google Maps.}
 \item{mapzoom}{Highest number = zoomed in. Google: 3 (continent) - 21 (building). stamen: 0-18.
 Default NULL is calculated based on your data.}
 
-\item{mapsource}{Source for ggmap::get_map; uses Stamen as fallback if no Google Maps API present.}
+\item{mapsource}{Source for ggmap::get_map; google needs Google Maps API present. Options
+“google”, “osm”, “stadia”.}
 
 \item{maptype}{Type of map for ggmap::get_map param maptype. Options: Google mapsource: "terrain",
-"terrain-background", "satellite", "roadmap", "hybrid". Stamen mapsource: "terrain",
-"terrain-background", "terrain-labels", "terrain-lines", "watercolor", "toner", "toner-2010",
-"toner-2011", "toner-background", "toner-hybrid", "toner-labels", "toner-lines", "toner-lite".}
+"terrain-background", "satellite", "roadmap", "hybrid". Stadia mapsource: "stamen_terrain",
+"stamen_toner", "stamen_toner_lite", "stamen_watercolor", "stamen_terrain_background",
+"stamen_toner_background", "stamen_terrain_lines", "stamen_terrain_labels", "stamen_toner_lines",
+"stamen_toner_labels".}
 
 \item{contour1colour}{Colour for contour 1, typically 95pct, default "red".}
 
@@ -121,6 +125,10 @@ to 1 (fully parent).}
 
 \item{COAalpha}{Alpha value for Centre of Activity point, default 1, values from 0 (fully transparent)
 to 1 (fully parent).}
+
+\item{COAshape}{Shape of Centre of Activity marker, default 4, an X. Permissible values 0 to 25.}
+
+\item{COAsize}{Size of COA point, default 1.}
 
 \item{plottitle}{Title of the resultant plot, default "Aggregated 95pct and 50pct UD contours".}
 

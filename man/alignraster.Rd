@@ -9,7 +9,7 @@ alignraster(
   foldernames = c("H", "L", "M"),
   pattern = ".asc",
   scalefolder = "Scaled",
-  scaledweightedname = "All_Rasters_Scaled",
+  scaledweightedname = "All_Rasters_Scaled_Weighted",
   savefolder = "/myfolder/Aligned",
   format = "ascii",
   datatype = "FLT4S",
