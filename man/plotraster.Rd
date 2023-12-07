@@ -23,6 +23,7 @@ plotraster(
   contour2colour = "orange",
   positionscolour = "white",
   positionsalpha = 0.33,
+  positionssize = 0.1,
   COAcolour = "black",
   COAalpha = 1,
   COAshape = 4,
@@ -120,6 +121,8 @@ Default NULL is calculated based on your data.}
 
 \item{positionsalpha}{Alpha value for positions, default 0.33, values from 0 (fully transparent)
 to 1 (fully parent).}
+
+\item{positionssize}{Point size for positions, default 0.1.}
 
 \item{COAcolour}{Colour for Centre of Activity marker, if plotted. Default "black".}
 

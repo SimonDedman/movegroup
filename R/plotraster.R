@@ -56,6 +56,7 @@
 #' @param positionscolour Colour for original animal locations, if xlatlon not NULL. Default "white".
 #' @param positionsalpha Alpha value for positions, default 0.33, values from 0 (fully transparent)
 #' to 1 (fully parent).
+#' @param positionssize Point size for positions, default 0.1.
 #' @param COAcolour Colour for Centre of Activity marker, if plotted. Default "black".
 #' @param COAalpha Alpha value for Centre of Activity point, default 1, values from 0 (fully transparent)
 #' to 1 (fully parent).
@@ -201,6 +202,7 @@ plotraster <- function(
     contour2colour = "orange", # colour for contour 2, typically 50%.
     positionscolour = "white", # colour for original locations, if xlatlon not NULL.
     positionsalpha = 0.33, # alpha value for positions, default 0.33, values from 0 (fully transparent) to 1 (fully parent).
+    positionssize = 0.1, # point size for positions, default 0.1.
     COAcolour = "black", # colour for Centre of Activity marker, if plotted.
     COAalpha  = 1, # Alpha value for Centre of Activity point, default 1, values from 0 (fully transparent) to 1 (fully parent).
     COAshape  = 4, # Shape of Centre of Activity marker, default 4, an X. Permissible values 0 to 25.
@@ -462,14 +464,7 @@ plotraster <- function(
   } # close if (!is.null(xlatlon))
   
   
-  
-  
-  
-  
-  
-  
-  
-  
+
   
   # plot map ####
   ggmap::ggmap(myMap) + # basemap CRS = 3857
@@ -527,22 +522,21 @@ plotraster <- function(
       ggplot2::geom_sf(data = mypointssf |>
                          sf::st_transform(3857),
                        inherit.aes = FALSE,
-                       ggplot2::aes(colour = "Positions",
-                                    shape = "PositionsShape",
-                                    size = "PositionsSize",
-                                    alpha = "positionsalpha")
+                       colour = positionscolour,
+                       size = positionssize,
+                       shape = 20,
+                       ggplot2::aes(alpha = "Positions")
       )
     } +
-
+    # 
     # Plot central place / centre of activity
     { if (calcCOA)
       ggplot2::geom_sf(data = COA |>
                          sf::st_transform(3857),
                        inherit.aes = FALSE,
-                       ggplot2::aes(colour = "Centre of Activity",
-                                    size = "COAsize",
-                                    alpha = "COAalpha",
-                                    shape = "COAshape")
+                       colour = COAcolour, # colours the X in the shape legend
+                       size = COAsize,
+                       ggplot2::aes(shape = "Centre of Activity")
       )
     } +
     
@@ -568,29 +562,24 @@ plotraster <- function(
                      ggplot2::aes(colour = "50% UD")) +
     
     # UD contour & COA colours
-    ggplot2::scale_colour_manual(name = legendtitle,
-                                 values = c("50% UD" = contour2colour,
-                                            "95% UD" = contour1colour,
-                                            "Positions" = positionscolour,
-                                            "Centre of Activity" = COAcolour)) +
+    ggplot2::scale_colour_manual(
+      # name = legendtitle,
+      name = NULL,
+      values = c("50% UD" = contour2colour,
+                 "95% UD" = contour1colour)) +
     
     # COA size
-    ggplot2::scale_size_manual(values = c("COAsize" = COAsize,
-                                          "PositionsSize" = 0.1),
-                               guide = "none") + # works here
-
-    # COA COAshape
-    ggplot2::scale_shape_manual(name = "Shapes", # setting as legendtitle doesn't collapse them
-                                values = c("COAshape" = COAshape,
-                                           "PositionsShape" = 20)
-                                ) + # guide = "none" does nothing?
+    # ggplot2::scale_size_manual(values = c("COAsize" = COAsize,
+    #                                       "PositionsSize" = 0.1),
+    #                            guide = "none") + # works here
     
-    ggplot2::guides(shape = FALSE) + # does nothing # "none"
+    # COA COAshape
+    ggplot2::scale_shape_manual(name = NULL,values = c("Centre of Activity" = COAshape)) + # guide = "none" does nothing?
+    
+    # ggplot2::guides(shape = FALSE) + # hides shape legend but can cause problems
     
     # COA alpha
-    ggplot2::scale_alpha_manual(values = c("COAalpha" = COAalpha,
-                                           "positionsalpha" = positionsalpha),
-                                guide = "none") + # works here
+    ggplot2::scale_alpha_manual(name = NULL, values = c("Positions" = positionsalpha)) + # guide = "none" works here
     
     # UD surface colour scale
     viridis::scale_fill_viridis(
@@ -613,8 +602,10 @@ plotraster <- function(
     
     # Enforce the order of the legend
     ggplot2::guides(colour = ggplot2::guide_legend(order = 1), # makes contour lines legend first
+                    alpha = ggplot2::guide_legend(order = 2),
+                    shape = ggplot2::guide_legend(order = 3),
                     # fill = ggplot2::guide_legend(order = 2) # makes fill binned for some reason
-                    ) +
+    ) +
     
     ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
     ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
