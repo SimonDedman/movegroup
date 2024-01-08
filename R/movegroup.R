@@ -539,8 +539,8 @@ movegroup <- function(
     # Note: Based on 'An introduction to the 'move' package', it's the opposite of what you might expect: "A cell with a very high value in the UD raster will have a very low value in the contour raster"
     # area.50 <- round(sum(raster::values(move::getVolumeUD(bb) <= .50)), 4)
     # area.95 <- round(sum(raster::values(move::getVolumeUD(bb) <= .95)), 4)
-    area.50 <- sum(raster::values(move::getVolumeUD(bb) <= .50)) # 2024-01-08 remove rounding here
-    area.95 <- sum(raster::values(move::getVolumeUD(bb) <= .95)) # 2024-01-08 remove rounding here
+    area.50 <- sum(raster::values(move::getVolumeUD(bb) <= .50)) # 2024-01-08 remove rounding here. Seemingly had no effect
+    area.95 <- sum(raster::values(move::getVolumeUD(bb) <= .95)) # 2024-01-08 remove rounding here. Seemingly had no effect
     
     # Below calc introduced in 2022-10-08 commit, message = 
     #"changed code volume area: instead of using getVolumeUD() from the move package,
@@ -550,8 +550,8 @@ movegroup <- function(
     # Changed back to previous calcs 2023-02-24. Added rounding
     # area.50.new <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.5)), 4)
     # area.95.new <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.05)), 4)
-    area.50.new <- sum(raster::values(bb) >= (max(bb@data@values) * 0.5)) # 2024-01-08 remove rounding here
-    area.95.new <- sum(raster::values(bb) >= (max(bb@data@values) * 0.05))# 2024-01-08 remove rounding here
+    area.50.new <- sum(raster::values(bb) >= (max(bb@data@values) * 0.5)) # 2024-01-08 remove rounding here. Seemingly had no effect
+    area.95.new <- sum(raster::values(bb) >= (max(bb@data@values) * 0.05))# 2024-01-08 remove rounding here. Seemingly had no effect
     
     # Combine in single df
     area.ct <- data.frame(
@@ -559,14 +559,13 @@ movegroup <- function(
       general.use = area.95,
       core.use.new = area.50.new,
       general.use.new = area.95.new
-    ) # 2024-01-08 add rounding here if necessary
+    ) # 2024-01-08 add rounding here if necessary. Maybe not.
     
     # Add ID id
     area.ct$ID <- i
     
     # Put in list
     bb.list[[counter]] <- area.ct
-    bb.list
     
     # need to reproject bb back to UTM else the resolution is unequal in x & y
     # only an issue for ascii raster format
@@ -591,6 +590,8 @@ movegroup <- function(
   # 2023-08-30 quoted column_label to hopefully address gbm.factorplot: no visible binding for global variable ‘column_label’
   md$core.use <- (rasterres * md$core.use) / 1000000 # convert from cells/pixels to metres squared area based on cell size, then to kilometres squared area
   md$general.use <- (rasterres * md$general.use) / 1000000
+  md$core.use.new <- (rasterres * md$core.use.new) / 1000000 # convert from cells/pixels to metres squared area based on cell size, then to kilometres squared area
+  md$general.use.new <- (rasterres * md$general.use.new) / 1000000
   
   write.csv(md,
             file = file.path(savedir, absVolumeAreaSaveName),
