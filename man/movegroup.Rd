@@ -92,7 +92,7 @@ data limits (in plot anyway), but prevents raster clipping crash.}
 \item{rasterCRS}{CRS for raster creation. Default sp::CRS("+proj=utm +zone=17 +datum=WGS84").}
 
 \item{rasterResolution}{Single numeric value to set raster resolution - cell
-size in metres? 111000: 1 degree lat = 111km. Trade-off between small res = big file & processing
+size in metres. 111000: 1 degree lat = 111km. Trade-off between small res = big file & processing
 time. Should be a function of the spatial resolution of your receivers or positioning tags.
 Higher resolution will lead to more precision in the volume areas calculations. Try using
 2*dbblocationerror, if dbblocationerror is a single value. Default 50 = 50m. Try around the

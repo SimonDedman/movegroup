@@ -290,11 +290,11 @@ scaleraster <- function(path = NULL,
                       bylayer = bylayer,
                       overwrite = overwrite)
   
-  # group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 4)
-  # group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 4)
+  group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 4) # 2024-01-08 vital check addition
+  group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 4) # 2024-01-08 vital check addition
   
-  group_area.50 <- round((sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.5)) * rasterres) / 1000000, 4)
-  group_area.95 <- round((sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.05)) * rasterres) / 1000000, 4)
+  group_area.50.new <- round((sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.5)) * rasterres) / 1000000, 4)
+  group_area.95.new <- round((sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.05)) * rasterres) / 1000000, 4)
   # See movegroup.R L748. Could switch above lines to this:
   # area.50 <- round(sum(raster::values(move::getVolumeUD(bb) <= .50)), 4)
   # area.95 <- round(sum(raster::values(move::getVolumeUD(bb) <= .95)), 4)
@@ -302,7 +302,9 @@ scaleraster <- function(path = NULL,
   
   # Combine in a single df
   area.ct <- data.frame(core.use = area.50,
-                        general.use = area.95
+                        general.use = area.95,
+                        core.use.new = group_area.50.new,
+                        general.use.new = group_area.95.new
   )
   
   # Create ID column from row.names and kill row names
@@ -319,7 +321,10 @@ scaleraster <- function(path = NULL,
                      "sd_across_UDs"),
                    c(group_area.50,
                      group_area.95,
-                     "Group-level_UD")
+                     "Group-level_UD"),
+                   c(group_area.50.new, # 2024-01-08 vital check addition
+                     group_area.95.new, # 2024-01-08 vital check addition
+                     "Group-level_UD-new")
   )
   
   # 2023-10-04 Vital memory bug warning
