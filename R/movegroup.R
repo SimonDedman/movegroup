@@ -537,8 +537,10 @@ movegroup <- function(
     
     # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: absolute scale
     # Note: Based on 'An introduction to the 'move' package', it's the opposite of what you might expect: "A cell with a very high value in the UD raster will have a very low value in the contour raster"
-    area.50 <- round(sum(raster::values(move::getVolumeUD(bb) <= .50)), 4)
-    area.95 <- round(sum(raster::values(move::getVolumeUD(bb) <= .95)), 4)
+    # area.50 <- round(sum(raster::values(move::getVolumeUD(bb) <= .50)), 4)
+    # area.95 <- round(sum(raster::values(move::getVolumeUD(bb) <= .95)), 4)
+    area.50 <- sum(raster::values(move::getVolumeUD(bb) <= .50)) # 2024-01-08 remove rounding here
+    area.95 <- sum(raster::values(move::getVolumeUD(bb) <= .95)) # 2024-01-08 remove rounding here
     
     # Below calc introduced in 2022-10-08 commit, message = 
     #"changed code volume area: instead of using getVolumeUD() from the move package,
@@ -546,8 +548,10 @@ movegroup <- function(
     # these seem to produce very plausible estimates!"
     # This change creates unnaturally small areas.
     # Changed back to previous calcs 2023-02-24. Added rounding
-    area.50.new <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.5)), 4)
-    area.95.new <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.05)), 4)
+    # area.50.new <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.5)), 4)
+    # area.95.new <- round(sum(raster::values(bb) >= (max(bb@data@values) * 0.05)), 4)
+    area.50.new <- sum(raster::values(bb) >= (max(bb@data@values) * 0.5)) # 2024-01-08 remove rounding here
+    area.95.new <- sum(raster::values(bb) >= (max(bb@data@values) * 0.05))# 2024-01-08 remove rounding here
     
     # Combine in single df
     area.ct <- data.frame(
@@ -555,7 +559,7 @@ movegroup <- function(
       general.use = area.95,
       core.use.new = area.50.new,
       general.use.new = area.95.new
-    )
+    ) # 2024-01-08 add rounding here if necessary
     
     # Add ID id
     area.ct$ID <- i
