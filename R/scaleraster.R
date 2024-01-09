@@ -262,20 +262,31 @@ scaleraster <- function(path = NULL,
   
   # Calculate 50% and 95% volume areas per UD, the mean and stdev across UDs, and finally core and home range volume area sizes of the group-level UD
   # A. individual core and home range volume area sizes
-  # area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50% volume area
-  area.50 <- UDlist |> sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.5))) # 50% volume area
+  area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50% volume area
   area.50 <- round((area.50 * rasterres) / 1000000, 4) # Convert from m^2 to km^2
   
-  # area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95% volume area
-  area.95 <- UDlist |> sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.05))) # 95% volume area
+  area.50.new <- UDlist |> sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.5))) # 50% volume area
+  area.50.new <- (area.50 * rasterres) / 1000000 # Convert from m^2 to km^2
+  
+  area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95% volume area
   area.95 <- round((area.95 * rasterres) / 1000000, 4) # Convert from m^2 to km^2
+  
+  area.95.new <- UDlist |> sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.05))) # 95% volume area
+  area.95.new <- (area.95 * rasterres) / 1000000 # Convert from m^2 to km^2
   
   # B. Mean and SD
   area.50.mean <- round(mean(area.50), 4) # 50% volume area mean
   area.50.sd <- round(stats::sd(area.50), 4) # 50% volume area SD
   
+  area.50.mean.new <- mean(area.50.new) # 50% volume area mean
+  area.50.sd.new <- stats::sd(area.50.new) # 50% volume area SD
+  
   area.95.mean <- round(mean(area.95), 4) # 95% volume area mean
   area.95.sd <- round(stats::sd(area.95), 4) # 95% volume area SD
+  
+  area.95.mean.new <- mean(area.95.new) # 50% volume area mean
+  area.95.sd.new <- stats::sd(area.95.new) # 50% volume area SD
+  
   
   # 3. Group-level core and home range volume areas
   UDScaled <- new(".UD", All_Rasters_Scaled_Weighted) # This uses the aeqd raster for calculations
@@ -303,8 +314,8 @@ scaleraster <- function(path = NULL,
   # Combine in a single df
   area.ct <- data.frame(core.use = area.50,
                         general.use = area.95,
-                        core.use.new = group_area.50.new,
-                        general.use.new = group_area.95.new
+                        core.use.new = area.50.new,
+                        general.use.new = area.95.new
   )
   
   # Create ID column from row.names and kill row names
@@ -313,18 +324,9 @@ scaleraster <- function(path = NULL,
   
   # Add mean, sd and group-level UD values
   area.ct <- rbind(area.ct,
-                   c(area.50.mean,
-                     area.95.mean,
-                     "mean_across_UDs"),
-                   c(round(area.50.sd, 1),
-                     round(area.95.sd, 1),
-                     "sd_across_UDs"),
-                   c(group_area.50,
-                     group_area.95,
-                     "Group-level_UD"),
-                   c(group_area.50.new, # 2024-01-08 vital check addition
-                     group_area.95.new, # 2024-01-08 vital check addition
-                     "Group-level_UD-new")
+                   c(area.50.mean, area.95.mean, area.50.mean.new, area.95.mean.new, "mean_across_UDs"),
+                   c(area.50.sd, area.95.sd, area.50.sd.new, area.95.sd.new, "sd_across_UDs"),
+                   c(group_area.50, group_area.95, group_area.50.new, group_area.95.new, "Group-level_UD") # 2024-01-08 vital check additions
   )
   
   # 2023-10-04 Vital memory bug warning
