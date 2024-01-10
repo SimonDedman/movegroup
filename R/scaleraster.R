@@ -263,26 +263,26 @@ scaleraster <- function(path = NULL,
   # Calculate 50% and 95% volume areas per UD, the mean and stdev across UDs, and finally core and home range volume area sizes of the group-level UD
   # A. individual core and home range volume area sizes
   area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50% volume area
-  area.50 <- round((area.50 * rasterres) / 1000000, 4) # Convert from m^2 to km^2
+  area.50 <- (area.50 * rasterres) / 1000000 # Convert from m^2 to km^2
   
   area.50.new <- UDlist |> sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.5))) # 50% volume area
-  area.50.new <- (area.50 * rasterres) / 1000000 # Convert from m^2 to km^2
+  area.50.new <- (area.50.new * rasterres) / 1000000 # Convert from m^2 to km^2
   
   area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95% volume area
-  area.95 <- round((area.95 * rasterres) / 1000000, 4) # Convert from m^2 to km^2
+  area.95 <- (area.95 * rasterres) / 1000000 # Convert from m^2 to km^2
   
   area.95.new <- UDlist |> sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.05))) # 95% volume area
-  area.95.new <- (area.95 * rasterres) / 1000000 # Convert from m^2 to km^2
+  area.95.new <- (area.95.new * rasterres) / 1000000 # Convert from m^2 to km^2
   
   # B. Mean and SD
-  area.50.mean <- round(mean(area.50), 4) # 50% volume area mean
-  area.50.sd <- round(stats::sd(area.50), 4) # 50% volume area SD
+  area.50.mean <- mean(area.50) # 50% volume area mean
+  area.50.sd <- stats::sd(area.50) # 50% volume area SD
   
   area.50.mean.new <- mean(area.50.new) # 50% volume area mean
   area.50.sd.new <- stats::sd(area.50.new) # 50% volume area SD
   
-  area.95.mean <- round(mean(area.95), 4) # 95% volume area mean
-  area.95.sd <- round(stats::sd(area.95), 4) # 95% volume area SD
+  area.95.mean <- mean(area.95) # 95% volume area mean
+  area.95.sd <- stats::sd(area.95) # 95% volume area SD
   
   area.95.mean.new <- mean(area.95.new) # 50% volume area mean
   area.95.sd.new <- stats::sd(area.95.new) # 50% volume area SD
@@ -301,11 +301,11 @@ scaleraster <- function(path = NULL,
                       bylayer = bylayer,
                       overwrite = overwrite)
   
-  group_area.50 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000, 4) # 2024-01-08 vital check addition
-  group_area.95 <- round((sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000, 4) # 2024-01-08 vital check addition
+  group_area.50 <- (sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000 # 2024-01-08 vital check addition
+  group_area.95 <- (sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000 # 2024-01-08 vital check addition
   
-  group_area.50.new <- round((sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.5)) * rasterres) / 1000000, 4)
-  group_area.95.new <- round((sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.05)) * rasterres) / 1000000, 4)
+  group_area.50.new <- (sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.5)) * rasterres) / 1000000
+  group_area.95.new <- (sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.05)) * rasterres) / 1000000
   # See movegroup.R L748. Could switch above lines to this:
   # area.50 <- round(sum(raster::values(move::getVolumeUD(bb) <= .50)), 4)
   # area.95 <- round(sum(raster::values(move::getVolumeUD(bb) <= .95)), 4)
