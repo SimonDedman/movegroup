@@ -79,12 +79,12 @@
 #' degrees. Don't go to 90 (degrees) north or south for ymax or ymin. Doesn't prevent constraint to 
 #' data limits (in plot anyway), but prevents raster clipping crash.
 #' @param rasterCRS CRS for raster creation. Default sp::CRS("+proj=utm +zone=17 +datum=WGS84").
-#' @param rasterResolution Single numeric value to set raster resolution - cell 
-#' size in metres. 111000: 1 degree lat = 111km. Trade-off between small res = big file & processing 
+#' @param rasterResolution Single numeric value to set raster resolution - cell size (width and 
+#' height) in metres. 111000: 1 degree lat = 111km. Trade-off between small res = big file & processing 
 #' time. Should be a function of the spatial resolution of your receivers or positioning tags. 
 #' Higher resolution will lead to more precision in the volume areas calculations. Try using 
-#' 2*dbblocationerror, if dbblocationerror is a single value. Default 50 = 50m. Try around the 
-#' median of your moveLocError.
+#' 2*dbblocationerror, if dbblocationerror is a single value. Default 50 = 50m = 50m² = 0.00005 km² 
+#' (divide by 1000000). Try around the median of your moveLocError.
 # #' @param dbblocationerror Location.error param in 'brownian.bridge.dyn' function in the 'move'
 # #' package. single numeric value or vector of the length of coordinates that describes the error of
 # #' the location (sender/receiver) system in map units. Or a character string with the name of the
@@ -187,7 +187,7 @@ movegroup <- function(
     rasterExtent = NULL, # if NULL, raster extent calculated from data, buffpct, rasterResolution. Else length 4 vector, c(xmn, xmx, ymn, ymx) decimal latlon degrees. Don't go to 90 for ymax
     # Doesn't prevent constraint to data limits (in plot anyway), but prevents raster clipping crash
     rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. This is around Bimini, Bahamas.
-    rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres? 111000: 1 degree lat = 111km
+    rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres. 111000: 1 degree lat = 111km
     # dbblocationerror = moveLocError, # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
     movemargin = 11, # Margin size for variance calc in move::brownian.motion.variance.dyn and behavioral change point analysis in move::brownian.bridge.dyn. Must be an odd number. Default 11.
     dbbext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 3.
@@ -539,8 +539,8 @@ movegroup <- function(
     # Note: Based on 'An introduction to the 'move' package', it's the opposite of what you might expect: "A cell with a very high value in the UD raster will have a very low value in the contour raster"
     # area.50 <- round(sum(raster::values(move::getVolumeUD(bb) <= .50)), 4)
     # area.95 <- round(sum(raster::values(move::getVolumeUD(bb) <= .95)), 4)
-    area.50 <- sum(raster::values(move::getVolumeUD(bb) <= .50)) # 2024-01-08 remove rounding here. Seemingly had no effect
-    area.95 <- sum(raster::values(move::getVolumeUD(bb) <= .95)) # 2024-01-08 remove rounding here. Seemingly had no effect
+    # area.50 <- sum(raster::values(move::getVolumeUD(bb) <= .50)) # 2024-01-08 remove rounding here. Seemingly had no effect
+    # area.95 <- sum(raster::values(move::getVolumeUD(bb) <= .95)) # 2024-01-08 remove rounding here. Seemingly had no effect
     
     # Below calc introduced in 2022-10-08 commit, message = 
     #"changed code volume area: instead of using getVolumeUD() from the move package,
@@ -555,8 +555,6 @@ movegroup <- function(
     
     # Combine in single df
     area.ct <- data.frame(
-      core.use = area.50,
-      general.use = area.95,
       core.use.new = area.50.new,
       general.use.new = area.95.new
     ) # 2024-01-08 add rounding here if necessary. Maybe not.
@@ -588,10 +586,8 @@ movegroup <- function(
   )  |> 
     dplyr::select(!"column_label") # remove column_label column
   # 2023-08-30 quoted column_label to hopefully address gbm.factorplot: no visible binding for global variable ‘column_label’
-  md$core.use <- (rasterres * md$core.use) / 1000000 # convert from cells/pixels to metres squared area based on cell size, then to kilometres squared area
-  md$general.use <- (rasterres * md$general.use) / 1000000
-  md$core.use.new <- (rasterres * md$core.use.new) / 1000000 # convert from cells/pixels to metres squared area based on cell size, then to kilometres squared area
-  md$general.use.new <- (rasterres * md$general.use.new) / 1000000
+  md$core.use <- (rasterres * md$core.use.new) / 1000000 # convert from cells/pixels to metres squared area based on cell size, then to kilometres squared area
+  md$general.use <- (rasterres * md$general.use.new) / 1000000
   
   write.csv(md,
             file = file.path(savedir, absVolumeAreaSaveName),
