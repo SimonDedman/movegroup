@@ -177,7 +177,7 @@ large enough, consider extending the raster in that direction or enlarging the e
 \item cannot allocate vector of size (BIG) Gb: Increase rasterResolution value.
 \item In min/max: No non-missing arguments to min; returning Inf: likely not enough memory, increase
 rasterResolution value.
-\item Error in tmp[\link{i}]: subscript out of bounds. dbbmmwindowsize may be too large relative to nrow
+\item Error in tmp[[i]]: subscript out of bounds. dbbmmwindowsize may be too large relative to nrow
 of that individual. Try lowering movemargin (default 11, has to be odd) and then lowering
 dbbmmwindowsize (default 23, has to be >=2*movemargin, has to be odd).
 }
