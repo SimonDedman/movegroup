@@ -58,7 +58,8 @@ plotraster(
   reclabpad = 0,
   reclabrad = 0.15,
   reclabbord = 0,
-  surface = TRUE
+  surface = TRUE,
+  cropsavedimage = FALSE
 )
 }
 \arguments{
@@ -201,6 +202,11 @@ Default 0.5.}
 \item{reclabbord}{Receiver label border in mm. Default 0.}
 
 \item{surface}{Plot complete UD surface along with contours. Default TRUE.}
+
+\item{cropsavedimage}{Crop the output image with knitr::plot_crop which uses pdfcrop on PDFs,
+otherwise magick::image_trim. magick requires system preinstall. deb: libmagick++-dev (Debian,
+Ubuntu), rpm: ImageMagick-c++-devel (Fedora, CentOS, RHEL), csw: imagemagick_dev (Solaris), brew:
+imagemagick@6 (MacOS). Default FALSE.}
 }
 \value{
 Individual-level utilization distributions, saved as rasters, as well as calculated

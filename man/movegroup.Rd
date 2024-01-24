@@ -108,8 +108,8 @@ bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmi
 \item{dbbwindowsize}{The window.size param in the 'brownian.bridge.dyn' function
 in the 'move' package. The size of the moving window along the track. Larger windows provide more
 stable/accurate estimates of the brownian motion variance but are less well able to capture more
-frequent changes in behaviour. Number must be odd. dBBMM not run if total detections of
-individual < window size (default 23).}
+frequent changes in behaviour. Number must be odd. Code will not run if total detections of
+individual < window size (default 23), which must be >= 2*movemargin (default 11).}
 
 \item{writeRasterFormat}{Character. Output file type for raster::writeRaster param format.
 Default "ascii". TO DEPRECIATE.}
@@ -177,6 +177,9 @@ large enough, consider extending the raster in that direction or enlarging the e
 \item cannot allocate vector of size (BIG) Gb: Increase rasterResolution value.
 \item In min/max: No non-missing arguments to min; returning Inf: likely not enough memory, increase
 rasterResolution value.
+\item Error in tmp[\link{i}]: subscript out of bounds. dbbmmwindowsize may be too large relative to nrow
+of that individual. Try lowering movemargin (default 11, has to be odd) and then lowering
+dbbmmwindowsize (default 23, has to be >=2*movemargin, has to be odd).
 }
 }
 }

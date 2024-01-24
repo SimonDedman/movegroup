@@ -99,8 +99,8 @@
 #' @param dbbwindowsize The window.size param in the 'brownian.bridge.dyn' function 
 #' in the 'move' package. The size of the moving window along the track. Larger windows provide more
 #'  stable/accurate estimates of the brownian motion variance but are less well able to capture more
-#'   frequent changes in behaviour. Number must be odd. dBBMM not run if total detections of 
-#'  individual < window size (default 23).
+#'   frequent changes in behaviour. Number must be odd. Code will not run if total detections of 
+#'  individual < window size (default 23), which must be >= 2*movemargin (default 11).
 #' @param writeRasterFormat Character. Output file type for raster::writeRaster param format. 
 #' Default "ascii". TO DEPRECIATE.
 #' @param writeRasterExtension Character. Output file extension for raster::writeRaster param 
@@ -143,6 +143,10 @@
 #' 
 #' 6. In min/max: No non-missing arguments to min; returning Inf: likely not enough memory, increase
 #'  rasterResolution value.
+#'  
+#' 7. Error in tmp[[i]]: subscript out of bounds. dbbmmwindowsize may be too large relative to nrow
+#' of that individual. Try lowering movemargin (default 11, has to be odd) and then lowering 
+#' dbbmmwindowsize (default 23, has to be >=2*movemargin, has to be odd).
 #' 
 #' @examples
 #' \dontrun{
@@ -189,9 +193,13 @@ movegroup <- function(
     rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. This is around Bimini, Bahamas.
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres. 111000: 1 degree lat = 111km
     # dbblocationerror = moveLocError, # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
-    movemargin = 11, # Margin size for variance calc in move::brownian.motion.variance.dyn and behavioral change point analysis in move::brownian.bridge.dyn. Must be an odd number. Default 11.
+    movemargin = 11, # Margin size for variance calc in move::brownian.motion.variance.dyn and behavioral change point analysis in
+    # move::brownian.bridge.dyn. Must be an odd number. Default 11.
     dbbext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 3.
-    dbbwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior. This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 23).
+    dbbwindowsize = 23, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more 
+    # stable/accurate estimates of the brownian motion variance but are less well able to capture more frequent changes in behavior.
+    # This number has to be odd. A dBBMM is not run if total detections of individual < window size (default 23). Must be >=2*margin (movemargin) which is 11 so >=22,
+    # but odd so >=23.
     writeRasterFormat = "ascii",
     writeRasterExtension = ".asc",
     writeRasterDatatype = "FLT4S",
@@ -494,7 +502,7 @@ movegroup <- function(
           } # close not length1 not same length as full dataset else
         } # close length1 or else
       } # close if exists moveLocError
-    }
+    } # close ifelse
     
     # location error needs to be a positive number. Replace zeroes with 0.00001
     moveLocError.i[which(moveLocError.i == 0)] <- 0.00001
@@ -536,7 +544,8 @@ movegroup <- function(
     rm(tmp)
     
     # Calculate volume area (m^2) within 50% (core) and 95% (general use) contours. Note: absolute scale
-    # Note: Based on 'An introduction to the 'move' package', it's the opposite of what you might expect: "A cell with a very high value in the UD raster will have a very low value in the contour raster"
+    # Note: Based on 'An introduction to the 'move' package', it's the opposite of what you might expect:
+    # "A cell with a very high value in the UD raster will have a very low value in the contour raster"
     # area.50 <- round(sum(raster::values(move::getVolumeUD(bb) <= .50)), 4)
     # area.95 <- round(sum(raster::values(move::getVolumeUD(bb) <= .95)), 4)
     # area.50 <- sum(raster::values(move::getVolumeUD(bb) <= .50)) # 2024-01-08 remove rounding here. Seemingly had no effect
