@@ -3,6 +3,7 @@
 \docType{package}
 \name{movegroup-package}
 \alias{movegroup-package}
+\alias{_PACKAGE}
 \title{movegroup: Visualizing and Quantifying Space Use Data for groups of animals}
 \description{
 Offers an easy and automated way to scale up individual-level space use analysis to that of groups. Contains a function from the 'move' package to calculate a dynamic Brownian bridge movement model from movement data for individual animals, as well as functions to visualize and quantify space use for individuals aggregated in groups. Originally written with passive acoustic telemetry in mind, this package also provides functionality to account for unbalanced acoustic receiver array designs, and satellite tag data.
@@ -13,6 +14,11 @@ Offers an easy and automated way to scale up individual-level space use analysis
 Authors:
 \itemize{
   \item Maurits van Zinnicq Bergmann \email{mauritsvzb@gmail.com} (\href{https://orcid.org/0000-0002-8414-5025}{ORCID})
+}
+
+Other contributors:
+\itemize{
+  \item Bart Kranstauber \email{b.kranstauber@uva.nl} (\href{https://orcid.org/0000-0001-8303-780X}{ORCID}) [contributor]
 }
 
 }
