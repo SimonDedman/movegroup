@@ -14,6 +14,17 @@ sudo apt install libgdal-dev
 then manually install `rgeos` and `rgdal` in R/RStudio. However be
 advised these packages are being depreciated in late-2023.
 
+The `cropsavedimage` parameter in the plotraster function crops the
+output image, removing excess whitespace, and uses `magick::image_trim`.
+`magick` requires system preinstall.
+
+``` r
+deb: libmagick++-dev (Debian, Ubuntu)
+rpm: ImageMagick-c++-devel (Fedora, CentOS, RHEL)
+csw: imagemagick_dev (Solaris)
+brew: imagemagick@6 (MacOS)
+```
+
 Also see each script’s Details section in the manual pages, as these
 frequently contain tips or common bugfixes.
 

@@ -3,7 +3,6 @@
 \docType{package}
 \name{movegroup-package}
 \alias{movegroup-package}
-\alias{_PACKAGE}
 \title{movegroup: Visualizing and Quantifying Space Use Data for groups of animals}
 \description{
 Offers an easy and automated way to scale up individual-level space use analysis to that of groups. Contains a function from the 'move' package to calculate a dynamic Brownian bridge movement model from movement data for individual animals, as well as functions to visualize and quantify space use for individuals aggregated in groups. Originally written with passive acoustic telemetry in mind, this package also provides functionality to account for unbalanced acoustic receiver array designs, and satellite tag data.
