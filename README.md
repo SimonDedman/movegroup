@@ -1,6 +1,18 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+# movegroup
+
+<!-- badges: start -->
+
+[![DOI](https://zenodo.org/badge/421261655.svg)](https://zenodo.org/doi/10.5281/zenodo.10607926)
+[![R-CMD-check](https://github.com/SimonDedman/movegroup/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SimonDedman/movegroup/actions/workflows/R-CMD-check.yaml)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/movegroup)](https://cran.r-project.org/package=movegroup)
+[![CRAN RStudio mirror
+downloads](https://cranlogs.r-pkg.org/badges/movegroup)](https://cran.r-project.org/package=movegroup)
+<!-- badges: end -->
+<!-- badgeplacer(location = ".", status = "active", githubaccount = SimonDedman, githubrepo = movegroup, branch = master, name = "README.Rmd") -->
+
 ### Install, help, background reading
 
 To install on Linux systems it may be required to type, in terminal:
