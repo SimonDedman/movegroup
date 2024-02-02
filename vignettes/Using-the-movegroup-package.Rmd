@@ -93,7 +93,7 @@ However please appraise yourself of the meaning of the various parameters as the
 
 Scales individual utilization distribution rasters and volume area estimates
 
-Scales individual-level utilization distribution (UD) rasters from 0 to 1 to facilitate interpretation as relative intensity of utilization (as opposed to absolute), making comparisons across individuals and interpretations at the group level more straightforward. Subsequently, scaled individual-level rasters are aggregated to create a single group-level UD raster. See http://www.gitHub.com/SimonDedman/movegroup for issues, feedback, and development suggestions. There is an option to account for bias in acoustic receiver array spatial representation (see Details).
+Scales individual-level utilization distribution (UD) rasters from 0 to 1 to facilitate interpretation as relative intensity of utilization (as opposed to absolute), making comparisons across individuals and interpretations at the group level more straightforward. Subsequently, scaled individual-level rasters are aggregated to create a single group-level UD raster. See https://github.com/SimonDedman/movegroup for issues, feedback, and development suggestions. There is an option to account for bias in acoustic receiver array spatial representation (see Details).
 
 The process employed by the function is:
 
