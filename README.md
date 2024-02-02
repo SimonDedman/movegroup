@@ -104,18 +104,18 @@ which would result in a larger Brownian motion variance of the bridge.
 </figure>
 
 Kranstauber et al. (2012) later introduced the dynamic BBMM (dBBMM),
-which improves upon the traditiional BBMM in its calculation of
+which improves upon the traditional BBMM in its calculation of
 utilization distribution (UD) statistics. While the Brownian motion
 variance in the BBMM is static i.e., constant throughout the movement
 track, the dBBMM allows this variance to vary to allow for changes in in
-behavior along the movement trajectory (e.g., foraging, traveling,
+behaviour along the movement trajectory (e.g., foraging, travelling,
 resting, etc.). The result is improved performance in predicting animal
 locations. The dBBMM is also better equipped in dealing with irregular
 sampling of tracks, and would therefore be applied more appropriately to
 telemetry data for which you can anticipate gaps in detection (e.g., due
 to tags requiring to breach the ocean surface to transmit their location
 to a satellite (‘Smart Position Only Tag’ or SPOT), which depends on the
-animal’s behavior, or tag-equipped aquatic animals leaving a fixed
+animal’s behaviour, or tag-equipped aquatic animals leaving a fixed
 acoustic receiver array, or a tag’s line of sight with a satellite being
 obstructed by physical structures, etc.).
 
@@ -130,7 +130,7 @@ by being able to handle multiple individuals simultaneously, and
 aggregates individual UDs in a single group-level UD, offering
 significant advancements in the investigation of group-/population level
 space use estimation of telemetered animals. Of additional benefit is
-the ability to incorporate heterogenous survey design e.g. unbalanced
+the ability to incorporate heterogeneous survey design e.g. unbalanced
 numbers of receivers across multiple arrays. All functions are designed
 to maximally automate the typical methodological pipeline, offloading
 the workload and technical skill required to (e.g.) scale and reproject
@@ -424,7 +424,7 @@ distances corresponding to the same-length vector of positions supplied
 in your dataset. For acoustic data, the error is likely static, in which
 case one can use a single value which is repeated for all positions. For
 satellite data, each position can have a different error based on
-changing strength of satellite uplink connection, number of satelllites
+changing strength of satellite uplink connection, number of satellites
 for triangulation, etc. If you have positions possibly filtered by
 `argosfilter::sdafilter` and with state space models applied using the
 `aniMotum` package (a process you can follow thanks to scripts

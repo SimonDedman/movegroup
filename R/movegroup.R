@@ -69,7 +69,7 @@
 #' @param timeDiffUnits Character. Unit for timeDiffLong. Default "hours".
 #' @param center US English alternate to centre. Do you want to center the move object within 
 #' extent? See spTransform. Default TRUE.
-#' @param centre British English alternate to center. Do you want to center the move object within 
+#' @param centre British English alternate to center. Do you want to centre the move object within 
 #' extent? See spTransform. Default NULL.
 #' @param buffpct Buffer extent for raster creation, proportion of 1. Default 0.3, can try e.g. 3 
 #' for a large buffer to avoid clipping, at the cost of file size, but later cropping in 
@@ -92,7 +92,7 @@
 # #' MoveLocErrorCalc function for satellite data with state space modelled locations with 95%
 # #' confidence intervals for latlon i.e. lat and lon025 and 975.
 #' @param movemargin Margin size for variance calc in move::brownian.motion.variance.dyn and 
-#' behavioral change point analysis in move::brownian.bridge.dyn. Must be an odd number. Default 11.
+#' behavioural change point analysis in move::brownian.bridge.dyn. Must be an odd number. Default 11.
 #' @param dbbext Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends 
 #' bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax)
 #' . Default 3. Excessive buffering will get cropped automatically.
