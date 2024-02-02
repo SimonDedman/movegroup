@@ -170,7 +170,7 @@ typing `?function`.
 
 ### movegroup
 
-Visualizing and Quantifying Space Use Data for groups of animals
+Visualizing and Quantifying Space Use Data for Groups of Animals
 
 Automates dynamic Brownian bridge movement model calculation for
 utilization distribution (UD) estimation for multiple individuals
@@ -221,15 +221,15 @@ adjust these elements after later seeing the resulting plots from
 
 ### scaleraster
 
-Scales individual utilization distribution rasters and volume area
-estimates
+Scales Individual Utilization Distribution Rasters and Volume Area
+Estimates
 
 Scales individual-level utilization distribution (UD) rasters from 0 to
 1 to facilitate interpretation as relative intensity of utilization (as
 opposed to absolute), making comparisons across individuals and
 interpretations at the group level more straightforward. Subsequently,
 scaled individual-level rasters are aggregated to create a single
-group-level UD raster. See <http://www.gitHub.com/SimonDedman/movegroup>
+group-level UD raster. See <https://github.com/SimonDedman/movegroup/>
 for issues, feedback, and development suggestions. There is an option to
 account for bias in acoustic receiver array spatial representation (see
 Details).
@@ -293,7 +293,7 @@ scaleraster(path = mysavedir, weighting = Weighting)
 
 ### alignraster
 
-Combines region-specific group-level UD rasters into a single raster.
+Combines Region-Specific Group-Level UD Rasters into a Single Raster
 
 Extends the spatial extent of each area-specific group-level raster to
 the spatial extent shared by all rasters. This will only be required if
@@ -329,7 +329,7 @@ alignraster(folderroots = paste0(mysavedir, tide),
 
 ### plotraster
 
-Plots a group-level utilization distribution
+Plots a Group-Level Utilization Distribution
 
 Plots 50 and 95pct contours of a group-level utilization distribution
 raster on a spatial map background. Contains functionality to also
@@ -412,8 +412,8 @@ If you’ve setup your Google maps API, you can expect graphics such as:
 
 ### moveLocErrorCalc
 
-moveLocError calculator for ARGOS or state space models resulting in
-95percent latlon confidence intervals
+moveLocError Calculator for ARGOS or State Space Models Resulting in
+95percent LatLon Confidence Intervals
 
 Builds a dataframe of original locations plus rowmeans of mean distance
 of location extremities lon975, lat; lon025, lat; lon, lat975; lon,
