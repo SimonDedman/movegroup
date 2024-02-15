@@ -19,15 +19,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R CMD check results
 
-0 errors | 1 warnings | 1 notes
+0 errors | 1 warnings | 0 notes
 
 Warnings:
 
 * ‘qpdf’ is needed for checks on size reduction of PDFs. Not yet installed. No PDFs.
-
-Notes:
-
-* Non-standard files/directories found at top level: Misc: useful runscripts, README, cran-comments, figures.
 
 ***
 
