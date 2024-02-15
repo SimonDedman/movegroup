@@ -428,9 +428,9 @@ changing strength of satellite uplink connection, number of satellites
 for triangulation, etc. If you have positions possibly filtered by
 `argosfilter::sdafilter` and with state space models applied using the
 `aniMotum` package (a process you can follow thanks to scripts
-[1](https://github.com/SimonDedman/SavingTheBlue/blob/main/R/06A_Filter_SPOT_data.R)
+[1](https://github.com/SimonDedman/SavingTheBlue/blob/main/R/06A_Filter_SPOT_data_argosfilter.R)
 &
-[2](https://github.com/SimonDedman/SavingTheBlue/blob/main/R/06B_CTCRW_SPOT_data_usin_animotum.R)
+[2](https://github.com/SimonDedman/SavingTheBlue/blob/main/R/06B_CTCRW_SSM_SPOT_using_aniMotum.R)
 by Vital Heim), this function converts those 95% confidence interval
 latitude and longitude locations into a mean error distance per
 position.
