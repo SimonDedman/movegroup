@@ -1,22 +1,22 @@
 #' Combines region-specific group-level UD rasters into a single raster.
 #'
-#' Extends the spatial extent of each area-specific group-level raster to the spatial extent shared by all rasters. 
-#' This will only be required if you have multiple individuals (e.g. different sharks) divided amongst a few discrete areas 
-#' (e.g. around different islands) and the effort (e.g. receiver coverage) is different among islands. 
-#' Not required for multiple individuals all within the same region or sampling regime.
+#' Extends the spatial extent of each area-specific group-level raster to the spatial extent shared by all rasters.
+#' This will only be required if you have multiple individuals (e.g. different sharks) divided amongst a few discrete areas
+#'  (e.g. around different islands) and the effort (e.g. receiver coverage) is different among islands.
+#'  Not required for multiple individuals all within the same region or sampling regime.
 #'
-#' @param folderroots Character vector of locations of folder roots output by movegroup. Function 
-#' expects CRS.Rds file and a subfolder with the scaled raster.
-#' @param foldernames Character vector names of folders corresponding to files in folderroots, i.e. 
-#' the names of the objects, arrays, regions, etc.
+#' @param folderroots Character vector of locations of folder roots output by movegroup. Function
+#'  expects CRS.Rds file and a subfolder with the scaled raster.
+#' @param foldernames Character vector names of folders corresponding to files in folderroots, i.e.
+#'  the names of the objects, arrays, regions, etc.
 #' @param pattern For input rasters from scaleraster. Default ".asc".
 #' @param scalefolder For input rasters from scaleraster. Default "Scaled".
 #' @param scaledweightedname For input rasters from scaleraster. Default "All_Rasters_Scaled".
 #' @param savefolder Single character entry of folder to save outputs, no trailing slash.
-#' @param format Character. Output file type for raster::writeRaster param format. Default ascii, 
-#' other options have generally not worked well in SD's experience.
-#' @param datatype Character. Data type for writing values to disk for raster::writeRaster param 
-#' datatype. Default FLT4S.
+#' @param format Character. Output file type for raster::writeRaster param format. Default ascii,
+#'  other options have generally not worked well in SD's experience.
+#' @param datatype Character. Data type for writing values to disk for raster::writeRaster param
+#'  datatype. Default FLT4S.
 #' @param bylayer For raster::writeRaster param bylayer. Default TRUE.
 #' @param overwrite For raster::writeRaster param overwrite. Default TRUE.
 #' @param returnObj Logical. Return the scaled object to the parent environment to be assigned as an
@@ -24,8 +24,8 @@
 #' 
 #' @return Region-specific group-level UD rasters that share the same spatial extent.
 #'
-#' @details When used in a movegroup pipeline, the order would be: movegroup.R, scaleraster.R, 
-#' alignraster.R if required, plotraster.R.
+#' @details When used in a movegroup pipeline, the order would be: movegroup.R, scaleraster.R,
+#'  alignraster.R if required, plotraster.R.
 #' 
 #' @examples
 #' \dontrun{

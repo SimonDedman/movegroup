@@ -1,7 +1,7 @@
 #' Data: Tracks of lemon sharks off Bimini, Bahamas
 #'
-#' Tracks of 17 lemon sharks (Negaprion brevirostris) tagged off Bimini, Bahamas, 2012:2014, by 
-#' Bimini Biological Field Station employees and volunteers, with accompanying tidal phase.
+#' Tracks of 17 lemon sharks (Negaprion brevirostris) tagged off Bimini, Bahamas, 2012:2014, by
+#'  Bimini Biological Field Station employees and volunteers, with accompanying tidal phase.
 #'
 #' @format A data frame with 1308 rows and 5 variables:
 #' \describe{

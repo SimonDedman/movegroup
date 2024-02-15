@@ -344,5 +344,4 @@ scaleraster <- function(path = NULL,
             row.names = FALSE)
   
   if (returnObj) return(All_Rasters_Scaled_Weighted)
-  
 }

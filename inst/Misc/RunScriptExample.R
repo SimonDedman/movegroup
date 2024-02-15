@@ -5,12 +5,13 @@
 
 saveloc <- "/home/simon/Dropbox/Blocklab Monterey/Data/IrishTags/dBBMM/"
 
-# moveLocError should be a vector of metres of error for each point. Need to create that from each polygon.
+# moveLocError should be a vector of metres of error for each point.
+# Need to create that from each polygon.
 reproject <- function(x, coorda, coordb, latloncrs, projectedcrs) {
   x <- sf::st_as_sf(x, coords = c(coorda, coordb)) |>
     sf::st_set_crs(latloncrs) |> # latlon degrees sf object
     st_transform(projectedcrs) |> # eastings northings units metres
-    dplyr::select(-everything()) # remove all columns. Geometry is protected and retained
+    dplyr::select(-everything()) # remove all columns. Geometry protected & retained
   return(x)
 }
 centre <- reproject(x = AllDailies,
