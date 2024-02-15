@@ -1,7 +1,7 @@
 ---
 title: "NEWS.md"
 author: "Simon Dedman"
-date: "2024-02-01"
+date: "2024-02-15"
 output: html_document
 ---
 # v2024.02.15
