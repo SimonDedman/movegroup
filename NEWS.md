@@ -4,7 +4,7 @@ author: "Simon Dedman"
 date: "2024-02-01"
 output: html_document
 ---
-# v2024.02.01
+# v2024.02.15
 * first CRAN release
 
 

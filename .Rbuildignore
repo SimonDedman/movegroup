@@ -3,3 +3,4 @@
 ^\.github$
 ^CRAN-SUBMISSION$
 ^LICENSE\.md$
+cran-comments.md
