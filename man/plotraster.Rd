@@ -88,7 +88,7 @@ xlatlon and locationpoints, including the ".csv".}
 dead space at the edges of the raster. Default TRUE.}
 
 \item{myLocation}{Location for extents, format c(xmin, ymin, xmax, ymax). Default NULL, extents
-autocreated from data. Set this if you want to expand or crop your map to cover a specific area.}
+auto-created from data. Set this if you want to expand or crop your map to cover a specific area.}
 
 \item{googlemap}{If pulling basemap from Google maps, this sets expansion factors since Google
 Maps tiling zoom setup doesn't align to myLocation extents. Default FALSE.}
@@ -204,7 +204,7 @@ Default 0.5.}
 \item{surface}{Plot complete UD surface along with contours. Default TRUE.}
 
 \item{cropsavedimage}{Crop the output image with knitr::plot_crop which uses pdfcrop on PDFs,
-otherwise magick::image_trim. magick requires system preinstall. deb: libmagick++-dev (Debian,
+otherwise magick::image_trim. magick requires system pre-install. deb: libmagick++-dev (Debian,
 Ubuntu), rpm: ImageMagick-c++-devel (Fedora, CentOS, RHEL), csw: imagemagick_dev (Solaris), brew:
 imagemagick@6 (MacOS). Default FALSE.}
 }
@@ -227,7 +227,7 @@ space use patterns i.e. the home range is bigger than the coverage by the acoust
 Errors and their origins:
 \enumerate{
 \item Error in gzfile(file, "rb") : cannot open the connection. In addition: Warning message: In
-gzfile(file, "rb"): cannot open compressed file '/var/folders/dl/gobbledigook/ggmap/index.rds',
+gzfile(file, "rb"): cannot open compressed file '/var/folders/dl/etc/ggmap/index.rds',
 probable reason 'No such file or directory'. Cause: index.rds may not have been created, due to a
 problem with ggmap::get_map, likely due to your API key failing silently.
 Filename too long - solve with filename = "whatever" but doesn't do anything. Added issue in

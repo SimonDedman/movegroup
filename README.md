@@ -57,7 +57,7 @@ utilization distribution (UD; [Winkle,
 
 The UD is an improvement upon the MCP-derived home range estimation
 because this definition not only quantifies the size of a tracked
-animal’s home range, but also the intensity with which subareas within
+animal’s home range, but also the intensity with which sub-areas within
 the home range are used ([Worton,
 1989](https://esajournals.onlinelibrary.wiley.com/doi/10.2307/1938423)).
 The kernel utilization distribution (KUD) is the first method that
