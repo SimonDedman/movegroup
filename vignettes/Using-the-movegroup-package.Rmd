@@ -39,7 +39,7 @@ The UD is an improvement upon the MCP-derived home range estimation because this
 
 [Horne et al. (2007)](https://esajournals.onlinelibrary.wiley.com/doi/10.1890/06-0957.1) describe the use of movement models that incorporate Brownian motion (Brownian bridge moment model, BBMM), which offers a more sophisticated way to estimate space use. The traditional BBMM integrates the temporal component of tracking data by explicitly modeling movements between consecutive relocations. This is achieved by accounting for both the order of subsequent relocations as well as the travel time between them. The BBMM reconstructs the movement path by computing biased random walk iterations, creating a probability density distribution or “bridge” between two consecutive relocations where the animal could have been when it was not detected.
 
-![KUD vs BBKUD](../vignettes/figures/BBtrajectoryvignette.png)
+![KUD vs BBUD](../vignettes/figures/BBtrajectoryvignette.png)
 
 A minimal time difference among relocations is then suggestive of a straight-line movement, and therefore the variance in Brownian motion (the associated error of the movement path) would be small; conversely, a larger time difference is suggestive of a tortuous movement path, which would result in a larger Brownian motion variance of the bridge.
 
