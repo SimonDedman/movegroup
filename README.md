@@ -13,6 +13,10 @@ downloads](https://cranlogs.r-pkg.org/badges/movegroup)](https://cran.r-project.
 <!-- badges: end -->
 <!-- badgeplacer(location = ".", status = "active", githubaccount = SimonDedman, githubrepo = movegroup, branch = master, name = "README.Rmd") -->
 
+<p align="center">
+<img src="man/figures/logo.png" width="200">
+</p>
+
 ### Install, help, background reading
 
 To install on Linux systems it may be required to type, in terminal:

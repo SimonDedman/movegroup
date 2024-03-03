@@ -23,7 +23,9 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 <!-- badgeplacer(location = ".", status = "active", githubaccount = SimonDedman, githubrepo = movegroup, branch = master, name = "README.Rmd") -->
 
-
+<p align="center">
+  <img src="man/figures/logo.png" width="200">
+</p>
 
 ### Install, help, background reading
 
