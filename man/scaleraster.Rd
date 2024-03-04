@@ -109,9 +109,9 @@ rasterResolution value.
 }
 }
 \examples{
-\dontrun{
+\donttest{
 # Having run the movegroup function example:
-scaleraster(path = mysavedir)
+scaleraster(path = tempdir())
 
 # Weighted by number of positions per ID, fewer locations = lower Weighting value = higher final 
 # UD values after dividing by Weighting. This scales all IDs up to match the group max.
@@ -122,7 +122,7 @@ Weighting <- TracksCleaned |>
  dplyr::mutate(N = N / max(N, na.rm = TRUE)) |> 
  dplyr::pull(N)
  
- scaleraster(path = mysavedir, weighting = Weighting)
+ scaleraster(path = tempdir(), weighting = Weighting)
 }
 
 }

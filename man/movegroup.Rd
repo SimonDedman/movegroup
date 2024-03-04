@@ -184,7 +184,6 @@ dbbmmwindowsize (default 23, has to be >=2*movemargin, has to be odd).
 }
 }
 \examples{
-\dontrun{
 # load data
 data("TracksCleaned")
 # run function
@@ -194,8 +193,7 @@ movegroup(
  Datetime = "Datetime",
  Lat = "Lat",
  Lon = "Lon",
- savedir = "/your/directory/here")
-}
+ savedir = tempdir())
 
 }
 \references{

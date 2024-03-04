@@ -149,7 +149,6 @@
 #' dbbmmwindowsize (default 23, has to be >=2*movemargin, has to be odd).
 #' 
 #' @examples
-#' \dontrun{
 #' # load data
 #' data("TracksCleaned")
 #' # run function
@@ -159,8 +158,7 @@
 #'  Datetime = "Datetime",
 #'  Lat = "Lat",
 #'  Lon = "Lon",
-#'  savedir = "/your/directory/here")
-#' }
+#'  savedir = tempdir())
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
@@ -418,10 +416,10 @@ movegroup <- function(
     
     # Print individual
     counter <- counter + 1
-    print(paste0(
+    message(
       "processing ", which(unique(data$ID) %in% i),
       " of ", length(unique(data$ID))
-    ))
+    )
     
     # Filter individual data
     data.i <- as.data.frame(data[data$ID == i, ])
@@ -454,7 +452,7 @@ movegroup <- function(
               dplyr::filter(ID == i)  |>  # filter for just this ID
               dplyr::pull(moveLocError) # and pull just the movelocerror for this ID
           } else { # if not length 1 and not length of nrow(data)
-            stop(print("moveLocError must be either length 1 or length(nrow(data))")) # if not stop and tell user
+            stop(message("moveLocError must be either length 1 or length(nrow(data))")) # if not stop and tell user
           } # close not length1 not same length as full dataset else
         } # close length1 or else
       } # close if exists movelocerror
@@ -498,7 +496,7 @@ movegroup <- function(
               dplyr::filter(ID == i)  |>  # filter for just this ID
               dplyr::pull(moveLocError) # and pull just the movelocerror for this ID
           } else { # if not length 1 and not length of nrow(data)
-            stop(print("moveLocError must be either length 1 or length(nrow(data))")) # if not stop and tell user
+            stop(message("moveLocError must be either length 1 or length(nrow(data))")) # if not stop and tell user
           } # close not length1 not same length as full dataset else
         } # close length1 or else
       } # close if exists moveLocError
@@ -604,10 +602,10 @@ movegroup <- function(
   )
   
   # 2023-10-04 Vital memory bug warning
-  if (all(md$core.use == md$core.use[1])) print("All core UDs identical. Possibly due to insufficient memory for raster calculations. Check rasterResolution")
-  if (all(md$general.use == md$general.use[1])) print("All general UDs identical. Possibly due to insufficient memory for raster calculations. Check rasterResolution")
-  if (length(which(md$core.use == max(md$core.use, na.rm = TRUE))) > 1) print("More than 1 individual share exactly the same max value for core use, possibly due to insufficient memory for raster calculations. Check rasterResolution")
-  if (length(which(md$general.use == max(md$general.use, na.rm = TRUE))) > 1) print("More than 1 individual share exactly the same max value for general use, possibly due to insufficient memory for raster calculations. Check rasterResolution")
-  if (length(which((md$core.use - md$general.use) == 0)) > 0) print("1 or more individuals have exactly the same value for core and general use, possibly due to insufficient memory for raster calculations. Check rasterResolution")
+  if (all(md$core.use == md$core.use[1])) message("All core UDs identical. Possibly due to insufficient memory for raster calculations. Check rasterResolution")
+  if (all(md$general.use == md$general.use[1])) message("All general UDs identical. Possibly due to insufficient memory for raster calculations. Check rasterResolution")
+  if (length(which(md$core.use == max(md$core.use, na.rm = TRUE))) > 1) message("More than 1 individual share exactly the same max value for core use, possibly due to insufficient memory for raster calculations. Check rasterResolution")
+  if (length(which(md$general.use == max(md$general.use, na.rm = TRUE))) > 1) message("More than 1 individual share exactly the same max value for general use, possibly due to insufficient memory for raster calculations. Check rasterResolution")
+  if (length(which((md$core.use - md$general.use) == 0)) > 0) message("1 or more individuals have exactly the same value for core and general use, possibly due to insufficient memory for raster calculations. Check rasterResolution")
   
 } # close function

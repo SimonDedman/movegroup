@@ -53,10 +53,8 @@ lon975, lat; lon025, lat; lon, lat975; lon, lat025 from the centre point lon, la
 Use on your data object from movegroup::movegroup(data).
 }
 \examples{
-\dontrun{
 data(argosFiltered)
 myMoveLocError <- moveLocErrorCalc(argosFiltered)
-}
 
 }
 \author{

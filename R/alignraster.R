@@ -12,7 +12,7 @@
 #' @param pattern For input rasters from scaleraster. Default ".asc".
 #' @param scalefolder For input rasters from scaleraster. Default "Scaled".
 #' @param scaledweightedname For input rasters from scaleraster. Default "All_Rasters_Scaled".
-#' @param savefolder Single character entry of folder to save outputs, no trailing slash.
+#' @param savefolder E.g. "/myfolder/Aligned". Single character entry of folder to save outputs, no trailing slash.
 #' @param format Character. Output file type for raster::writeRaster param format. Default ascii,
 #'  other options have generally not worked well in SD's experience.
 #' @param datatype Character. Data type for writing values to disk for raster::writeRaster param
@@ -28,30 +28,28 @@
 #'  alignraster.R if required, plotraster.R.
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # load data
 #' data("TracksCleaned")
-#' # set save directory
-#' mysavedir <- "/your-directory-here"
 #' # loop movegroup and scaleraster through tide subsets
 #' tide <- c("H", "M", "L")
 #' for (i in tide) {
-#' dir.create(file.path(mysavedir, i))
+#' dir.create(file.path(tempdir(), i))
 #'   movegroup(
 #'     data = TracksCleaned[TracksCleaned$T.Ph == i, ],
 #'     ID = "Shark",
 #'     Datetime = "Datetime",
 #'     Lat = "Lat",
 #'     Lon = "Lon",
-#'     savedir = file.path(mysavedir, i, "/"))
+#'     savedir = file.path(tempdir(), i, "/"))
 #'   
-#'   scaleraster(path = file.path(mysavedir, i),
-#'               crsloc = file.path(mysavedir, i))
+#'   scaleraster(path = file.path(tempdir(), i),
+#'               crsloc = file.path(tempdir(), i))
 #' }
 #' 
-#' alignraster(folderroots = file.path(mysavedir, tide),
+#' alignraster(folderroots = file.path(tempdir(), tide),
 #'             foldernames = tide,
-#'             savefolder = file.path(mysavedir, "Aligned"))
+#'             savefolder = file.path(tempdir(), "Aligned"))
 #' }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
@@ -74,8 +72,8 @@ alignraster <- function(folderroots = c("/myfolder/H", # character vector of loc
                         foldernames = c("H", "L", "M"), # character vector names of folders corresponding to files in folderroots, i.e. the names of the objects, arrays, regions, etc.
                         pattern = ".asc", # for input rasters from scaleraster
                         scalefolder = "Scaled", # for input rasters from scaleraster
-                        scaledweightedname = "All_Rasters_Scaled_Weighted", # for input rasters from scaleraster
-                        savefolder = "/myfolder/Aligned", # single character entry, no trailing slash
+                        scaledweightedname = "All_Rasters_Scaled_Weighted", # for input rasters from scaleraster.
+                        savefolder = tempdir(), # e.g. "/myfolder/Aligned". Single character entry, no trailing slash.
                         format = "ascii", # save format
                         datatype = "FLT4S", # save format
                         bylayer = TRUE, # save format

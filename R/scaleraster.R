@@ -80,9 +80,9 @@
 #' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Having run the movegroup function example:
-#' scaleraster(path = mysavedir)
+#' scaleraster(path = tempdir())
 #' 
 #' # Weighted by number of positions per ID, fewer locations = lower Weighting value = higher final 
 #' # UD values after dividing by Weighting. This scales all IDs up to match the group max.
@@ -93,7 +93,7 @@
 #'  dplyr::mutate(N = N / max(N, na.rm = TRUE)) |> 
 #'  dplyr::pull(N)
 #'  
-#'  scaleraster(path = mysavedir, weighting = Weighting)
+#'  scaleraster(path = tempdir(), weighting = Weighting)
 #' }
 #'
 #' @export scaleraster
@@ -337,7 +337,7 @@ scaleraster <- function(path = NULL,
   )
   
   # 2023-10-04 Vital memory bug warning
-  if ((round(area.50.sd.new, 2) == 0) | (round(area.95.sd.new, 2) == 0)) print("No or low standard deviation: all individual UDs may be identical, possibly due to insufficient memory for raster calculations. Check VolumeAreas_ScaledAllFish.csv, then if so, try editing rasterResolution in movegroup")
+  if ((round(area.50.sd.new, 2) == 0) | (round(area.95.sd.new, 2) == 0)) message("No or low standard deviation: all individual UDs may be identical, possibly due to insufficient memory for raster calculations. Check VolumeAreas_ScaledAllFish.csv, then if so, try editing rasterResolution in movegroup")
   
   write.csv(area.ct,
             file = file.path(path, scalefolder, "VolumeAreas_ScaledAllFish.csv"),

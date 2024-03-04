@@ -164,17 +164,17 @@
 #' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Having run the movegroup and scaleraster function examples:
 #' plotraster(
-#'   x = file.path(mysavedir, "Scaled", "All_Rasters_Scaled_Weighted_UDScaled.asc"),
+#'   x = file.path(tempdir(), "Scaled", "All_Rasters_Scaled_Weighted_UDScaled.asc"),
 #'   mapzoom = 14,
 #'   mapsource = "stamen",
 #'   maptype = "terrain",
-#'   savedir = file.path(mysavedir, "Plot"),
-#'   xlatlon = file.path(mysavedir, "Scaled", "All_Rasters_Scaled_Weighted_LatLon.asc"),
+#'   savedir = file.path(tempdir(), "Plot"),
+#'   xlatlon = file.path(tempdir(), "Scaled", "All_Rasters_Scaled_Weighted_LatLon.asc"),
 #'   locationpoints = TracksCleaned |> dplyr::rename(lat = "Lat", lon = "Lon"),
-#'   pointsincontourssave = file.path(mysavedir, "Scaled", "pointsincontours.csv"))
+#'   pointsincontourssave = file.path(tempdir(), "Scaled", "pointsincontours.csv"))
 #' }
 
 plotraster <- function(
@@ -481,8 +481,8 @@ plotraster <- function(
     # if pointsincontourssave wasn't entered, autogenerate
     if (is.null(pointsincontourssave)) pointsincontourssave <- file.path(savedir, "pointsincontour.csv")
     write.csv(locationpoints, file = pointsincontourssave)
-    print(paste0(round(nrow(pointsin50) / nrow(locationpoints) * 100, 2), "% of location points within 50% contour")) # 72.16
-    print(paste0(round(nrow(pointsin95) / nrow(locationpoints) * 100, 2), "% of location points within 95% contour")) # 99.77
+    message(round(nrow(pointsin50) / nrow(locationpoints) * 100, 2), "% of location points within 50% contour") # 72.16
+    message(round(nrow(pointsin95) / nrow(locationpoints) * 100, 2), "% of location points within 95% contour") # 99.77
     # ISSUE3 ####
     # Possibly the discrepancy between % of points within contours and 50 / 95,
     # is due to AEQD --> latlon CRS change??

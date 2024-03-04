@@ -35,10 +35,8 @@
 #' @details Use on your data object from movegroup::movegroup(data).
 #' 
 #' @examples
-#' \dontrun{
 #' data(argosFiltered)
 #' myMoveLocError <- moveLocErrorCalc(argosFiltered)
-#' }
 #'
 
 # moveLocError calculator for ARGOS / state space models resulting in 95% latlon confidence intervals

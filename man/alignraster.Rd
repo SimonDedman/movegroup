@@ -10,7 +10,7 @@ alignraster(
   pattern = ".asc",
   scalefolder = "Scaled",
   scaledweightedname = "All_Rasters_Scaled_Weighted",
-  savefolder = "/myfolder/Aligned",
+  savefolder = tempdir(),
   format = "ascii",
   datatype = "FLT4S",
   bylayer = TRUE,
@@ -31,7 +31,7 @@ the names of the objects, arrays, regions, etc.}
 
 \item{scaledweightedname}{For input rasters from scaleraster. Default "All_Rasters_Scaled".}
 
-\item{savefolder}{Single character entry of folder to save outputs, no trailing slash.}
+\item{savefolder}{E.g. "/myfolder/Aligned". Single character entry of folder to save outputs, no trailing slash.}
 
 \item{format}{Character. Output file type for raster::writeRaster param format. Default ascii,
 other options have generally not worked well in SD's experience.}
@@ -60,30 +60,28 @@ When used in a movegroup pipeline, the order would be: movegroup.R, scaleraster.
 alignraster.R if required, plotraster.R.
 }
 \examples{
-\dontrun{
+\donttest{
 # load data
 data("TracksCleaned")
-# set save directory
-mysavedir <- "/your-directory-here"
 # loop movegroup and scaleraster through tide subsets
 tide <- c("H", "M", "L")
 for (i in tide) {
-dir.create(file.path(mysavedir, i))
+dir.create(file.path(tempdir(), i))
   movegroup(
     data = TracksCleaned[TracksCleaned$T.Ph == i, ],
     ID = "Shark",
     Datetime = "Datetime",
     Lat = "Lat",
     Lon = "Lon",
-    savedir = file.path(mysavedir, i, "/"))
+    savedir = file.path(tempdir(), i, "/"))
   
-  scaleraster(path = file.path(mysavedir, i),
-              crsloc = file.path(mysavedir, i))
+  scaleraster(path = file.path(tempdir(), i),
+              crsloc = file.path(tempdir(), i))
 }
 
-alignraster(folderroots = file.path(mysavedir, tide),
+alignraster(folderroots = file.path(tempdir(), tide),
             foldernames = tide,
-            savefolder = file.path(mysavedir, "Aligned"))
+            savefolder = file.path(tempdir(), "Aligned"))
 }
 
 }

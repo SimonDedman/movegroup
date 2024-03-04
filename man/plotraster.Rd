@@ -266,17 +266,17 @@ https://www.youtube.com/watch?v=O5cUoVpVUjU&t=232s
 }
 }
 \examples{
-\dontrun{
+\donttest{
 # Having run the movegroup and scaleraster function examples:
 plotraster(
-  x = file.path(mysavedir, "Scaled", "All_Rasters_Scaled_Weighted_UDScaled.asc"),
+  x = file.path(tempdir(), "Scaled", "All_Rasters_Scaled_Weighted_UDScaled.asc"),
   mapzoom = 14,
   mapsource = "stamen",
   maptype = "terrain",
-  savedir = file.path(mysavedir, "Plot"),
-  xlatlon = file.path(mysavedir, "Scaled", "All_Rasters_Scaled_Weighted_LatLon.asc"),
+  savedir = file.path(tempdir(), "Plot"),
+  xlatlon = file.path(tempdir(), "Scaled", "All_Rasters_Scaled_Weighted_LatLon.asc"),
   locationpoints = TracksCleaned |> dplyr::rename(lat = "Lat", lon = "Lon"),
-  pointsincontourssave = file.path(mysavedir, "Scaled", "pointsincontours.csv"))
+  pointsincontourssave = file.path(tempdir(), "Scaled", "pointsincontours.csv"))
 }
 }
 \author{
