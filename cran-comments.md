@@ -1,7 +1,7 @@
 ---
 title: "cran-comments"
 author: "Simon Dedman"
-date: "4 March 2024"
+date: "5 March 2024"
 output: html_document
 ---
 
@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R CMD check results
 
-0 errors | 1 warnings | 0 notes
+0 errors | 1 warning | 0 notes
 
 Warnings:
 

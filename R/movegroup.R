@@ -149,6 +149,7 @@
 #' dbbmmwindowsize (default 23, has to be >=2*movemargin, has to be odd).
 #' 
 #' @examples
+#' \donttest{
 #' # load data
 #' data("TracksCleaned")
 #' # run function
@@ -159,6 +160,7 @@
 #'  Lat = "Lat",
 #'  Lon = "Lon",
 #'  savedir = tempdir())
+#'  }
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}

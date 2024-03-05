@@ -1,10 +1,10 @@
 ---
 title: "NEWS.md"
 author: "Simon Dedman"
-date: "2024-03-04"
+date: "2024-03-05"
 output: html_document
 ---
-# v2024.03.04
+# v2024.03.05
 * first CRAN release
 
 
