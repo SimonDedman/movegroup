@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![DOI](https://zenodo.org/badge/421261655.svg)](https://zenodo.org/doi/10.5281/zenodo.10607926)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10805518.svg)](https://doi.org/10.5281/zenodo.10805518)
 [![R-CMD-check](https://github.com/SimonDedman/movegroup/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SimonDedman/movegroup/actions/workflows/R-CMD-check.yaml)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/movegroup)](https://cran.r-project.org/package=movegroup)
 [![CRAN RStudio mirror
