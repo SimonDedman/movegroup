@@ -73,7 +73,7 @@ context of animal movement data that are inherently spatially and
 temporarily autocorrelated.
 
 <figure>
-<img src="./figures/relocationsUDvignette.png"
+<img src="./vignettes/figures/relocationsUDvignette.png"
 alt="Relocations and UD" />
 <figcaption aria-hidden="true">Relocations and UD</figcaption>
 </figure>
@@ -92,7 +92,8 @@ between two consecutive relocations where the animal could have been
 when it was not detected.
 
 <figure>
-<img src="./figures/BBtrajectoryvignette.png" alt="KUD vs BBKUD" />
+<img src="./vignettes/figures/BBtrajectoryvignette.png"
+alt="KUD vs BBKUD" />
 <figcaption aria-hidden="true">KUD vs BBKUD</figcaption>
 </figure>
 
@@ -103,7 +104,8 @@ a larger time difference is suggestive of a tortuous movement path,
 which would result in a larger Brownian motion variance of the bridge.
 
 <figure>
-<img src="./figures/BBvariancesvignette.png" alt="Variances" />
+<img src="./vignettes/figures/BBvariancesvignette.png"
+alt="Variances" />
 <figcaption aria-hidden="true">Variances</figcaption>
 </figure>
 
@@ -408,7 +410,8 @@ plotraster(
 If you’ve setup your Google maps API, you can expect graphics such as:
 
 <figure>
-<img src="./figures/plotrasterVignette.png" alt="plotraster-output" />
+<img src="./vignettes/figures/plotrasterVignette.png"
+alt="plotraster-output" />
 <figcaption aria-hidden="true">plotraster-output</figcaption>
 </figure>
 
