@@ -2,6 +2,10 @@ bibentry(
   bibtype  = "Article",
   title    = "movegroup: Visualizing and Quantifying Space Use Data for Groups of Animals",
   author   = "Dedman, S and van Zinnicq Bergmann, MPM",
+  journal  = "In Prep.",
+  volume   = "In Prep.",
+  number   = "In Prep.",
+  pages    = "In Prep.",
   year     = "2024",
   doi      = "10.5281/zenodo.10805518",
   url      = "https://github.com/SimonDedman/movegroup"
