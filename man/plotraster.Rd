@@ -59,7 +59,9 @@ plotraster(
   reclabrad = 0.15,
   reclabbord = 0,
   surface = TRUE,
-  cropsavedimage = FALSE
+  cropsavedimage = FALSE,
+  savewidth = 6,
+  saveheight = NULL
 )
 }
 \arguments{
@@ -207,6 +209,10 @@ Default 0.5.}
 otherwise magick::image_trim. magick requires system pre-install. deb: libmagick++-dev (Debian,
 Ubuntu), rpm: ImageMagick-c++-devel (Fedora, CentOS, RHEL), csw: imagemagick_dev (Solaris), brew:
 imagemagick@6 (MacOS). Default FALSE.}
+
+\item{savewidth}{Width of saved output image in inches, default 6.}
+
+\item{saveheight}{Height of saved output image in inches, default NULL, will calculate optimal height based on aspect ratio.}
 }
 \value{
 Individual-level utilization distributions, saved as rasters, as well as calculated

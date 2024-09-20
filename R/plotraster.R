@@ -106,6 +106,8 @@
 #' otherwise magick::image_trim. magick requires system pre-install. deb: libmagick++-dev (Debian, 
 #' Ubuntu), rpm: ImageMagick-c++-devel (Fedora, CentOS, RHEL), csw: imagemagick_dev (Solaris), brew:
 #'  imagemagick@6 (MacOS). Default FALSE.
+#' @param savewidth Width of saved output image in inches, default 6.
+#' @param saveheight Height of saved output image in inches, default NULL, will calculate optimal height based on aspect ratio.
 #'
 #' @details
 #'
@@ -250,10 +252,12 @@ plotraster <- function(
     reclabrad = 0.15, # Receiver label radius in lines.
     reclabbord = 0, # Receiver label border in mm.
     surface = TRUE, # Plot complete UD surface as well as contours.
-    cropsavedimage = FALSE # crop the output image with knitr::plot_crop which uses pdfcrop on PDFs,
+    cropsavedimage = FALSE, # crop the output image with knitr::plot_crop which uses pdfcrop on PDFs,
     # otherwise magick::image_trim. magick requires system preinstall. deb: libmagick++-dev (Debian,
     # Ubuntu), rpm: ImageMagick-c++-devel (Fedora, CentOS, RHEL), csw: imagemagick_dev (Solaris), 
     # brew: imagemagick@6 (MacOS)
+    savewidth = 6,
+    saveheight = NULL
 ) {
   # check receiver inputs are the correct lengths, if present.
   if (!is.null(receiverlats) & !is.null(receiverlons)) if (length(receiverlats) != length(receiverlons)) stop("length of receiverlats must equal length of receiverlons")
@@ -404,7 +408,8 @@ plotraster <- function(
   # Maintains ratio by scales height to width(6). Then *1.2 because it still wasn't perfect.
   # attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]] # longitude, x, width, bind as 6
   # attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]] # latitude, y, height
-  autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]]) * 1.2
+  # if saveheight is NULL (default), calculate it based on map aspect
+  if (is.null(saveheight)) autoheight <- (6 / (attr(myMap, "bb")[[4]] - attr(myMap, "bb")[[2]])) * (attr(myMap, "bb")[[3]] - attr(myMap, "bb")[[1]]) * 1.2
   
   # Create receiver objects
   if (!is.null(receiverlats) & !is.null(receiverlons)) {
@@ -689,9 +694,8 @@ plotraster <- function(
   
   ggplot2::ggsave(filename = filesavename, plot = ggplot2::last_plot(), device = "png", path = savedir, scale = 1,
                   #changes how big lines & legend items & axes & titles are relative to basemap. Smaller number = bigger items
-                  # width = 6,
-                  # height = 6,
-                  # height = autoheight, # 7.2
+                  width = savewidth, # savewidth = 6,
+                  height = autoheight, # saveheight = NULL, typically 7.2?
                   units = "in", dpi = 600, limitsize = TRUE)
   
   if (cropsavedimage) knitr::plot_crop(x = file.path(savedir, filesavename)) # uses pdfcrop (often shipped with a LaTeX distribution) on PDFs, otherwise magick::image_trim()
