@@ -4,15 +4,15 @@
 #' lon975, lat; lon025, lat; lon, lat975; lon, lat025 from the centre point lon, lat.
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
-#' 
+#'
 #' @importFrom dplyr select
 #' @importFrom purrr map_df
 #' @importFrom rlang set_names
 #' @importFrom sf st_as_sf st_set_crs st_transform st_distance
 #' @importFrom tidyselect everything
-#' 
+#'
 #' @export moveLocErrorCalc
-#' 
+#'
 #' @param x Data frame or tibble with lats and lons and their high and low confidence interval 
 #' counterparts.
 #' @param loncol Name of longitude column in x, character. Default "lon".
@@ -28,12 +28,12 @@
 #' "lat025".
 #' @param lat975 Name of high 2.5% confidence interval latitude column in x, character. Default 
 #' "lat975".
-#' 
+#'
 #' @return Dataframe of original locations plus rowmeans of mean distance of location extremities, 
 #' for use in movegroup::movegroup(moveLocError).
 #'
 #' @details Use on your data object from movegroup::movegroup(data).
-#' 
+#'
 #' @examples
 #' data(argosFiltered)
 #' myMoveLocError <- moveLocErrorCalc(argosFiltered)

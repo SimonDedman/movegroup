@@ -127,7 +127,7 @@ scaleraster <- function(path = NULL,
   
   # Read in rasters and add to list
   rasterlist <-
-    lapply(filelist, function(x) raster::raster(file.path(path, x)))  |>  # Read in rasters
+    lapply(filelist, function(x) raster::raster(file.path(path, x))) |> # Read in rasters
     lapply(function(x) raster::setMinMax(x)) # Set minmax values
   names(rasterlist) <- stringr::str_remove(filelist, pattern = pattern) # Name the list object (raster); need to get rid of extension e.g. ".asc"
   
@@ -155,12 +155,12 @@ scaleraster <- function(path = NULL,
   
   # Read in appropriate rasters and add to list
   rasterlist_subsets <- 
-    lapply(filelist_subsets, function(x) raster::raster(paste0(pathsubsets, "/", x)))  |>  # Read in only rasters that occur in the filtered list
+    lapply(filelist_subsets, function(x) raster::raster(paste0(pathsubsets, "/", x))) |> # Read in only rasters that occur in the filtered list
     lapply(function(x) raster::setMinMax(x)) # Reintroduce values
   
   # Get max of maxes across subsets 
   scalemax <-
-    lapply(rasterlist_subsets, function(x) raster::maxValue(x))  |>  # extract maxes
+    lapply(rasterlist_subsets, function(x) raster::maxValue(x)) |> # extract maxes
     unlist() |>  # to vector
     max(na.rm = TRUE) # extract max of maxes
   
@@ -168,9 +168,9 @@ scaleraster <- function(path = NULL,
   dir.create(file.path(path, scalefolder))
   
   # Scale all raster values to max of maxes (maximum value becomes 1)
-  rasterlist  <- lapply(rasterlist, function(x) x / scalemax)  |>  # scaling occurs here
-    # lapply(function(x) x / weighting)  |>  # Weighting occurs here
-    purrr::map2(.y = weighting, .f = `/`)  |>  # Weighting occurs here. .y will be recycled if length 1.
+  rasterlist  <- lapply(rasterlist, function(x) x / scalemax) |> # scaling occurs here
+    # lapply(function(x) x / weighting) |> # Weighting occurs here
+    purrr::map2(.y = weighting, .f = `/`) |> # Weighting occurs here. .y will be recycled if length 1.
     lapply(function(x) raster::writeRaster(x = x, # save scaled individual rasters
                                            filename = file.path(path, scalefolder, names(x)), # should have "/", before names() ?
                                            format = format,

@@ -41,6 +41,10 @@
 #' already registered with ggmap::register_google(). See Details for instructions. If you don't have
 #'  an API or don't want to get one, leave NULL, ensure mapsource is stamen, and maptype is
 #'  stamen-compatible.
+#' @param stadiaAPI Enter your stadia API here, quoted character string. Can leave NULL if
+#' already registered with ggmap::register_stadiamaps(). See Details for instructions. If you don't have
+#'  an API or don't want to get one, leave NULL, ensure mapsource is stamen, and maptype is
+#'  stamen-compatible.
 #' @param expandfactor Extents expansion factor for basemap. 1.3 to 1.5 are the same zoom as 1. 1.6
 #' is a big leap up in zoom out. 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using
 #' Google Maps.
@@ -158,6 +162,9 @@
 #' c. At the top click 'Create Credentials > API Key'. d. API key should pop up with option to copy
 #' it. e. You can restrict the key if you want by following steps 4 & 5 here:
 #' https://www.youtube.com/watch?v=O5cUoVpVUjU&t=232s
+#' 
+#' ## How to get Stadia Maps basemaps
+#' https://client.stadiamaps.com/signup/ Get an account, copy your API key.
 #'
 #' @return Individual-level utilization distributions, saved as rasters, as well as calculated
 #' volume area estimates for 50 and 95pct contours, saved in a .csv file.
@@ -194,7 +201,8 @@ plotraster <- function(
     googlemap = FALSE, # If pulling basemap from Google maps, this sets expansion
     # factors since Google Maps tiling zoom setup doesn't align to myLocation
     # extents.
-    gmapsAPI = NULL, # enter your Google maps API here, quoted character string
+    gmapsAPI = NULL, # enter your Google maps API here, quoted character string.
+    stadiaAPI = NULL, # enter your Stadia maps API here, quoted character string.
     expandfactor = 1.6, # extents expansion factor for basemap.
     # 1.3 to 1.5 are the same zoom as 1. 1.6 is a big leap up in zoom (out).
     # 1.9 & maybe 1.7 or 1.8 is another step out. Ignored if not using Google Maps.
@@ -302,6 +310,8 @@ plotraster <- function(
   if (!is.null(gmapsAPI)) ggmap::register_google(key = gmapsAPI, # an api key
                                                  account_type = "standard",
                                                  write = TRUE)
+  if (!is.null(stadiaAPI)) ggmap::register_stadiamaps(key = stadiaAPI, # an api key
+                                                      write = TRUE)
   
   if (mapsource != "google") googlemap <- FALSE # in case user forgot to set both
   
@@ -494,7 +504,7 @@ plotraster <- function(
   } # close if (!is.null(xlatlon))
   
   
-
+  
   
   # plot map ####
   ggmap::ggmap(myMap) + # basemap CRS = 3857
@@ -558,7 +568,7 @@ plotraster <- function(
                        ggplot2::aes(alpha = "Positions")
       )
     } +
-    # 
+     
     # Plot central place / centre of activity
     { if (calcCOA)
       ggplot2::geom_sf(data = COA |>
@@ -567,7 +577,20 @@ plotraster <- function(
                        colour = COAcolour, # colours the X in the shape legend
                        size = COAsize,
                        ggplot2::aes(shape = "Centre of Activity")
-      )
+      ) +
+      
+      # COA size
+      # ggplot2::scale_size_manual(values = c("COAsize" = COAsize,
+      #                                       "PositionsSize" = 0.1),
+      #                            guide = "none") + # works here
+      
+      # COA COAshape
+      ggplot2::scale_shape_manual(name = NULL, values = c("Centre of Activity" = COAshape)) + # guide = "none" does nothing?
+        
+        # ggplot2::guides(shape = FALSE) + # hides shape legend but can cause problems
+        
+        # COA alpha
+      ggplot2::scale_alpha_manual(name = NULL, values = c("Positions" = positionsalpha)) # guide = "none" works here
     } +
     
     # 95% UD
@@ -597,19 +620,6 @@ plotraster <- function(
       name = NULL,
       values = c("50% UD" = contour2colour,
                  "95% UD" = contour1colour)) +
-    
-    # COA size
-    # ggplot2::scale_size_manual(values = c("COAsize" = COAsize,
-    #                                       "PositionsSize" = 0.1),
-    #                            guide = "none") + # works here
-    
-    # COA COAshape
-    ggplot2::scale_shape_manual(name = NULL,values = c("Centre of Activity" = COAshape)) + # guide = "none" does nothing?
-    
-    # ggplot2::guides(shape = FALSE) + # hides shape legend but can cause problems
-    
-    # COA alpha
-    ggplot2::scale_alpha_manual(name = NULL, values = c("Positions" = positionsalpha)) + # guide = "none" works here
     
     # UD surface colour scale
     viridis::scale_fill_viridis(
@@ -701,4 +711,3 @@ plotraster <- function(
   if (cropsavedimage) knitr::plot_crop(x = file.path(savedir, filesavename)) # uses pdfcrop (often shipped with a LaTeX distribution) on PDFs, otherwise magick::image_trim()
   
 } # close function
-

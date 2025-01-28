@@ -249,6 +249,9 @@ movegroup <- function(
                         ID = .data[[ID]],
                         Lat = .data[[Lat]],
                         Lon = .data[[Lon]])  |> 
+  # TO UPDATE####
+  # Warning message: Use of .data in tidyselect expressions was deprecated in tidyselect 1.2.0.
+  # Please use `all_of(var)` (or `any_of(var)`) instead of `.data[[var]]`
     # prefixes "X" to numerical-named sharks to avoid issues later
     dplyr::mutate(ID = make.names(ID))
   
@@ -355,10 +358,18 @@ movegroup <- function(
   alldata <- data  |> 
     dplyr::arrange(Datetime)  |> 
     dplyr::group_by(Datetime)  |>  # remove duplicates
-    dplyr::summarise(dplyr::across(where(~ is.numeric(.)), mean, na.rm = TRUE),
-                     dplyr::across(where(~ is.character(.) | lubridate::is.POSIXt(.)), dplyr::first))  |>  # library(lubridate)
-    dplyr::mutate(dplyr::across(where(~ is.numeric(.)), ~ ifelse(is.nan(.), NA, .)), #convert NaN to NA. POSIX needs lubridate
-                  dplyr::across(where(~ is.character(.)), ~ ifelse(is.nan(.), NA, .)))  |>  # https://community.rstudio.com/t/why-does-tidyrs-fill-work-with-nas-but-not-nans/25506/5
+    dplyr::summarise(dplyr::across(tidyselect::where(~ is.numeric(.)), mean, na.rm = TRUE),
+    # TO UPDATE####
+    # Warning message: There was 1 warning in `dplyr::summarise()`.
+    # In argument: `dplyr::across(where(~is.numeric(.)), mean, na.rm = TRUE)`.
+    # In group 1: `Datetime = 2024-01-01`. Caused by warning:
+    # The `...` argument of `across()` is deprecated as of dplyr 1.1.0.
+    # Supply arguments directly to `.fns` through an anonymous function instead.
+    # Previously across(a:b, mean, na.rm = TRUE)
+    # Now across(a:b, \(x) mean(x, na.rm = TRUE))
+                     dplyr::across(tidyselect::where(~ is.character(.) | lubridate::is.POSIXt(.)), dplyr::first))  |>  # library(lubridate)
+    dplyr::mutate(dplyr::across(tidyselect::where(~ is.numeric(.)), ~ ifelse(is.nan(.), NA, .)), #convert NaN to NA. POSIX needs lubridate
+                  dplyr::across(tidyselect::where(~ is.character(.)), ~ ifelse(is.nan(.), NA, .)))  |>  # https://community.rstudio.com/t/why-does-tidyrs-fill-work-with-nas-but-not-nans/25506/5
     dplyr::ungroup()
   
   alldata <- as.data.frame(alldata)
