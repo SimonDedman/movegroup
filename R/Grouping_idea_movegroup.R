@@ -35,30 +35,30 @@ m = 2 #Select shark group: naive = 1, provisioned = 2, unknown = 3
 
 # C1.i: Studyperiod selection - DONT change this ----
 
-spp <- sort(unique(DET$studyperiod))
+# spp <- sort(unique(DET$studyperiod))
 #> spp
 #[1] "night"   "outside" "within" 
 
 # Select studyperiod
-spp.f <- spp[i]
+# spp.f <- spp[i]
 
 # Filter for studyperiod
-DET.i <- filter(DET, studyperiod == spp.f)
+# DET.i <- filter(DET, studyperiod == spp.f)
 
 # C2.l = Filter for shark group ----
 #sort(unique(DET$Elasmo))
 
-sgrp <- sort(unique(DET$group))
-sgrp.f <- sgrp[m]
+# sgrp <- sort(unique(DET$group))
+# sgrp.f <- sgrp[m]
 
-DET.i <- filter(DET.i, sgroup == sgrp.f)
+# DET.i <- filter(DET.i, sgroup == sgrp.f)
 
 # C3: summarise data and check before submitting to dBBMM calc ----
 
-ds.j <- DET.i
-table(ds.j$Elasmo)
-length(unique(ds.j$Elasmo))
-length(unique(ds.j$Station.Name))
+# ds.j <- DET.i
+# table(ds.j$Elasmo)
+# length(unique(ds.j$Elasmo))
+# length(unique(ds.j$Station.Name))
 #sort(unique(ds.j$Station.Name))
 
 ### Preparations are completed!
