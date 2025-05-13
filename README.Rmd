@@ -109,6 +109,12 @@ However please appraise yourself of the meaning of the various parameters as the
 
 ***
 
+### stitchraster
+
+If over-large datasets cause RAM crashes for movegroup, one can run batches of individuals in movegroup then join the individual saved area.ct csv files.
+
+***
+
 ### scaleraster
 
 Scales Individual Utilization Distribution Rasters and Volume Area Estimates

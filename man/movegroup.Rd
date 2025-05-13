@@ -30,6 +30,7 @@ movegroup(
   writeRasterDatatype = "FLT4S",
   absVolumeAreaSaveName = "VolumeArea_AbsoluteScale.csv",
   savedir = tempdir(),
+  saveAreaCT = FALSE,
   alerts = TRUE
 )
 }
@@ -136,6 +137,11 @@ raster::writeRaster param Datatype. Default "FLT4S". TO DEPRECIATE.}
 to desired directory e.g. "/home/me/folder". Do not use getwd() for this.
 Do NOT include terminal slash. Directory must exist. Default tempdir().}
 
+\item{saveAreaCT}{Save tiny individual core and general use areas tables to
+disk. These are the only things retained in the per-individual loop, so if
+your large dataset causes memory crashes, you can run it in chunks and stitch
+the results together later with stitchraster. Default FALSE.}
+
 \item{alerts}{Audio warning for failures. Default TRUE.}
 }
 \value{
@@ -170,8 +176,9 @@ suggestions.
 
 install_git('https://gitlab.com/bartk/move.git') #Installs 'move' development version
 
-When used together, the order of functions would be: movegroup, scaleraster, alignraster if
-required, plotraster.
+When used together, the order of functions would be: movegroup, (stitchraster
+if required), scaleraster, (alignraster if required then stitchraster again)
+, plotraster.
 \subsection{Errors and their origins:}{
 \enumerate{
 \item Error in .local(object, raster, location.error = location.error, ext = ext: Higher y or x grid not
@@ -190,6 +197,13 @@ rasterResolution value.
 \item Error in tmp[[i]]: subscript out of bounds. dbbmmwindowsize may be too large relative to nrow
 of that individual. Try lowering movemargin (default 11, has to be odd) and then lowering
 dbbmmwindowsize (default 23, has to be >=2*movemargin, has to be odd).
+\item Error in validityMethod(as(object, superClass)): The used raster is not a
+UD (sum unequal to 1), sum is NaN. Potentially from memory overrun from large
+datasets. Close all other programs, restart your session, remove other
+objects from R, and try again, watching the RAM usage piechart by the
+Environment tab. If unsuccessful, run function in chunks of individuals until
+all (of length >= windowsize) are saved to disc as asc files, then produce
+final summary stats with stitchraster.
 }
 }
 }

@@ -14,6 +14,7 @@ downloads](https://cranlogs.r-pkg.org/badges/movegroup)](https://cran.r-project.
 <!-- badgeplacer(location = ".", status = "active", githubaccount = SimonDedman, githubrepo = movegroup, branch = master, name = "README.Rmd") -->
 
 <p align="center">
+
 <img src="man/figures/logo.png" width="200">
 </p>
 
@@ -222,6 +223,14 @@ rasterExtent, rasterResolution, centre for sizing your data and rasters,
 which has implications for later plotting. It might be that you need to
 adjust these elements after later seeing the resulting plots from
 `plotraster`, or if an overly large raster has caused a crash.
+
+------------------------------------------------------------------------
+
+### stitchraster
+
+If over-large datasets cause RAM crashes for movegroup, one can run
+batches of individuals in movegroup then join the individual saved
+area.ct csv files.
 
 ------------------------------------------------------------------------
 

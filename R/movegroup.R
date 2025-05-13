@@ -122,6 +122,10 @@
 #' @param savedir Save outputs to a temporary directory (default) else change
 #' to desired directory e.g. "/home/me/folder". Do not use getwd() for this.
 #' Do NOT include terminal slash. Directory must exist. Default tempdir().
+#' @param saveAreaCT Save tiny individual core and general use areas tables to
+#' disk. These are the only things retained in the per-individual loop, so if
+#' your large dataset causes memory crashes, you can run it in chunks and stitch
+#'  the results together later with stitchraster. Default FALSE.
 #' @param alerts Audio warning for failures. Default TRUE.
 #'
 #' @return Individual-level utilization distributions, saved as rasters, as well
@@ -130,8 +134,9 @@
 #'  move::brownian.motion.variance.dyn. No processed object is returned, i.e. bad: "objectname <-
 #'  movegroup()", good: "movegroup()".
 #' @details
-#' When used together, the order of functions would be: movegroup, scaleraster, alignraster if
-#' required, plotraster.
+#' When used together, the order of functions would be: movegroup, (stitchraster
+#'  if required), scaleraster, (alignraster if required then stitchraster again)
+#' , plotraster.
 #'
 #' ## Errors and their origins:
 #'
@@ -157,6 +162,14 @@
 #' 7. Error in tmp\[\[i\]\]: subscript out of bounds. dbbmmwindowsize may be too large relative to nrow
 #' of that individual. Try lowering movemargin (default 11, has to be odd) and then lowering
 #' dbbmmwindowsize (default 23, has to be >=2*movemargin, has to be odd).
+#'
+#' 8. Error in validityMethod(as(object, superClass)): The used raster is not a
+#' UD (sum unequal to 1), sum is NaN. Potentially from memory overrun from large
+#' datasets. Close all other programs, restart your session, remove other
+#' objects from R, and try again, watching the RAM usage piechart by the
+#' Environment tab. If unsuccessful, run function in chunks of individuals until
+#' all (of length >= windowsize) are saved to disc as asc files, then produce
+#' final summary stats with stitchraster.
 #'
 #' @examples
 #' \donttest{
@@ -216,6 +229,10 @@ movegroup <- function(
   absVolumeAreaSaveName = "VolumeArea_AbsoluteScale.csv",
   savedir = tempdir(), # save outputs to a temporary directory (default) else change to current
   # directory e.g. "/home/me/folder". Do not use getwd() here.
+  saveAreaCT = FALSE, # save tiny individual core and general use areas tables
+  # to disk. These are the only things retained in the per-individual loop, so
+  # if your large dataset causes memory crashes, you can run it in chunks and
+  # stitch the results together later with stitchraster.
   alerts = TRUE # audio warning for failures
 ) {
   # If savedir has a terminal slash, remove it, it's added later
@@ -259,13 +276,6 @@ movegroup <- function(
       "HFA" = ".img"
     )
 
-  # data <- dplyr::rename(
-  #   .data = data, # Rename user entry to "ID", Ditto Datetime Lat & Lon
-  #   Datetime = .data[[Datetime]],
-  #   ID = .data[[ID]],
-  #   Lat = .data[[Lat]],
-  #   Lon = .data[[Lon]]
-  # )
   data <- dplyr::rename(
     # Rename user entry to "ID", Ditto Datetime Lat & Lon
     .data = data,
@@ -299,23 +309,6 @@ movegroup <- function(
   data <- cbind(data, cord.UTM) # 1308 x 7
   rm(list = c("cord.UTM", "cord.dec"))
 
-  # Construct movement models per individual.
-  # Some notes regarding the 'move package and construction of movement models: Several arguments
-  # need to be used to run the model. 1. Window size: corresponds with number of locations and moves
-  # along a given trajectory to estimate the MA parameter within defined subsections of the path.
-  # This increases the ability to detect breakpoints where changes in behaviour occur. The window
-  # size should relate to what kind of behaviours the model is desired to identify e.g., a window
-  # size of 23 means the sliding window is moved every 23 locations or every 23 hours (has to do
-  # with sampling interval) 2. Margin: motion variance based on only the middle section of the
-  # trajectory; the ends of the movement trajectory where no changes are allowed because at some
-  # stage you want to have a few locations to base your estimation of the variance on and how many
-  # locations in either side of the window we use for this, is called the margin. Smaller values for
-  # window size and margin is expected to give a higher frequency of behavioural changes; make these
-  # large for looking at migrations. 3. The raster dictates the grid cell size for the UD to be
-  # calculated per grid cell per individual. Create the raster of certain size that matches with
-  # coordinates used to make the move object 4. Extent: is incorporated if there are animal
-  # locations that border the edges of the raster.
-
   # A dBBMM is not run if total detections of individual < window size (default value, 31).
   # Below code checks and filters out individuals with insufficient data.
   enoughrelocs <- data |>
@@ -325,24 +318,10 @@ movegroup <- function(
     pull(ID)
   data <- data |> filter(ID %in% enoughrelocs)
   rm(enoughrelocs)
-  # check1 <- data |>
-  #   dplyr::group_by(.data$ID) |>
-  #   dplyr::summarise(relocations = length(.data$Datetime))
-  # check2 <- dplyr::filter(check1, .data$relocations >= dbbwindowsize) # filter: removed 2 rows (14%), 12 rows remaining
-  #
-  # if (length(check1$ID) != length(check2$ID)) {
-  #   data <- dplyr::semi_join(data, check2) # Joining, by = "ID". semi_join: added no columns
-  #   check1 <- data |>
-  #     dplyr::group_by(.data$ID) |>
-  #     dplyr::summarise(relocations = length(.data$Datetime))
-  #   check2 <- dplyr::filter(check1, .data$relocations >= dbbwindowsize) # filter: no rows removed
-  #   length(check1$ID) == length(check2$ID)
-  # }
 
   # Create per-individual move object, project it, construct a dBBMM, calculate the volume area
   # within the 50% and 95% contours, save as ASCII.
 
-  bb <- list()
   bb.list <- list()
 
   data <- tidyr::drop_na(data = data, ID) |>
@@ -669,6 +648,15 @@ movegroup <- function(
     # Add ID id
     area.ct$ID <- i
 
+    # Save area.ct's if requested due to memory issues
+    if (exists("saveAreaCT") && saveAreaCT) {
+      write.csv(
+        area.ct,
+        file = file.path(savedir, paste0("areact_", i, ".csv")),
+        row.names = FALSE
+      )
+    }
+
     # Put in list
     bb.list[[counter]] <- area.ct
 
@@ -686,8 +674,15 @@ movegroup <- function(
       if (writeRasterFormat != "CDF") bylayer = TRUE, # bylayer kills ncdf4
       overwrite = TRUE
     )
+    rm(bb)
     gc() # cleanup
   } # close for i in unique data$ID
+
+  # MEMORY OVERRUN ISSUE ####
+  # conceptually I could save area.ct
+  # (and bb? bb is created as a blank list but then overwritten as a new UD then named (may do nothing) then reoverwritten in the next loop)
+  # then load all area.ct objects in a loop
+  # so users could break their runs into chunks
 
   # Put everything in a data.frame
   md <- dplyr::bind_rows(bb.list, .id = "column_label") |>
@@ -705,22 +700,22 @@ movegroup <- function(
   # 2023-10-04 Vital memory bug warning
   if (all(md$core.use == md$core.use[1]))
     message(
-      "All core UDs identical. Possibly due to insufficient memory for raster calculations. Check rasterResolution"
+      "All core UDs identical. Maybe insufficient memory for raster calcs - check rasterResolution"
     )
   if (all(md$general.use == md$general.use[1]))
     message(
-      "All general UDs identical. Possibly due to insufficient memory for raster calculations. Check rasterResolution"
+      "All general UDs identical. Maybe insufficient memory for raster calcs - check rasterResolution"
     )
   if (length(which(md$core.use == max(md$core.use, na.rm = TRUE))) > 1)
     message(
-      "More than 1 individual share exactly the same max value for core use, possibly due to insufficient memory for raster calculations. Check rasterResolution"
+      "More than 1 individual share exactly the same max value for core use, maybe insufficient memory for raster calcs - check rasterResolution"
     )
   if (length(which(md$general.use == max(md$general.use, na.rm = TRUE))) > 1)
     message(
-      "More than 1 individual share exactly the same max value for general use, possibly due to insufficient memory for raster calculations. Check rasterResolution"
+      "More than 1 individual share exactly the same max value for general use, maybe insufficient memory for raster calcs - check rasterResolution"
     )
   if (length(which((md$core.use - md$general.use) == 0)) > 0)
     message(
-      "1 or more individuals have exactly the same value for core and general use, possibly due to insufficient memory for raster calculations. Check rasterResolution"
+      "1 or more individuals have exactly the same value for core and general use, maybe insufficient memory for raster calcs - check rasterResolution"
     )
 } # close function

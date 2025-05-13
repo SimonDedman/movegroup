@@ -1,9 +1,12 @@
 ---
 title: "NEWS.md"
 author: "Simon Dedman"
-date: "2024-03-05"
+date: "2024-05-13"
 output: html_document
 ---
+# v2025.05.13
+* stitchraster added, movegroup made more efficient and updated for tidyselect 1.2.0
+
 # v2024.03.05
 * first CRAN release
 
