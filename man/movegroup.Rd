@@ -96,20 +96,29 @@ height) in metres. 111000: 1 degree lat = 111km. Trade-off between small res = b
 time. Should be a function of the spatial resolution of your receivers or positioning tags.
 Higher resolution will lead to more precision in the volume areas calculations. Try using
 2*dbblocationerror, if dbblocationerror is a single value. Default 50 = 50m = 50m² = 0.00005 km²
-(divide by 1000000). Try around the median of your moveLocError.}
+(divide by 1000000) = 0.00045 degrees. Try around the median of your moveLocError.}
 
 \item{movemargin}{Margin size for variance calc in move::brownian.motion.variance.dyn and
-behavioural change point analysis in move::brownian.bridge.dyn. Must be an odd number. Default 11.}
+behavioural change point analysis in move::brownian.bridge.dyn. Must be an odd number. Default 11.
+Motion variance based on only the middle section of the trajectory; the ends
+of the movement trajectory where no changes are allowed because at some stage
+you want to have a few locations to base your estimation of the variance on
+and how many locations in either side of the window we use for this, is
+called the margin. Smaller values for window size and margin is expected to
+give a higher frequency of behavioural changes; make these large for looking
+at migrations.}
 
 \item{dbbext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends
 bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax)
-. Default 3. Excessive buffering will get cropped automatically.}
+. Default 0.3 - extends bounding box by 30 percent. Excessive buffering will get cropped automatically.}
 
 \item{dbbwindowsize}{The window.size param in the 'brownian.bridge.dyn' function
 in the 'move' package. The size of the moving window along the track. Larger windows provide more
 stable/accurate estimates of the brownian motion variance but are less well able to capture more
-frequent changes in behaviour. Number must be odd. Code will not run if total detections of
-individual < window size (default 23), which must be >= 2*movemargin (default 11).}
+frequent changes in behaviour. Number must be odd. Individuals with fewer
+detections than the window size (default 23) will be removed. A window size
+of 23 means the sliding window is moved every 23 locations or every 23 hours
+(via timeDiffUnits). Must be >= 2*movemargin (default 11).}
 
 \item{writeRasterFormat}{Character. Output file type for raster::writeRaster param format.
 Default "ascii". TO DEPRECIATE.}
@@ -147,6 +156,7 @@ movegroup::movegroup function.
 Step 1. Filter individuals.
 Remove those individuals for which there are insufficient data i.e. number of re-locations is
 smaller than the window size parameter value (default = 31).
+
 Step 2. Generate universal raster.
 Based on all remaining data, a universal raster is generated where the calculated UDs are plotted
 into.
@@ -164,7 +174,7 @@ When used together, the order of functions would be: movegroup, scaleraster, ali
 required, plotraster.
 \subsection{Errors and their origins:}{
 \enumerate{
-\item Error in .local(object, raster, location.error = location.error, ext = ext: Higher y grid not
+\item Error in .local(object, raster, location.error = location.error, ext = ext: Higher y or x grid not
 large enough, consider extending the raster in that direction or enlarging the ext argument.
 Increase buffpct, e.g. to 3.
 \item Error in .data[[dttm]]: Must subset the data pronoun with a string, not a <POSIXct/POSIXt>

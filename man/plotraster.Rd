@@ -15,6 +15,7 @@ plotraster(
   myLocation = NULL,
   googlemap = FALSE,
   gmapsAPI = NULL,
+  stadiaAPI = NULL,
   expandfactor = 1.6,
   mapzoom = NULL,
   mapsource = "google",
@@ -97,6 +98,11 @@ Maps tiling zoom setup doesn't align to myLocation extents. Default FALSE.}
 
 \item{gmapsAPI}{Enter your google maps API here, quoted character string. Can leave NULL if
 already registered with ggmap::register_google(). See Details for instructions. If you don't have
+an API or don't want to get one, leave NULL, ensure mapsource is stamen, and maptype is
+stamen-compatible.}
+
+\item{stadiaAPI}{Enter your stadia API here, quoted character string. Can leave NULL if
+already registered with ggmap::register_stadiamaps(). See Details for instructions. If you don't have
 an API or don't want to get one, leave NULL, ensure mapsource is stamen, and maptype is
 stamen-compatible.}
 
@@ -269,6 +275,11 @@ c. At the top click 'Create Credentials > API Key'. d. API key should pop up wit
 it. e. You can restrict the key if you want by following steps 4 & 5 here:
 https://www.youtube.com/watch?v=O5cUoVpVUjU&t=232s
 }
+}
+
+\subsection{How to get Stadia Maps basemaps}{
+
+https://client.stadiamaps.com/signup/ Get an account, copy your API key.
 }
 }
 \examples{
