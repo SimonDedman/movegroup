@@ -78,7 +78,7 @@
 #' box from L to R, percent distance from Bottom to Top. Values 0 to 1. Default c(0.11, 0.85).
 #' @param fontsize Font size, default 12.
 #' @param fontfamily = Font family, default "Times New Roman".
-#' @param filesavename File savename, default today's date + "_dBBMM-contours.png".
+#' @param filesavename File savename, default today's date + "_UD-contours.png".
 #' @param savedir Save outputs to a temporary directory (default) else change to current directory
 #' e.g. "/home/me/folder". Do not use getwd() here. No terminal slash. E.g.
 #' file.path(movegroupsavedir, "Plot") . Auto-created if it doesn't exist.
@@ -171,6 +171,7 @@
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
+#' @author Vital Heim, \email{vital.heim@@gmail.com}
 #'
 #' @examples
 #' \donttest{
@@ -238,7 +239,7 @@ plotraster <- function(
     legendposition = c(0.105, 0.8), # Percent distance (of middle? of legend box) from L to R, percent distance from Bottom to Top.
     fontsize = 12,
     fontfamily = "Times New Roman",
-    filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
+    filesavename = paste0(lubridate::today(), "_UD-contours.png"),
     savedir = tempdir(), # file.path(work.dir, out.dir, "Scaled")
     receiverlats = NULL, # vector of latitudes for receivers to be plotted
     receiverlons = NULL, # vector of longitudes for receivers to be plotted
