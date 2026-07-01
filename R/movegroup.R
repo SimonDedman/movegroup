@@ -310,6 +310,9 @@ movegroup <- function(
     alerts = TRUE # audio warning for failures
 ) {
   
+  # define global variables for general.use.new and core.use.new
+  utils::globalVariables(c("general.use.new", "core.use.new"))
+  
   # first, validate a valid model choice
   model <- match.arg(model, choices = c("dbbmm", "dbgb"))
   
@@ -405,7 +408,7 @@ movegroup <- function(
   # Below code checks and filters out individuals with insufficient data.
   enoughrelocs <- data |>
     group_by(ID) |>
-    summarise(n = n()) |>
+    summarise(n = dplyr::n()) |>
     filter(n >= dbbwindowsize) |>
     pull(ID)
   data <- data |> filter(ID %in% enoughrelocs)

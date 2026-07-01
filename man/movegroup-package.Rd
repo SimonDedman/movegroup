@@ -7,7 +7,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Offers an easy and automated way to scale up individual-level space use analysis to that of groups. Contains a function from the 'move' package to calculate a dynamic Brownian bridge movement model from movement data for individual animals, as well as functions to visualize and quantify space use for individuals aggregated in groups. Originally written with passive acoustic telemetry in mind, this package also provides functionality to account for unbalanced acoustic receiver array designs, and satellite tag data.
+Offers an easy and automated way to scale up individual-level space use analysis to that of groups. Contains functions from the 'move' package to calculate either a dynamic Brownian bridge movement model or dynamic Bivariate Gaussian bridges from movement data for individual animals, as well as functions to visualize and quantify space use for individuals aggregated in groups. Originally written with passive acoustic telemetry in mind, this package also provides functionality to account for unbalanced acoustic receiver array designs, and satellite tag data.
 }
 \author{
 \strong{Maintainer}: Simon Dedman \email{simondedman@gmail.com} (\href{https://orcid.org/0000-0002-9108-972X}{ORCID})
@@ -15,6 +15,7 @@ Offers an easy and automated way to scale up individual-level space use analysis
 Authors:
 \itemize{
   \item Maurits van Zinnicq Bergmann \email{mauritsvzb@gmail.com} (\href{https://orcid.org/0000-0002-8414-5025}{ORCID})
+  \item Vital Heim \email{vital.heim@gmail.com} (\href{https://orcid.org/0000-0002-8492-9196}{ORCID})
 }
 
 }

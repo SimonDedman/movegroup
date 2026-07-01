@@ -4,6 +4,9 @@ author: "Simon Dedman"
 date: "2024-05-13"
 output: html_document
 ---
+# v2026.07.01 
+* dBGB engine added, plotraster functionality increased by adding user definable contour and UD surface levels, changed from raw probability UD calculations to volumetric UD calculations, long time gaps in data masked via @segments approach in move object rather than via bursting
+
 # v2025.05.13
 * stitchraster added, movegroup made more efficient and updated for tidyselect 1.2.0
 
