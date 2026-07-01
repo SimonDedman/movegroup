@@ -1,7 +1,7 @@
 ---
 title: "cran-comments"
 author: "Simon Dedman"
-date: "5 March 2024"
+date: "1 July 2026"
 output: html_document
 ---
 
@@ -12,18 +12,18 @@ knitr::opts_chunk$set(echo = TRUE)
 ***
 
 ## Test environments
-* local R installation, R 4.3.1, Xubuntu 23.10
+* local R installation, R 4.4.1, Windows 11
 * win-builder (devel and release)
 
 ***
 
 ## R CMD check results
 
-0 errors | 1 warning | 0 notes
+0 errors | 0 warnings | 1 note
 
-Warnings:
+Note:
 
-* ‘qpdf’ is needed for checks on size reduction of PDFs. Not yet installed. No PDFs.
+* "checking for future file timestamps; unable to verify current time" R check known bug.
 
 ***
 
