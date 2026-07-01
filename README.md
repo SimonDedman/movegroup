@@ -14,7 +14,6 @@ downloads](https://cranlogs.r-pkg.org/badges/movegroup)](https://cran.r-project.
 <!-- badgeplacer(location = ".", status = "active", githubaccount = SimonDedman, githubrepo = movegroup, branch = master, name = "README.Rmd") -->
 
 <p align="center">
-
 <img src="man/figures/logo.png" width="200">
 </p>
 
@@ -124,25 +123,37 @@ to tags requiring to breach the ocean surface to transmit their location
 to a satellite (‘Smart Position Only Tag’ or SPOT), which depends on the
 animal’s behaviour, or tag-equipped aquatic animals leaving a fixed
 acoustic receiver array, or a tag’s line of sight with a satellite being
-obstructed by physical structures, etc.).
+obstructed by physical structures, etc.). However, the movement across
+Brownian bridges is assumed to be diffusive, which means that the
+movement between consecutive locations is equally likely to happen is
+all directions. This assumption has been challenged as animal movement
+likely contains directional bias and consequently, Kranstauber et
+al. (2014), introduced dynamic Bivariate Gaussian Bridges (dBGB), where
+the diffusion between two locations, i.e. the Brownian variance
+estimate, is split into two directions: one aligned with the direction
+towards the next location and one orthogonal to it. Thus, dBGBs may
+provide a more accurate method to capture directional correlation in
+movement, which may improve the quantification of UDs via estimating
+movement anisotropies.
 
-The dBBMM is calculated using the ‘move’ package. While this package is
-great for calculating UDs, the package can only calculate a model and
-output a UD for a single individual. Grouping individuals together to
-create a group-level/aggregated UD is not realistic, because the
-brownian.bridge.dyn() function requires a chronological movement path as
-input; grouping multiple individuals together would imply that
-individuals can teleport. This package that builds on the move package
-by being able to handle multiple individuals simultaneously, and
-aggregates individual UDs in a single group-level UD, offering
-significant advancements in the investigation of group-/population level
-space use estimation of telemetered animals. Of additional benefit is
-the ability to incorporate heterogeneous survey design e.g. unbalanced
-numbers of receivers across multiple arrays. All functions are designed
-to maximally automate the typical methodological pipeline, offloading
-the workload and technical skill required to (e.g.) scale and reproject
-multiple movement tracks to an optimal shared projection and extent, and
-plot output maps containing various disparate elements.
+The dBBMM and the dBGB are calculated using the ‘move’ package. While
+this package is great for calculating UDs, the package can only
+calculate a model and output a UD for a single individual. Grouping
+individuals together to create a group-level/aggregated UD is not
+realistic, because the brownian.bridge.dyn() and dynBGB() functions
+require a chronological movement path as input; grouping multiple
+individuals together would imply that individuals can teleport. This
+package that builds on the move package by being able to handle multiple
+individuals simultaneously, and aggregates individual UDs in a single
+group-level UD, offering significant advancements in the investigation
+of group-/population level space use estimation of telemetered animals.
+Of additional benefit is the ability to incorporate heterogeneous survey
+design e.g. unbalanced numbers of receivers across multiple arrays. All
+functions are designed to maximally automate the typical methodological
+pipeline, offloading the workload and technical skill required to (e.g.)
+scale and reproject multiple movement tracks to an optimal shared
+projection and extent, and plot output maps containing various disparate
+elements.
 
 We strongly recommend that you download papers:
 
@@ -150,6 +161,11 @@ We strongly recommend that you download papers:
 Kays, R., LaPoint, S. D., Wikelski, M. and Safi, K. (2012) A dynamic
 Brownian bridge movement model to estimate utilization distributions for
 heterogeneous animal movement. Journal of Animal Ecology.
+
+[Kranstauber](https://link.springer.com/article/10.1186/2051-3933-2-5),
+B., Safi, K. & Bartumeus, F. (2014) Bivariate Gaussian bridges:
+directioal factorization of diffusion in Brownian bridge movement
+models. Movement Ecology.
 
 [Kranstauber](https://CRAN.R-project.org/package=move), B., M. Smolla &
 A. K. Scharf. (2019) Move: visualizing and analyzing animal track data.
