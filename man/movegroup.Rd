@@ -2,17 +2,19 @@
 % Please edit documentation in R/movegroup.R
 \name{movegroup}
 \alias{movegroup}
-\title{Automates dynamic Brownian bridge movement model construction across individuals}
+\title{Automates dynamic Brownian bridge movement model and dynamic bivariate Gaussian bridge construction across individuals}
 \usage{
 movegroup(
   data = NULL,
+  model = "dbbmm",
   ID = NULL,
   Datetime = NULL,
   Lat = NULL,
   Lon = NULL,
   dat.TZ = "US/Eastern",
   proj = sp::CRS("+proj=longlat +datum=WGS84"),
-  sensor = "VR2W",
+  sensor = "acoustic-telemetry",
+  integrationStep = NULL,
   moveLocError = 1,
   timeDiffLong = 2,
   timeDiffUnits = "hours",
@@ -22,9 +24,9 @@ movegroup(
   rasterExtent = NULL,
   rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"),
   rasterResolution = 50,
-  movemargin = 11,
+  movemargin = NULL,
   dbbext = 3,
-  dbbwindowsize = 23,
+  dbbwindowsize = NULL,
   writeRasterFormat = "ascii",
   writeRasterExtension = ".asc",
   writeRasterDatatype = "FLT4S",
@@ -38,6 +40,17 @@ movegroup(
 \item{data}{Data frame object containing the data. Requires columns Lat Lon DateTime ID and
 potentially a grouping column (not currently implemented, email to request). Column names
 specified in later parameters.}
+
+\item{model}{Character. Movement model to use for utilization distribution estimation. Either
+"dbbmm" (dynamic Brownian bridge movement model, default) or "dbgb" (dynamic bivariate Gaussian
+bridge). Please familiarize yourself with the different models using the references provided in the details before
+making a decision on which model you choose. Remember, in dBBMMs the animal's movement between two locations
+is equally likely to happen in all directions, i.e. is an isotropic diffusive process. In dBGBs, the diffusion
+is factorized in two directions, i.e. the direction towards the next location, and the direction perpendicular to it.
+The uncertainty in your animals whereabouts between locations when the time gap between two locations is large, can
+therefore have different extents and patterns depending on your model choice, and depending on the temporal resolution
+and dynamics, your data may be more suitable for one model or the other. Please also see our suggestion on how to quickly
+and qualitatively compare the two models and their suitability for your data in the Details below.}
 
 \item{ID}{Name of animal tag ID column in data. "Character".}
 
@@ -53,22 +66,33 @@ Must be in POSIXct format. "Character".}
 \item{proj}{CRS for move function. Default sp::CRS("+proj=longlat +datum=WGS84").}
 
 \item{sensor}{Sensor for move function. Single character or vector with length of the number of
-coordinates. Optional. Default "VR2W".}
+coordinates. Optional. Default "acoustic-telemetry". See https://www.movebank.org/cms/movebank-content/movebank-attribute-dictionary#event_attributes for
+possible sensor types. This is just for personal record, and not used in any calculations.}
 
-\item{moveLocError}{Location error (m) in the 'brownian.bridge.dyn' function in the 'move'
-package. Numeric. Either single or a vector of length nrow data. If using passive acoustic data
+\item{integrationStep}{corresponds to time.step and timeStep in move::brownian.bridge.dyn and move::dynBGB, respectively.
+I.e. corresponds to the size of the timer intervals taken for every integration step in minutes. If left NULL, this function uses the default values
+from the 'move' package where 15 (for dBBMM) or 20.1 (for dBGB) steps are taken in the shortest time interval
+For example, in dBBMM-calculations this means that if there is a location recorded e.g. every 60 minutes, the function divides each
+segment into 4 minute chunks upon which it does the calculation. However, please be advised, that if you have even just
+one very short time interval, each segment of the track will be divided in the nr. of chunks based on this one short time interval.
+This can markedly increase computing time. Check the time intervals in your data first. As quote from the 'move' vignette:
+"If the track contains time intervals much shorter than the scheduled on the tag, set the time.step e.g. to the scheduled time
+interval at which the tag was set (in minutes). Higher values to this argument reduce calculation time."
+The here provided function automatically divides your chosen duration by 15 or 20.1 depending on your model choice.}
+
+\item{moveLocError}{location.error (m) in the 'brownian.bridge.dyn' function and locErr (m) in the 'dynBGB' function
+in the 'move' package. Numeric. Either single or a vector of length nrow data. If using passive acoustic data
 this is the detection range of the receiver(s). Default 1. See MoveLocErrorCalc function for
 satellite data with state space modelled locations with 95\% confidence intervals for latlon i.e.
 lat and lon025 and 975.}
 
-\item{timeDiffLong}{Single numeric value. Threshold value in timeDiffUnits designating the length
-of long breaks in re-locations. Used for bursting a movement track into segments, thereby
-removing long breaks from the movement track. See ?move::bursted for details. Default 2 hours is
-arbitrary, looping through 18, 24, and 36 hours for satellite data on great hammerhead sharks
-revealed volume areas for core and general use gradually rise with timeDiffLong increases,
-multiple small dots of presence get blobbed together, and therefore sometimes this covers land.
-Ideally one would not discard any data, in which case one should choose a value higher than the
-largest between-detections gap in their dataset (or just pick a very large number). This
+\item{timeDiffLong}{Single numeric value. Threshold value in units set via 'timeDiffUnits' designating the length
+of long breaks in re-locations. Allows setting movement segments that correspond to long time gaps to FALSE so they
+are ignored in subsequent model calculations avoiding model and UD inflation. Default of 2 hours is arbitrary. Looping
+through 18, 24, and 36 hours for satellite data on great hammerhead sharks revealed volume areas for core and
+general use gradually rise with timeDiffLong increases, multiple small dots of presence get blobbed together, and
+therefore sometimes this covers land. Ideally one would not discard any data, in which case one should choose a value
+higher than the largest between-detections gap in their dataset (or just pick a very large number). This
 parameter is useful when the model would otherwise get stuck trying to calculate a UD for an
 individual with a very large home range that is inadequately captured by a receiver array.
 Default 2.}
@@ -100,7 +124,9 @@ Higher resolution will lead to more precision in the volume areas calculations. 
 (divide by 1000000) = 0.00045 degrees. Try around the median of your moveLocError.}
 
 \item{movemargin}{Margin size for variance calc in move::brownian.motion.variance.dyn and
-behavioural change point analysis in move::brownian.bridge.dyn. Must be an odd number. Default 11.
+behavioural change point analysis in move::brownian.bridge.dyn. It is also used in move::dynBGBvariance
+for the behavioral change point analysis and in move::dynBGB. Must be an odd number. Depending on model choice
+there are different defaults: dbbmm - 11, dbgb - 15.
 Motion variance based on only the middle section of the trajectory; the ends
 of the movement trajectory where no changes are allowed because at some stage
 you want to have a few locations to base your estimation of the variance on
@@ -109,17 +135,17 @@ called the margin. Smaller values for window size and margin is expected to
 give a higher frequency of behavioural changes; make these large for looking
 at migrations.}
 
-\item{dbbext}{Ext param in the 'brownian.bridge.dyn' function in the 'move' package. Extends
+\item{dbbext}{Ext param in the 'brownian.bridge.dyn' and 'dynBGB' functions in the 'move' package. Extends
 bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax)
 . Default 0.3 - extends bounding box by 30 percent. Excessive buffering will get cropped automatically.}
 
-\item{dbbwindowsize}{The window.size param in the 'brownian.bridge.dyn' function
+\item{dbbwindowsize}{The window.size param in the 'brownian.bridge.dyn' and windowSize param in the 'dynBGB' functions
 in the 'move' package. The size of the moving window along the track. Larger windows provide more
 stable/accurate estimates of the brownian motion variance but are less well able to capture more
-frequent changes in behaviour. Number must be odd. Individuals with fewer
-detections than the window size (default 23) will be removed. A window size
-of 23 means the sliding window is moved every 23 locations or every 23 hours
-(via timeDiffUnits). Must be >= 2*movemargin (default 11).}
+frequent changes in behaviour. For example: a window size of 31 means the sliding window is moved every 31 locations
+or every 31 hours (via timeDiffUnits). This number must be odd. Must be >= 2*movemargin. Given the different 'movemargin' defaults for
+dBBMM (11) and dBGB (15), defaults for this parameter are set to 23 and 31 depending on your model choice 'dbbmm' and 'dbgb', respectively.
+Individuals with fewer detections than the window size will be removed.}
 
 \item{writeRasterFormat}{Character. Output file type for raster::writeRaster param format.
 Default "ascii". TO DEPRECIATE.}
@@ -135,7 +161,7 @@ raster::writeRaster param Datatype. Default "FLT4S". TO DEPRECIATE.}
 
 \item{savedir}{Save outputs to a temporary directory (default) else change
 to desired directory e.g. "/home/me/folder". Do not use getwd() for this.
-Do NOT include terminal slash. Directory must exist. Default tempdir().}
+Do NOT include terminal slash. Default tempdir().}
 
 \item{saveAreaCT}{Save tiny individual core and general use areas tables to
 disk. These are the only things retained in the per-individual loop, so if
@@ -148,26 +174,58 @@ the results together later with stitchraster. Default FALSE.}
 Individual-level utilization distributions, saved as rasters, as well
 as calculated volume area estimates for 50 and 95pct contours, saved in a
 .csv file. Motion variance csvs per individual ("MotionVariance.csv"), see
-move::brownian.motion.variance.dyn. No processed object is returned, i.e. bad: "objectname <-
+move::brownian.motion.variance.dyn or move::dynBGBvariance. No processed object is returned, i.e. bad: "objectname <-
 movegroup()", good: "movegroup()".
 }
 \description{
-Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD)
-estimation for multiple individuals simultaneously, using functions in the 'move' package. The
-authors are indebted to the move package authors Bart Kraunstauber, Marco Smolla, and Anne K
+Automates dynamic Brownian bridge movement model (dBBMM) and dynamic bivariate Gaussian bridge (dBGB) calculation for
+utilization distribution (UD) estimation for multiple individuals simultaneously, using functions in the 'move' package.
+The authors are indebted to the move package authors Bart Kraunstauber, Marco Smolla, and Anne K
 Scharf, and to Sarah Becker for seed code which inspired the development of the
 movegroup::movegroup function.
 }
 \details{
-Step 1. Filter individuals.
-Remove those individuals for which there are insufficient data i.e. number of re-locations is
-smaller than the window size parameter value (default = 31).
+We strongly recommend that prior to choosing any of the model options, you familiarize yourself with the underlying
+concepts of dBBMMs and dBGBs by reading the corresponding publications from Kranstauber et al. (2012) for dBBMMs and
+Kranstauber et al. (2014) for dBGBs. Please see the full reference details in the 'References' section below.
 
-Step 2. Generate universal raster.
+Here we provide a very short overview of the most important points from the listed references. Dynamic BBMMs and dBGBs are an improvement over traditional UD calculation methods, as they are able to integrate a
+temporal component to the movement data and explicitly model the movement trajectory between two consecutive locations.
+The dBBMM does this by defining the variance of the Brownian motion between two locations and estimating how irregular the
+movement path is. Importantly, in dBBMMs the movement between locations is assumed to be diffusive and isotropic. Effectively, this means
+that the movement between two locations is equally likely to happen in all directions.
+Dynamic BGBs allow the incorporation of a directional bias in the movement path analysis of bridging models. Kranstauber et al.'s
+Bivariate Gaussian Bridges model does this by factorizing the diffusion, i.e. the Brownian variance estimates, into
+the direction towards and perpendicular to a straight line to the next location, resulting in two normally distributed
+probability densities for each direction.
+
+In either model choice, long time gaps between two consecutive detections can therefore present an issue, as these long time
+gaps create a very high uncertainty in regard to your animal's whereabouts between two locations. However, given the different
+underlying assumptions in regard to the diffusion process in each model, longer time gaps can cause different problematic outputs.
+We would like to thank Dr. Anne K. Scharf for the further explanations regarding the model choice.
+In short, dBBMM does not distinguish between the animal changing movement in direction or speed between two locations. But, dBGBs make a difference
+between the animal changing movement in direction and in speed between two locations. Long time gaps in dBGBs can therefore create
+stronger uncertainty in change in direction so that the outputs of your model runs might show biologically unrealistic, very narrow and long peaks along or perpendicular to the
+trajectory between two locations, whereas such a case in dBBMMs would create a uninformative, inflated circular area with a large diameter within which
+your animal might have been (i.e. pretty much anywhere, which is not informative).
+
+The solution to this problem is in both cases to remove the variance of the segments corresponding to the large time gaps. This can be done using the 'move'
+package, and is directly implemented in this function already (please see params timeDiffLong and timeDiffUnits above). However, the ideal settings
+may be different based on your model choice due to the reasons explained above. And, based on your data structure, your data may be inadequate for your model choice.
+It is therefore imperative that you understand the assumptions of the different models and how they relate to your own data.
+
+Once you have decided, which model is most appropriate for your data, we here provide the movegroup::movegroup() function
+that automates the following steps in calculating dBBMM/dBGB-based UDs:
+
+Step 1. Filters individuals.
+Remove those individuals for which there are insufficient data i.e. number of re-locations is
+smaller than the window size parameter value (defaults: 23 for model "dbbmm" and 31 for model "dBGB").
+
+Step 2. Generates universal raster.
 Based on all remaining data, a universal raster is generated where the calculated UDs are plotted
 into.
 
-Step 3. Loop through individuals.
+Step 3. Loops through individuals.
 Individuals are looped through to construct individual-level movement models (on an absolute
 scale).
 
@@ -176,7 +234,8 @@ suggestions.
 
 install_git('https://gitlab.com/bartk/move.git') #Installs 'move' development version
 
-When used together, the order of functions would be: movegroup, (stitchraster
+The movegroup package provides additional functions to automate and simplify the visualisation and quantification of space
+use data of a group or populations of animals. When used together, the order of these functions would be: movegroup, (stitchraster
 if required), scaleraster, (alignraster if required then stitchraster again)
 , plotraster.
 \subsection{Errors and their origins:}{
@@ -204,6 +263,13 @@ objects from R, and try again, watching the RAM usage piechart by the
 Environment tab. If unsuccessful, run function in chunks of individuals until
 all (of length >= windowsize) are saved to disc as asc files, then produce
 final summary stats with stitchraster.
+\item Error in validityMethod(as(object, superClass)) : The used raster is not a UD (sum unequal to 1), sum is: NaN One possible cause is
+loss of accuracy due to writing raster to disk with dataType FLT4S this can be solved preventing disk usage or changing data type.
+Same error message as in nr. 8 above. This error can also occur if you are calculating dBGBs and set your timeDiffLong shorter than the shortest
+segment. Check your time gaps between locations and compare to timeDiffLong, check the timeDiffUnits parameter and make sure you chose the correct unit.
+Try shorter timeDiffLong options.
+\item Function runs but no findable output: The default directory into which outputs are saved (i.e. savedir) is set to
+'tempdir()'. This means, that if you forget to change this parameter, all outputs will be saved to your system's temporary folder.
 }
 }
 }
@@ -213,19 +279,23 @@ final summary stats with stitchraster.
 data("TracksCleaned")
 # run function
 movegroup(
- data = TracksCleaned,
- ID = "Shark",
- Datetime = "Datetime",
- Lat = "Lat",
- Lon = "Lon",
- savedir = tempdir())
- }
+  data = TracksCleaned,
+  ID = "Shark",
+  Datetime = "Datetime",
+  Lat = "Lat",
+  Lon = "Lon",
+  savedir = tempdir()
+)
+}
 
 }
 \references{
 Kranstauber, B., Kays, R., LaPoint, S. D., Wikelski, M. and Safi, K. (2012), A
 dynamic Brownian bridge movement model to estimate utilization distributions for heterogeneous
 animal movement. Journal of Animal Ecology. doi: 10.1111/j.1365-2656.2012.01955.x
+
+Kranstauber, B., Safi, K., and Bartumeus, F. (2014). Bivariate Gaussian bridges: directional
+factorization of diffusion in Brownian bridge models. Movement Ecology. https://doi.org/10.1186/2051-3933-2-5
 
 Kranstauber, B., M. Smolla & A. K. Scharf. 2019. Move: visualizing and analyzing animal track
 data. R package version 4.2.4 (at 2023-08-15). https://CRAN.R-project.org/package=move.
@@ -234,4 +304,6 @@ data. R package version 4.2.4 (at 2023-08-15). https://CRAN.R-project.org/packag
 Simon Dedman, \email{simondedman@gmail.com}
 
 Maurits van Zinnicq Bergmann, \email{mauritsvzb@gmail.com}
+
+Vital Heim, \email{vital.heim@gmail.com}
 }
