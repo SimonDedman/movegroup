@@ -73,6 +73,8 @@ We strongly recommend that you download papers:
 
 [Kranstauber](https://doi.org/10.1111/j.1365-2656.2012.01955.x), B., Kays, R., LaPoint, S. D., Wikelski, M. and Safi, K. (2012) A dynamic Brownian bridge movement model to estimate utilization distributions for heterogeneous animal movement. Journal of Animal Ecology.
 
+[Kranstauber](https://link.springer.com/article/10.1186/2051-3933-2-5), B., Safi, K. & Bartumeus, F. (2014) Bivariate Gaussian bridges: directioal factorization of diffusion in Brownian bridge movement models. Movement Ecology.
+
 [Kranstauber](https://CRAN.R-project.org/package=move), B., M. Smolla & A. K. Scharf. (2019) Move: visualizing and analyzing animal track data. R package version 4.2.4 (at 2023-08-15).
 
 [van Zinnicq Bergmann](https://doi.org/10.1016/j.biocon.2022.109469), M. P. M., Guttridge, T. L., Smukall, M. J., Adams, V. M., Bond, M. E., Burke, P. J., Fuentes, M. M. P. B., Heinrich, D. D. U., Huveneers, C., Gruber, S. H., and Papastamatiou, Y. P. (2022) Using movement models and systematic conservation planning to inform marine protected area design for a multi-species predator community. Biological Conservation.
