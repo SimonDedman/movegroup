@@ -1,6 +1,6 @@
 #' Plots a group-level utilization distribution
 #'
-#' Plots 50 and 95pct contours of a group-level utilization distribution raster on a spatial map
+#' Plots 50 and 95% utilization distribution (UD) contours of a group-level UD raster on a spatial map
 #' background. Contains functionality to also visualize geographic locations of individual listening
 #' stations (e.g., acoustic receivers) as well as the entire surface UD.
 #'
@@ -57,6 +57,8 @@
 #' "stamen_toner", "stamen_toner_lite", "stamen_watercolor", "stamen_terrain_background", 
 #' "stamen_toner_background", "stamen_terrain_lines", "stamen_terrain_labels", "stamen_toner_lines",
 #'  "stamen_toner_labels".
+#' @param generalUDpct numerical. Utilization Distribution % in decimals for the contour level depicting general space use areas within the UD surface. Typically 95% UD, i.e. 0.95. Default 0.95. Contourlines colored in 'contour1color'.
+#' @param coreUDpct numerical. Utilization Distribution % in decimals for the contour level depicting core space use areas within the UD surface. Typically 50% UD, i.e. 0.5. Default 0.5. Contourlines colored in 'contour2color'.
 #' @param contour1colour Colour for contour 1, typically 95pct, default "red".
 #' @param contour2colour Colour for contour 2, typically 50pct, default "orange".
 #' @param positionscolour Colour for original animal locations, if xlatlon not NULL. Default "white".
@@ -105,7 +107,12 @@
 #' @param reclabpad Receiver label padding in lines. Default 0.
 #' @param reclabrad Receiver label radius in lines. Default 0.15.
 #' @param reclabbord Receiver label border in mm. Default 0.
-#' @param surface Plot complete UD surface along with contours. Default TRUE.
+#' @param surface Plot the surface of the 'surfaceUDpct' UD on a continuous scale along with contours. Default TRUE.
+#' @param surfaceUDpct numerical; Percent of UD surface to be plotted if 'surface' is TRUE in decimals. Tracking datasets of gill-breathing animals are
+#' often characterized by relatively long time gaps between consecutive detections. These long gaps can cause higher uncertainties in the animals'
+#' whereabouts between these detections causing the inclusion of raster cells with relatively low UD values within the complete UD surface.
+#' These very low UD values contain little information and this parameters provides the option to trim the UD surface to a desired UD %.
+#' Default is 0.95. This means the 95% UD surface is plotted on a continuous scale.
 #' @param cropsavedimage Crop the output image with knitr::plot_crop which uses pdfcrop on PDFs, 
 #' otherwise magick::image_trim. magick requires system pre-install. deb: libmagick++-dev (Debian, 
 #' Ubuntu), rpm: ImageMagick-c++-devel (Fedora, CentOS, RHEL), csw: imagemagick_dev (Solaris), brew:
@@ -120,8 +127,10 @@
 #' the entire home range of the study species. This term is problematic when applied to a passive
 #' acoustic telemetry setting where an array of non-overlapping receivers are used to assess local
 #' space use patterns i.e. the home range is bigger than the coverage by the acoustic array.
-#'
-#' Errors and their origins:
+#' 
+#' Please be aware, 
+#' 
+#' ## Errors and their origins:
 #' 1. Error in gzfile(file, "rb") : cannot open the connection. In addition: Warning message: In
 #' gzfile(file, "rb"): cannot open compressed file '/var/folders/dl/etc/ggmap/index.rds',
 #' probable reason 'No such file or directory'. Cause: index.rds may not have been created, due to a
@@ -215,6 +224,8 @@ plotraster <- function(
     # "stamen_toner", "stamen_toner_lite", "stamen_watercolor", "stamen_terrain_background", 
     # "stamen_toner_background", "stamen_terrain_lines", "stamen_terrain_labels", "stamen_toner_lines",
     #  "stamen_toner_labels".
+    generalUDpct = .95, # Contour level depicting general space use areas within the UD. Typically 95% UD, i.e. 0.95.
+    coreUDpct = .5, # Contour level depicting core space use areas within the UD. Typically 50% UD, i.e. 0.5. Default 0.5.
     contour1colour = "red", # colour for contour 1, typically 95%.
     contour2colour = "orange", # colour for contour 2, typically 50%.
     positionscolour = "white", # colour for original locations, if xlatlon not NULL.
@@ -261,6 +272,7 @@ plotraster <- function(
     reclabrad = 0.15, # Receiver label radius in lines.
     reclabbord = 0, # Receiver label border in mm.
     surface = TRUE, # Plot complete UD surface as well as contours.
+    surfaceUDpct = .95, # Trimmed UD surface to be plotted on a continuous scale if 'surface' is TRUE. 
     cropsavedimage = FALSE, # crop the output image with knitr::plot_crop which uses pdfcrop on PDFs,
     # otherwise magick::image_trim. magick requires system preinstall. deb: libmagick++-dev (Debian,
     # Ubuntu), rpm: ImageMagick-c++-devel (Fedora, CentOS, RHEL), csw: imagemagick_dev (Solaris), 
@@ -280,9 +292,24 @@ plotraster <- function(
   if (substr(x = savedir, start = nchar(savedir), stop = nchar(savedir)) == "/") savedir = substr(x = savedir, start = 1, stop = nchar(savedir) - 1)
   dataCRS <- readRDS(file.path(crsloc, "CRS.Rds")) # load CRS from file
   # Import raster
-  x <- stars::read_stars(x)
+  # x <- stars::read_stars(x) # DEPRECATED 20260626 due to change back to volumetric UDs and need for raster::raster()
   # set CRS, function from sp
-  sf::st_crs(x) <- sp::proj4string(dataCRS)
+  # sf::st_crs(x) <- sp::proj4string(dataCRS) # DEPRECATED 20260626 due to change back to volumetric UDs and need for raster::raster()
+  x <- raster::raster(x)
+  # set CRS
+  raster::crs(x) <- dataCRS
+  
+  # make a new UD object to plot volumetric UD later
+  newUD <- new(".UD", x)
+  
+  # calculate volumetric UD
+  volUD <- move::getVolumeUD(newUD)
+  raster::crs(volUD) <- dataCRS # reset CRS - safety
+  
+  # convert your volumetric UD object into a stars raster for easier contour plotting later
+  ud_stars <- stars::st_as_stars(volUD)
+  # add your crs info, function from sp
+  sf::st_crs(ud_stars) <- sp::proj4string(dataCRS) # this should be used for volumetric UD calcs, i.e. ud_stars
   
   # for plotting the surface UD on the map:
   # surfaceUD <- x %>% sf::st_set_crs(3857) # 4326 = WGS84. Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: degree
@@ -293,19 +320,22 @@ plotraster <- function(
   # https://github.com/r-spatial/stars/issues/464
   
   # Trim data to plot surface
-  y <- x # make dupe object else removing all data < 0.05 means the 0.05 contour doesn't work in ggplot
-  if (trim) { # trim raster extent to data?
+  y <- ud_stars # make dupe object else removing all data < 0.05 means the 0.05 contour doesn't work in ggplot
+  if (trim) { # trim raster extent to data, remove 0 values and crop to 99% UD
     is.na(y[[1]]) <- y[[1]] == 0 # replace char pattern (0) in whole df/tbl with NA
-    is.na(y[[1]]) <- y[[1]] < (max(y[[1]], na.rm = TRUE) * 0.05) # replace anything < 95% contour with NA since it won't be drawn
+    # is.na(y[[1]]) <- y[[1]] < (max(y[[1]], na.rm = TRUE) * 0.05) # replace anything < 95% contour with NA since it won't be drawn - DEPRECATED 20260626 as based on raw probabilities
+    is.na(y[[1]]) <- as.vector(y[[1]]) > surfaceUDpct # mask all cells outside the 95% UD
     # does this mean subsequent 50 & 95%'s are 95% of 95%?
-    # No: Y is only used for the UD surface, NOT the contours, that's xlatlon
+    # No: Y is only used for the UD surface, NOT the contours, that's based on entire UD surface
   }
   y <- starsExtra::trim2(y) # remove NA columns, which were all zero columns. This changes the bbox accordingly
   y[[1]] <- (y[[1]] / max(y[[1]], na.rm = TRUE)) * 100 # convert from raw values to 0:100 scale so legend is 0:100%
   
   # if (is.null(myLocation)) myLocation <- y %>% sf::st_transform(4326) %>% sf::st_bbox() %>% as.vector() # trimmer raster extents are smaller than UD95 contours
   # if (is.null(myLocation)) myLocation <- sf_95 %>% sf::st_transform(4326) %>% sf::st_bbox() %>% as.vector() # not using sf_95 any more
-  if (is.null(myLocation)) myLocation <- stars::st_contour(x = x, contour_lines = TRUE, breaks = max(x[[1]], na.rm = TRUE) * 0.05)  |>
+  # if (is.null(myLocation)) myLocation <- stars::st_contour(x = x, contour_lines = TRUE, breaks = max(x[[1]], na.rm = TRUE) * 0.05)  |>
+  
+  if (is.null(myLocation)) myLocation <- stars::st_contour(x = ud_stars, contour_lines = TRUE, breaks = surfaceUDpct)  |>
     sf::st_transform(4326) |>  sf::st_bbox()  |>  as.vector()
   
   if (!is.null(gmapsAPI)) ggmap::register_google(key = gmapsAPI, # an api key
@@ -440,20 +470,36 @@ plotraster <- function(
   # Produce CSV of which points are within which UD contour
   if (!is.null(xlatlon)) {
     # Import raster
-    xlatlon <- stars::read_stars(xlatlon) # UDScaled
+    # xlatlon <- stars::read_stars(xlatlon) # UDScaled
+    xlalton <- raster::raster(xlatlon)
     # ISSUE1 ####
     # Comment above says UDScaled but param guide says LatLon.
     # If it was LatLon it wouldn't need dataCRS which is AEQD not latlon,
     # So potentially it SHOULD be UDScaled, in which case I only have to change the guide, not the code.
     # Check with Lib's coderuns.
-    sf::st_crs(xlatlon) <- sp::proj4string(dataCRS) # set CRS
+    # set CRS
+    raster::crs(xlatlon) <- dataCRS
+    # make a new UD object to plot volumetric UD later
+    xlatlon_newUD <- new(".UD", xlatlon)
+    # calculate volumetric UD
+    xlatlon_volUD <- move::getVolumeUD(xlatlon_newUD)
+    raster::crs(xlatlon_volUD) <- dataCRS # reset CRS - safety
+    # convert your volumetric UD object into a stars raster for easier contour plotting later
+    xlatlon_stars <- stars::st_as_stars(xlatlon_volUD)
+    # add your crs info, function from sp
+    # sf::st_crs(xlatlon) <- sp::proj4string(dataCRS) # set CRS
+    sf::st_crs(xlatlon_stars) <- sp::proj4string(dataCRS)
+    
     
     # Create contours & polygons for ggplot & polygon count objects
     # 95% UD
-    UD95poly <- stars::st_contour(x = xlatlon,
+    # UD95poly <- stars::st_contour(x = xlatlon,
+    #                               contour_lines = TRUE,
+    #                               breaks = max(xlatlon[[1]],
+    #                                            na.rm = TRUE) * 0.05) |>
+    UD95poly <- stars::st_contour(x = xlatlon_stars,
                                   contour_lines = TRUE,
-                                  breaks = max(xlatlon[[1]],
-                                               na.rm = TRUE) * 0.05) |>
+                                  breaks = generalUDpct) |>
       
       sf::st_cast("POLYGON")
     sf::st_crs(UD95poly) <- sp::proj4string(dataCRS)# set CRS
@@ -465,10 +511,13 @@ plotraster <- function(
     UD95poly <- UD95poly |> sf::st_set_crs(4326) # make 4326, doesn't match CRS of mypointssf otherwise
     
     # 50% UD
-    UD50poly <- stars::st_contour(x = xlatlon,
+    # UD50poly <- stars::st_contour(x = xlatlon,
+    #                               contour_lines = TRUE,
+    #                               breaks = max(xlatlon[[1]],
+    #                                            na.rm = TRUE) * 0.5) |>
+    UD50poly <- stars::st_contour(x = xlatlon_stars,
                                   contour_lines = TRUE,
-                                  breaks = max(xlatlon[[1]],
-                                               na.rm = TRUE) * 0.5) |>
+                                  breaks = coreUDpct) |>
       sf::st_cast("POLYGON")
     sf::st_crs(UD50poly) <- sp::proj4string(dataCRS)# set CRS
     UD50poly <- UD50poly |> sf::st_set_crs(4326) # make 4326, doesn't match CRS of mypointssf otherwise
@@ -489,9 +538,9 @@ plotraster <- function(
     # Assign points to contours/UDs
     pointsin50 <- mypointssf[UD50poly, ]
     # label those points TRUE
-    locationpoints[locationpoints$Index %in% pointsin50$Index, "UD50"] <- as.logical(TRUE)
+    locationpoints[locationpoints$Index %in% pointsin50$Index, paste0("UD",coreUDpct*100)] <- as.logical(TRUE)
     pointsin95 <- mypointssf[UD95poly, ]
-    locationpoints[locationpoints$Index %in% pointsin95$Index, "UD95"] <- as.logical(TRUE)
+    locationpoints[locationpoints$Index %in% pointsin95$Index, paste0("UD", generalUDpct*100)] <- as.logical(TRUE)
     # if savedir doesn't exist, can't save into it, therefore create it
     if (!file.exists(savedir)) dir.create(savedir)
     # if pointsincontourssave wasn't entered, autogenerate
@@ -504,15 +553,12 @@ plotraster <- function(
     # is due to AEQD --> latlon CRS change??
   } # close if (!is.null(xlatlon))
   
-  
-  
-  
   # plot map ####
   ggmap::ggmap(myMap) + # basemap CRS = 3857
     
     # UD surface
     {if (surface)
-      stars::geom_stars(data = y  |>  sf::st_transform(3857), inherit.aes = FALSE)
+      stars::geom_stars(data = y  |>  sf::st_transform(3857), inherit.aes = FALSE) # this should now be the trimmed stars raster via raster::raster, new(), getVolumneUD
     } +
     
     # receiver centrepoints
@@ -569,7 +615,7 @@ plotraster <- function(
                        ggplot2::aes(alpha = "Positions")
       )
     } +
-     
+    
     # Plot central place / centre of activity
     { if (calcCOA)
       ggplot2::geom_sf(data = COA |>
@@ -579,65 +625,84 @@ plotraster <- function(
                        size = COAsize,
                        ggplot2::aes(shape = "Centre of Activity")
       ) +
-      
-      # COA size
-      # ggplot2::scale_size_manual(values = c("COAsize" = COAsize,
-      #                                       "PositionsSize" = 0.1),
-      #                            guide = "none") + # works here
-      
-      # COA COAshape
-      ggplot2::scale_shape_manual(name = NULL, values = c("Centre of Activity" = COAshape)) + # guide = "none" does nothing?
+        
+        # COA size
+        # ggplot2::scale_size_manual(values = c("COAsize" = COAsize,
+        #                                       "PositionsSize" = 0.1),
+        #                            guide = "none") + # works here
+        
+        # COA COAshape
+        ggplot2::scale_shape_manual(name = NULL, values = c("Centre of Activity" = COAshape)) + # guide = "none" does nothing?
         
         # ggplot2::guides(shape = FALSE) + # hides shape legend but can cause problems
         
         # COA alpha
-      ggplot2::scale_alpha_manual(name = NULL, values = c("Positions" = positionsalpha)) # guide = "none" works here
+        ggplot2::scale_alpha_manual(name = NULL, values = c("Positions" = positionsalpha)) # guide = "none" works here
     } +
     
-    # 95% UD
+    # 95% UD or general use area % as specified by user
     # ggplot2::aes(colour = "95% UD")) + # https://github.com/dkahle/ggmap/issues/160#issuecomment-966812818
-    ggplot2::geom_sf(data = stars::st_contour(x = x,
+    # ggplot2::geom_sf(data = stars::st_contour(x = x,
+    #                                           contour_lines = TRUE,
+    #                                           breaks = max(x[[1]],
+    #                                                        na.rm = TRUE) * 0.05) |>
+    ggplot2::geom_sf(data = stars::st_contour(x = ud_stars,
                                               contour_lines = TRUE,
-                                              breaks = max(x[[1]],
-                                                           na.rm = TRUE) * 0.05) |>
+                                              breaks = generalUDpct) |>
                        sf::st_transform(3857),
                      fill = NA,
                      inherit.aes = FALSE,
-                     ggplot2::aes(colour = "95% UD")) +
+                     ggplot2::aes(colour = paste0(generalUDpct*100,"% UD"))
+    ) +
     
     # 50% UD
-    ggplot2::geom_sf(data = stars::st_contour(x = x,
+    # ggplot2::geom_sf(data = stars::st_contour(x = x,
+    #                                           contour_lines = TRUE,
+    #                                           breaks = max(x[[1]],
+    #                                                        na.rm = TRUE) * 0.5) |>
+    ggplot2::geom_sf(data = stars::st_contour(x = ud_stars,
                                               contour_lines = TRUE,
-                                              breaks = max(x[[1]],
-                                                           na.rm = TRUE) * 0.5) |>
+                                              breaks = coreUDpct) |>
                        sf::st_transform(3857),
                      fill = NA,
                      inherit.aes = FALSE,
-                     ggplot2::aes(colour = "50% UD")) +
+                     ggplot2::aes(colour = paste0(coreUDpct*100,"% UD"))
+    ) +
     
     # UD contour & COA colours
+    # ggplot2::scale_colour_manual( 
+    #   # name = legendtitle,
+    #   name = NULL,
+    #   values = c("50% UD" = contour2colour, # - DEPRECATED 20260701: if we want to parametrize name of contours based on user preference, the left side of the cannot be a function call such as paste0() as the R parerser rejects it
+    #              "95% UD" = contour1colour)
+    #   ) +
     ggplot2::scale_colour_manual(
-      # name = legendtitle,
       name = NULL,
-      values = c("50% UD" = contour2colour,
-                 "95% UD" = contour1colour)) +
+      values = setNames(
+        c(contour2colour, contour1colour),
+        c(paste0(coreUDpct*100, "% UD"), paste0(generalUDpct*100, "% UD"))
+      )
+    ) +
     
     # UD surface colour scale
     viridis::scale_fill_viridis(
       alpha = 1, # 0:1
       begin = 0, # hue
       end = 1, # hue
-      direction = 1, # colour order, 1 or -1
+      # direction = 1, # colour order, 1 or -1 - DEPRECATED 20260630 to be in agreement with volumetric UD approach
+      direction = -1, # colour order, 1 or -1, use -1 for volumetric UD approach
       discrete = FALSE, # false = continuous
       option = "D", # A magma B inferno C plasma D viridis E cividis F rocket G mako H turbo
       space = "Lab",
       na.value = "grey50",
-      guide = "colourbar",
+      # guide = "colourbar", - DEPRECATED 20260630 - for L686
       aesthetics = "fill",
       name = "UD%",
-      labels = ~ 100 - .x, # https://stackoverflow.com/questions/77609884/how-to-reverse-legend-labels-only-so-high-value-starts-at-bottom
+      # labels = ~ 100 - .x, # https://stackoverflow.com/questions/77609884/how-to-reverse-legend-labels-only-so-high-value-starts-at-bottom
       # values are 0-100 with 100=max in the centre but for proportion of time in UD we use % of max with 95% being 0.05 of max.
-      # So we need to reverse the labels to convert usage density into proportion of time.
+      # So we need to reverse the labels to convert usage density into proportion of time. - DEPRECATED 20260630 - due to switching direction -1 this becomes redundant.
+      labels = waiver(),
+      guide = guide_colorbar(reverse = TRUE), # added 20260630, places 100% (i.e. lowest prob of your animal's whereabouts) at the bottom of the legend
       position = "right"
     ) +
     
