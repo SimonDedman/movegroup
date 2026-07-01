@@ -31,7 +31,7 @@ plotraster(
   COAalpha = 1,
   COAshape = 4,
   COAsize = 1,
-  plottitle = "Aggregated 95\% and 50\% UD contours",
+  plottitle = NULL,
   plotsubtitle = "Scaled contours",
   legendtitle = "Percent UD Contours",
   plotcaption = paste0("movegroup, ", lubridate::today()),
@@ -149,7 +149,8 @@ to 1 (fully parent).}
 
 \item{COAsize}{Size of COA point, default 1.}
 
-\item{plottitle}{Title of the resultant plot, default "Aggregated 95pct and 50pct UD contours".}
+\item{plottitle}{Title of the resultant plot, Optional. Default NULL. Optional plot title. If NULL, title will be generated automatically as "Aggregated 'generalUDpct' \%
+and 'coreUDpct' \% UD contours".}
 
 \item{plotsubtitle}{Plot subtitle, default "Scaled contours". Can add the n of your individuals.}
 
