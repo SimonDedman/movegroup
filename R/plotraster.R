@@ -329,8 +329,11 @@ plotraster <- function(
     # No: Y is only used for the UD surface, NOT the contours, that's based on entire UD surface
   }
   y <- starsExtra::trim2(y) # remove NA columns, which were all zero columns. This changes the bbox accordingly
-  y[[1]] <- (y[[1]] / max(y[[1]], na.rm = TRUE)) * 100 # convert from raw values to 0:100 scale so legend is 0:100%
+  y[[1]] <- (y[[1]] / max(y[[1]], na.rm = TRUE)) * 100 # convert from raw values to 0:100 scale for later colour display, legend breaks will be corrected later so they correspond to absolute UD values
   
+  # However, now we need to prepare breaks and labels for later plotting
+  legendbreaks <- c(0, 25/surfaceUDpct, 50/surfaceUDpct, 75/surfaceUDpct, 100)
+  legendlabels <- c("0", "25", "50","75", paste0(surfaceUDpct*100))
   # if (is.null(myLocation)) myLocation <- y %>% sf::st_transform(4326) %>% sf::st_bbox() %>% as.vector() # trimmer raster extents are smaller than UD95 contours
   # if (is.null(myLocation)) myLocation <- sf_95 %>% sf::st_transform(4326) %>% sf::st_bbox() %>% as.vector() # not using sf_95 any more
   # if (is.null(myLocation)) myLocation <- stars::st_contour(x = x, contour_lines = TRUE, breaks = max(x[[1]], na.rm = TRUE) * 0.05)  |>
@@ -701,8 +704,10 @@ plotraster <- function(
       # labels = ~ 100 - .x, # https://stackoverflow.com/questions/77609884/how-to-reverse-legend-labels-only-so-high-value-starts-at-bottom
       # values are 0-100 with 100=max in the centre but for proportion of time in UD we use % of max with 95% being 0.05 of max.
       # So we need to reverse the labels to convert usage density into proportion of time. - DEPRECATED 20260630 - due to switching direction -1 this becomes redundant.
-      labels = waiver(),
-      guide = guide_colorbar(reverse = TRUE), # added 20260630, places 100% (i.e. lowest prob of your animal's whereabouts) at the bottom of the legend
+      # labels = waiver(), # DEPRECATED 20260701 to accomodate user choice in UD surface that is actually plotted
+      labels = legendlabels,
+      breaks = legendbreaks,
+      guide = guide_colorbar(reverse = TRUE), #places 100% (i.e. lowest prob of your animal's whereabouts) at the bottom of the legend
       position = "right"
     ) +
     
