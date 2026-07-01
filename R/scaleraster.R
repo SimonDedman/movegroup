@@ -1,10 +1,37 @@
-#' Scales individual utilization distribution rasters and volume area estimates
+#' Scales individual utilization distribution (UD) rasters and volume area estimates
 #' 
 #' Scales individual-level utilization distribution (UD) rasters from 0 to 1 to facilitate interpretation as relative 
 #' intensity of utilization (as opposed to absolute), making comparisons across individuals and interpretations at 
 #' the group level more straightforward. Subsequently, scaled individual-level rasters are aggregated to create a 
 #' single group-level UD raster. See www.GitHub.com/SimonDedman/movegroup for issues, feedback, and development 
 #' suggestions. There is an option to account for bias in acoustic receiver array spatial representation (see Details). 
+#' 
+#' @param path Path to directory where the individual-level UDs are saved. Likely the same as 
+#' savedir from movegroup. Default NULL.
+#' @param pathsubsets Path to parent directory that contains all UDs across spatial groups or 
+#' subsets, i.e. if you ran movegroup multiple times for different areas in a connected system, this
+#' would be the parent folder within which all the movegroup savedir's are located. Default NULL.
+#' @param pattern Extension pattern used to read in all UDs in directory and pathsubsets directory. 
+#' Default ".asc".
+#' @param weighting Addresses unbalanced receiver array design after receivers have first been 
+#' partitioned into regions, and group-level UDs estimated per region. Numeric. Weights 
+#' area-specific scaled group-level UD raster by value. This then means that estimated scaled 
+#' individual-level volume areas also become weighted. Default is 1 for no weighting.
+#' @param format Character. Output file type for raster::writeRaster param format. Default "ascii".
+#' @param datatype Character. Data type for writing values to disk for raster::writeRaster param 
+#' Datatype. Default "FLT4S". 
+#' @param bylayer For raster::writeRaster param bylayer. Default TRUE.
+#' @param overwrite For raster::writeRaster param overwrite. Default TRUE.
+#' @param scalefolder Folder to save outputs to. Default "Scaled".
+#' @param scaledweightedname Name of chunk for scaled and weighted output rasters. Default 
+#' "All_Rasters_Scaled_Weighted".
+#' @param crsloc Location of saved CRS Rds file from movegroup.R. Should be same as path. Default 
+#' NULL.
+#' @param returnObj Logical. Return the scaled object to the parent environment? Default FALSE.
+#' 
+#' @details We here provide the movegroup::scaleraster() function that automates the following steps to scale individual-level
+#' utiliszation distribution (UD) rasters from 0 to 1 for intepretation as relative insensity of utilization, and to subsequently
+#' aggregate scaled individual-level rasters into one single group-level UD raster:
 #' 
 #' Step 1. Scale rasters.
 #' Individual-level UD rasters are scaled from 0 to 1 by dividing each raster by the maximum probability density value
@@ -34,30 +61,7 @@
 #' 
 #' Step 8. Export the projected-CRS group-level raster.
 #' 
-#' @param path Path to directory where the individual-level UDs are saved. Likely the same as 
-#' savedir from movegroup. Default NULL.
-#' @param pathsubsets Path to parent directory that contains all UDs across spatial groups or 
-#' subsets, i.e. if you ran movegroup multiple times for different areas in a connected system, this
-#' would be the parent folder within which all the movegroup savedir's are located. Default NULL.
-#' @param pattern Extension pattern used to read in all UDs in directory and pathsubsets directory. 
-#' Default ".asc".
-#' @param weighting Addresses unbalanced receiver array design after receivers have first been 
-#' partitioned into regions, and group-level UDs estimated per region. Numeric. Weights 
-#' area-specific scaled group-level UD raster by value. This then means that estimated scaled 
-#' individual-level volume areas also become weighted. Default is 1 for no weighting.
-#' @param format Character. Output file type for raster::writeRaster param format. Default "ascii".
-#' @param datatype Character. Data type for writing values to disk for raster::writeRaster param 
-#' Datatype. Default "FLT4S". 
-#' @param bylayer For raster::writeRaster param bylayer. Default TRUE.
-#' @param overwrite For raster::writeRaster param overwrite. Default TRUE.
-#' @param scalefolder Folder to save outputs to. Default "Scaled".
-#' @param scaledweightedname Name of chunk for scaled and weighted output rasters. Default 
-#' "All_Rasters_Scaled_Weighted".
-#' @param crsloc Location of saved CRS Rds file from movegroup.R. Should be same as path. Default 
-#' NULL.
-#' @param returnObj Logical. Return the scaled object to the parent environment? Default FALSE.
-#' 
-#' @details Errors and their origins:
+#' ## Errrors and their origins:
 #' 
 #' 1. Error in (function (cond): error in evaluating the argument 'x' in selecting a method for 
 #' function 'res': subscript out of bounds. Probably path can't find any files of type=pattern:
@@ -78,6 +82,7 @@
 #'
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #' @author Maurits van Zinnicq Bergmann, \email{mauritsvzb@@gmail.com}
+#' @author Vital Heim, \email{vital.heim@@gmail.com}
 #' 
 #' @examples
 #' \donttest{
@@ -105,17 +110,17 @@
 #' @importFrom sp CRS
 
 scaleraster <- function(path = NULL,
-                        pathsubsets = NULL,
-                        pattern = ".asc",
-                        weighting = 1,
-                        format = "ascii",
-                        datatype = "FLT4S",
-                        bylayer = TRUE,
-                        overwrite = TRUE,
-                        scalefolder = "Scaled",
-                        scaledweightedname = "All_Rasters_Scaled_Weighted",
-                        crsloc = NULL,
-                        returnObj = FALSE) {
+                         pathsubsets = NULL,
+                         pattern = ".asc",
+                         weighting = 1,
+                         format = "ascii",
+                         datatype = "FLT4S",
+                         bylayer = TRUE,
+                         overwrite = TRUE,
+                         scalefolder = "Scaled",
+                         scaledweightedname = "All_Rasters_Scaled_Weighted",
+                         crsloc = NULL,
+                         returnObj = FALSE) {
   
   # 1. Scale individual-level UD rasters and aggregate into one group-level UD raster ####
   
@@ -258,37 +263,30 @@ scaleraster <- function(path = NULL,
   # Convert the scaled individual-level rasters within rasterlist to class ".UD". Also ensure that values within a raster sum to 1 so that they can be fed into getVolumeUD()
   UDlist <- UDlist |> sapply(function(x) new(".UD", x / sum(raster::values(x))))
   
-  
-  
-  # Calculate 50% and 95% volume areas per UD, the mean and stdev across UDs, and finally core and home range volume area sizes of the group-level UD
-  # A. individual core and home range volume area sizes
-  # area.50 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50% volume area
-  # area.50 <- (area.50 * rasterres) / 1000000 # Convert from m^2 to km^2
-  
-  area.50.new <- UDlist |> sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.5))) # 50% volume area
-  area.50.new <- (area.50.new * rasterres) / 1000000 # Convert from m^2 to km^2
-  
-  # area.95 <- UDlist %>% sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95% volume area
-  # area.95 <- (area.95 * rasterres) / 1000000 # Convert from m^2 to km^2
-  
-  area.95.new <- UDlist |> sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.05))) # 95% volume area
-  area.95.new <- (area.95.new * rasterres) / 1000000 # Convert from m^2 to km^2
+  # Calculate 50% and 95% volume areas per UD, the mean and stdev across UDs, and finally core and general space use area sizes of the group-level UD
+  # A. individual core and general space use area sizes
+  # area.50.new <- UDlist |> sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.5))) # 50% volume area - DEPRECATED 20260624
+  # area.50.new <- (area.50.new * rasterres) / 1000000 # Convert from m^2 to km^2 - DEPRECATED 20260624
+  area.50.new <- UDlist |> sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .50))) # 50% volume area
+  area.50.new.km2 <- (area.50.new * rasterres) / 1000000 # Convert from m^2 to km^2
+  # area.95.new <- UDlist |> sapply(function(x) sum(raster::values(x) >= (max(x@data@values) * 0.05))) # 95% volume area - DEPRECATED 20260624
+  # area.95.new <- (area.95.new * rasterres) / 1000000 # Convert from m^2 to km^2 - DEPRECATED 20260624
+  area.95.new <- UDlist |> sapply(function(x) sum(raster::values(move::getVolumeUD(x) <= .95))) # 95% volume area
+  area.95.new.km2 <- (area.95.new * rasterres) / 1000000 # Convert from m^2 to km^2
   
   # B. Mean and SD
   # area.50.mean <- mean(area.50) # 50% volume area mean
   # area.50.sd <- stats::sd(area.50) # 50% volume area SD
-  
-  area.50.mean.new <- mean(area.50.new) # 50% volume area mean
-  area.50.sd.new <- stats::sd(area.50.new) # 50% volume area SD
+  area.50.mean.new <- mean(area.50.new.km2) # 50% volume area mean
+  area.50.sd.new <- stats::sd(area.50.new.km2) # 50% volume area SD
   
   # area.95.mean <- mean(area.95) # 95% volume area mean
   # area.95.sd <- stats::sd(area.95) # 95% volume area SD
+  area.95.mean.new <- mean(area.95.new.km2) # 50% volume area mean
+  area.95.sd.new <- stats::sd(area.95.new.km2) # 50% volume area SD
   
-  area.95.mean.new <- mean(area.95.new) # 50% volume area mean
-  area.95.sd.new <- stats::sd(area.95.new) # 50% volume area SD
   
-  
-  # 3. Group-level core and home range volume areas
+  # 3. Group-level core and general space use areas
   UDScaled <- new(".UD", All_Rasters_Scaled_Weighted) # This uses the aeqd raster for calculations
   # UDScaled <- UDScaled / sum(raster::values(UDScaled)) # Safety: ensures raster values sum to 1
   # UDScaled <- new(".UD", UDScaled) # Convert back to .UD so getVolumeUD can work
@@ -301,11 +299,10 @@ scaleraster <- function(path = NULL,
                       bylayer = bylayer,
                       overwrite = overwrite)
   
-  # group_area.50 <- (sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000 # 2024-01-08 vital check addition
-  # group_area.95 <- (sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000 # 2024-01-08 vital check addition
-  
-  group_area.50.new <- (sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.5)) * rasterres) / 1000000
-  group_area.95.new <- (sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.05)) * rasterres) / 1000000
+  group_area.50.new <- (sum(raster::values(move::getVolumeUD(UDScaled) <= .50)) * rasterres) / 1000000 # 2026-06-24 vital check addition
+  group_area.95.new <- (sum(raster::values(move::getVolumeUD(UDScaled) <= .95)) * rasterres) / 1000000 # 2026-06-24 vital check addition
+  # group_area.50.new <- (sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.5)) * rasterres) / 1000000 # - DEPRECATED 20260624
+  # group_area.95.new <- (sum(raster::values(UDScaled) >= (max(UDScaled@data@values) * 0.05)) * rasterres) / 1000000 # - DEPRECATED 20260624 
   # See movegroup.R L748. Could switch above lines to this:
   # area.50 <- round(sum(raster::values(move::getVolumeUD(bb) <= .50)), 4)
   # area.95 <- round(sum(raster::values(move::getVolumeUD(bb) <= .95)), 4)
@@ -315,8 +312,10 @@ scaleraster <- function(path = NULL,
   area.ct <- data.frame(
     # core.use = area.50,
     # general.use = area.95,
-    core.use.new = area.50.new,
-    general.use.new = area.95.new
+    # core.use.new = area.50.new.km2,
+    # general.use.new = area.95.new.km2
+    core.use.km2 = area.50.new.km2,
+    general.use.km2 = area.95.new.km2
   )
   
   # Create ID column from row.names and kill row names
@@ -327,13 +326,13 @@ scaleraster <- function(path = NULL,
   area.ct <- rbind(area.ct,
                    c(
                      # area.50.mean, area.95.mean, 
-                    area.50.mean.new, area.95.mean.new, "mean_across_UDs"),
+                     area.50.mean.new, area.95.mean.new, "mean_across_UDs"),
                    c(
                      # area.50.sd, area.95.sd,
                      area.50.sd.new, area.95.sd.new, "sd_across_UDs"),
                    c(
                      # group_area.50, group_area.95,
-                     group_area.50.new, group_area.95.new, "Group-level_UD") # 2024-01-08 vital check additions
+                     group_area.50.new, group_area.95.new, "Group-level_UD") # 2026-06-24 vital check additions
   )
   
   # 2023-10-04 Vital memory bug warning
