@@ -20,6 +20,8 @@ plotraster(
   mapzoom = NULL,
   mapsource = "google",
   maptype = "satellite",
+  generalUDpct = 0.95,
+  coreUDpct = 0.5,
   contour1colour = "red",
   contour2colour = "orange",
   positionscolour = "white",
@@ -38,7 +40,7 @@ plotraster(
   legendposition = c(0.105, 0.8),
   fontsize = 12,
   fontfamily = "Times New Roman",
-  filesavename = paste0(lubridate::today(), "_dBBMM-contours.png"),
+  filesavename = paste0(lubridate::today(), "_UD-contours.png"),
   savedir = tempdir(),
   receiverlats = NULL,
   receiverlons = NULL,
@@ -60,6 +62,7 @@ plotraster(
   reclabrad = 0.15,
   reclabbord = 0,
   surface = TRUE,
+  surfaceUDpct = 0.95,
   cropsavedimage = FALSE,
   savewidth = 6,
   saveheight = NULL
@@ -122,6 +125,10 @@ Default NULL is calculated based on your data.}
 "stamen_toner_background", "stamen_terrain_lines", "stamen_terrain_labels", "stamen_toner_lines",
 "stamen_toner_labels".}
 
+\item{generalUDpct}{numerical. Utilization Distribution \% in decimals for the contour level depicting general space use areas within the UD surface. Typically 95\% UD, i.e. 0.95. Default 0.95. Contourlines colored in 'contour1color'.}
+
+\item{coreUDpct}{numerical. Utilization Distribution \% in decimals for the contour level depicting core space use areas within the UD surface. Typically 50\% UD, i.e. 0.5. Default 0.5. Contourlines colored in 'contour2color'.}
+
 \item{contour1colour}{Colour for contour 1, typically 95pct, default "red".}
 
 \item{contour2colour}{Colour for contour 2, typically 50pct, default "orange".}
@@ -161,7 +168,7 @@ box from L to R, percent distance from Bottom to Top. Values 0 to 1. Default c(0
 
 \item{fontfamily}{= Font family, default "Times New Roman".}
 
-\item{filesavename}{File savename, default today's date + "_dBBMM-contours.png".}
+\item{filesavename}{File savename, default today's date + "_UD-contours.png".}
 
 \item{savedir}{Save outputs to a temporary directory (default) else change to current directory
 e.g. "/home/me/folder". Do not use getwd() here. No terminal slash. E.g.
@@ -209,7 +216,13 @@ Default 0.5.}
 
 \item{reclabbord}{Receiver label border in mm. Default 0.}
 
-\item{surface}{Plot complete UD surface along with contours. Default TRUE.}
+\item{surface}{Plot the surface of the 'surfaceUDpct' UD on a continuous scale along with contours. Default TRUE.}
+
+\item{surfaceUDpct}{numerical; Percent of UD surface to be plotted if 'surface' is TRUE in decimals. Tracking datasets of gill-breathing animals are
+often characterized by relatively long time gaps between consecutive detections. These long gaps can cause higher uncertainties in the animals'
+whereabouts between these detections causing the inclusion of raster cells with relatively low UD values within the complete UD surface.
+These very low UD values contain little information and this parameters provides the option to trim the UD surface to a desired UD \%.
+Default is 0.95. This means the 95\% UD surface is plotted on a continuous scale.}
 
 \item{cropsavedimage}{Crop the output image with knitr::plot_crop which uses pdfcrop on PDFs,
 otherwise magick::image_trim. magick requires system pre-install. deb: libmagick++-dev (Debian,
@@ -225,7 +238,7 @@ Individual-level utilization distributions, saved as rasters, as well as calcula
 volume area estimates for 50 and 95pct contours, saved in a .csv file.
 }
 \description{
-Plots 50 and 95pct contours of a group-level utilization distribution raster on a spatial map
+Plots 50 and 95\% utilization distribution (UD) contours of a group-level UD raster on a spatial map
 background. Contains functionality to also visualize geographic locations of individual listening
 stations (e.g., acoustic receivers) as well as the entire surface UD.
 }
@@ -236,7 +249,8 @@ the entire home range of the study species. This term is problematic when applie
 acoustic telemetry setting where an array of non-overlapping receivers are used to assess local
 space use patterns i.e. the home range is bigger than the coverage by the acoustic array.
 
-Errors and their origins:
+Please be aware,
+\subsection{Errors and their origins:}{
 \enumerate{
 \item Error in gzfile(file, "rb") : cannot open the connection. In addition: Warning message: In
 gzfile(file, "rb"): cannot open compressed file '/var/folders/dl/etc/ggmap/index.rds',
@@ -253,6 +267,8 @@ Increase mapzoom number.
 be unavailable at the chosen zoom level for the specific region of interest. Inspect the output
 map and try a lower level (number) of mapzoom.
 }
+}
+
 \subsection{How to get Google map basemaps}{
 
 (from https://www.youtube.com/watch?v=O5cUoVpVUjU):
@@ -300,4 +316,6 @@ plotraster(
 Simon Dedman, \email{simondedman@gmail.com}
 
 Maurits van Zinnicq Bergmann, \email{mauritsvzb@gmail.com}
+
+Vital Heim, \email{vital.heim@gmail.com}
 }
