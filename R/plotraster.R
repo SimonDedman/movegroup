@@ -70,7 +70,8 @@
 #' to 1 (fully parent).
 #' @param COAshape Shape of Centre of Activity marker, default 4, an X. Permissible values 0 to 25.
 #' @param COAsize Size of COA point, default 1.
-#' @param plottitle Title of the resultant plot, default "Aggregated 95pct and 50pct UD contours".
+#' @param plottitle Title of the resultant plot, Optional. Default NULL. Optional plot title. If NULL, title will be generated automatically as "Aggregated 'generalUDpct' % 
+#' and 'coreUDpct' % UD contours".
 #' @param plotsubtitle Plot subtitle, default "Scaled contours". Can add the n of your individuals.
 #' @param legendtitle Legend title, default "Percent UD Contours".
 #' @param plotcaption Plot caption, default "movegroup" + today's date.
@@ -235,7 +236,7 @@ plotraster <- function(
     COAalpha  = 1, # Alpha value for Centre of Activity point, default 1, values from 0 (fully transparent) to 1 (fully parent).
     COAshape  = 4, # Shape of Centre of Activity marker, default 4, an X. Permissible values 0 to 25.
     COAsize = 1, # Size of COA point
-    plottitle = "Aggregated 95% and 50% UD contours",
+    plottitle = NULL, 
     # Can use the term 'home range' when an animal can be detected wherever it goes
     # i.e. using GPS, satellite or acoustic telemetry whereby it is known that acoustic
     # receivers cover the entire home range of the study species.
@@ -291,6 +292,12 @@ plotraster <- function(
   if (substr(x = crsloc, start = nchar(crsloc), stop = nchar(crsloc)) == "/") crsloc = substr(x = crsloc, start = 1, stop = nchar(crsloc) - 1)
   if (substr(x = savedir, start = nchar(savedir), stop = nchar(savedir)) == "/") savedir = substr(x = savedir, start = 1, stop = nchar(savedir) - 1)
   dataCRS <- readRDS(file.path(crsloc, "CRS.Rds")) # load CRS from file
+  
+  # define the plot title
+  if (is.null(plottitle)) {
+    title_pp <- paste0("Aggregated ", generalUDpct * 100," % and ", coreUDpct * 100," % UD contours")
+  }
+  
   # Import raster
   # x <- stars::read_stars(x) # DEPRECATED 20260626 due to change back to volumetric UDs and need for raster::raster()
   # set CRS, function from sp
@@ -718,7 +725,7 @@ plotraster <- function(
                     # fill = ggplot2::guide_legend(order = 2) # makes fill binned for some reason
     ) +
     
-    ggplot2::ggtitle(plottitle, subtitle = plotsubtitle) +
+    ggplot2::ggtitle(title_pp, subtitle = plotsubtitle) +
     ggplot2::labs(x = axisxlabel, y = axisylabel, caption = plotcaption) +
     ggplot2::theme_minimal() +
     ggplot2::theme(
