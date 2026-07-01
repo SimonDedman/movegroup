@@ -2,7 +2,7 @@
 % Please edit documentation in R/scaleraster.R
 \name{scaleraster}
 \alias{scaleraster}
-\title{Scales individual utilization distribution rasters and volume area estimates}
+\title{Scales individual utilization distribution (UD) rasters and volume area estimates}
 \usage{
 scaleraster(
   path = NULL,
@@ -67,6 +67,10 @@ single group-level UD raster. See www.GitHub.com/SimonDedman/movegroup for issue
 suggestions. There is an option to account for bias in acoustic receiver array spatial representation (see Details).
 }
 \details{
+We here provide the movegroup::scaleraster() function that automates the following steps to scale individual-level
+utiliszation distribution (UD) rasters from 0 to 1 for intepretation as relative insensity of utilization, and to subsequently
+aggregate scaled individual-level rasters into one single group-level UD raster:
+
 Step 1. Scale rasters.
 Individual-level UD rasters are scaled from 0 to 1 by dividing each raster by the maximum probability density value
 occurring within the raster set.
@@ -94,8 +98,7 @@ For each scaled individual-level UD raster, estimate 50 and 95pct contour volume
 deviation. Additionally, the 50 and 95pct volume area is estimated for the group-level UD raster.
 
 Step 8. Export the projected-CRS group-level raster.
-
-Errors and their origins:
+\subsection{Errrors and their origins:}{
 \enumerate{
 \item Error in (function (cond): error in evaluating the argument 'x' in selecting a method for
 function 'res': subscript out of bounds. Probably path can't find any files of type=pattern:
@@ -106,6 +109,7 @@ argument is of length zero: pathsubsets is wrong. Try setting to same as path. N
 file or directory': crsloc is wrong. Try setting to same as path. NULL does this.
 \item In min/max: No non-missing arguments to min; returning Inf: likely not enough memory, increase
 rasterResolution value.
+}
 }
 }
 \examples{
@@ -130,4 +134,6 @@ Weighting <- TracksCleaned |>
 Simon Dedman, \email{simondedman@gmail.com}
 
 Maurits van Zinnicq Bergmann, \email{mauritsvzb@gmail.com}
+
+Vital Heim, \email{vital.heim@gmail.com}
 }
