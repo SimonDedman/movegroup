@@ -2,7 +2,7 @@
 #'
 #' Automates dynamic Brownian bridge movement model (dBBMM) and dynamic bivariate Gaussian bridge (dBGB) calculation for 
 #' utilization distribution (UD) estimation for multiple individuals simultaneously, using functions in the 'move' package. 
-#' The authors are indebted to the move package authors Bart Kraunstauber, Marco Smolla, and Anne K
+#' The authors are indebted to the move package authors Bart Kranstauber, Marco Smolla, and Anne K
 #' Scharf, and to Sarah Becker for seed code which inspired the development of the
 #' movegroup::movegroup function.
 #'
@@ -57,7 +57,7 @@
 #' The here provided function automatically divides your chosen duration by 15 or 20.1 depending on your model choice.
 #' @param moveLocError location.error (m) in the 'brownian.bridge.dyn' function and locErr (m) in the 'dynBGB' function
 #' in the 'move' package. Numeric. Either single or a vector of length nrow data. If using passive acoustic data
-#' this is the detection range of the receiver(s). Default 1. See MoveLocErrorCalc function for
+#' this is the detection range of the receiver(s). Default 1. See moveLocErrorCalc function for
 #' satellite data with state space modelled locations with 95% confidence intervals for latlon i.e.
 #' lat and lon025 and 975.
 #' @param timeDiffLong Single numeric value. Threshold value in units set via 'timeDiffUnits' designating the length
@@ -97,7 +97,7 @@
 # #' confidence intervals for latlon i.e. lat and lon025 and 975.
 #' @param movemargin Margin size for variance calc in move::brownian.motion.variance.dyn and
 #' behavioural change point analysis in move::brownian.bridge.dyn. It is also used in move::dynBGBvariance
-#' for the behavioral change point analysis and in move::dynBGB. Must be an odd number. Depending on model choice
+#' for the behavioural change point analysis and in move::dynBGB. Must be an odd number. Depending on model choice
 #' there are different defaults: dbbmm - 11, dbgb - 15.
 #' Motion variance based on only the middle section of the trajectory; the ends
 #' of the movement trajectory where no changes are allowed because at some stage
@@ -121,7 +121,7 @@
 #' @param writeRasterExtension Character. Output file extension for raster::writeRaster param
 #' extension. Default ".asc". TO DEPRECIATE.
 #' @param writeRasterDatatype Character. Data type for writing values to disk for
-#' raster::writeRaster param Datatype. Default "FLT4S". TO DEPRECIATE.
+#' raster::writeRaster param datatype. Default "FLT4S". TO DEPRECIATE.
 #' @param absVolumeAreaSaveName File name plus extension where UD estimates are saved. Default
 #' "VolumeArea_AbsoluteScale.csv".
 #' @param savedir Save outputs to a temporary directory (default) else change
@@ -227,7 +227,7 @@
 #' final summary stats with stitchraster.
 #'
 #' 9. Error in validityMethod(as(object, superClass)) : The used raster is not a UD (sum unequal to 1), sum is: NaN One possible cause is 
-#' loss of accuracy due to writing raster to disk with dataType FLT4S this can be solved preventing disk usage or changing data type. 
+#' loss of accuracy due to writing raster to disk with datatype FLT4S this can be solved preventing disk usage or changing data type. 
 #' Same error message as in nr. 8 above. This error can also occur if you are calculating dBGBs and set your timeDiffLong shorter than the shortest
 #' segment. Check your time gaps between locations and compare to timeDiffLong, check the timeDiffUnits parameter and make sure you chose the correct unit.
 #' Try shorter timeDiffLong options.
@@ -259,16 +259,13 @@
 #' animal movement. Journal of Animal Ecology. doi: 10.1111/j.1365-2656.2012.01955.x
 #' @references Kranstauber, B., Safi, K., and Bartumeus, F. (2014). Bivariate Gaussian bridges: directional
 #' factorization of diffusion in Brownian bridge models. Movement Ecology. https://doi.org/10.1186/2051-3933-2-5
-#' @references Kranstauber, B., M. Smolla & A. K. Scharf. 2019. Move: visualizing and analyzing animal track
+#' @references Kranstauber, B., M. Smolla & A. K. Scharf. 2019. Move: visualising and analysing animal track
 #' data. R package version 4.2.4 (at 2023-08-15). https://CRAN.R-project.org/package=move.
 
 movegroup <- function(
     data = NULL, # Data frame object containing the data. Requires columns Lat Lon DateTime ID and optionally a grouping column.
     model = "dbbmm", # Movement model choice: "dbbmm" (dynamic Brownian bridge movement model,
-    # default) or "dbgb" (dynamic bivariate Gaussian bridge). Outputs are saved into a
-    # subdirectory of savedir named after the chosen model (savedir/dbbmm or savedir/dbgb).
-    # Note: dBGB uses the non-bursted move object r.i and does not support bursting via
-    # timeDiffLong/timeDiffUnits. dBBMM uses the bursted move object as before.
+    # default) or "dbgb" (dynamic bivariate Gaussian bridge).
     ID = NULL, # Name of animal tag ID column in data.
     Datetime = NULL, # Column name in data that contains date/time stamps for each recorded detection. Must be in POSIXct format.
     Lat = NULL, # name of Lat & Lon columns in data.
@@ -289,7 +286,7 @@ movegroup <- function(
     rasterCRS = sp::CRS("+proj=utm +zone=17 +datum=WGS84"), # CRS for raster creation. This is around Bimini, Bahamas.
     rasterResolution = 50, # numeric vector of length 1 or 2 to set raster resolution - cell size in metres. 111000: 1 degree lat = 111km
     # dbblocationerror = moveLocError, # location.error param in brownian.bridge.dyn. Could use the same as moveLocError?
-    movemargin = NULL, # Margin size for variance calc in move::brownian.motion.variance.dyn and behavioral change point analysis in
+    movemargin = NULL, # Margin size for variance calc in move::brownian.motion.variance.dyn and behavioural change point analysis in
     # move::brownian.bridge.dyn. Must be an odd number. Default 11.
     dbbext = 3, # ext param in brownian.bridge.dyn. Extends bounding box around track. Numeric single (all edges), double (x & y), or 4 (xmin xmax ymin ymax). Default 3.
     dbbwindowsize = NULL, # window.size param in brownian.bridge.dyn. The size of the moving window along the track. Larger windows provide more

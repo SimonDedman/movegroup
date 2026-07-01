@@ -19,7 +19,7 @@
 #' individual-level volume areas also become weighted. Default is 1 for no weighting.
 #' @param format Character. Output file type for raster::writeRaster param format. Default "ascii".
 #' @param datatype Character. Data type for writing values to disk for raster::writeRaster param 
-#' Datatype. Default "FLT4S". 
+#' datatype. Default "FLT4S". 
 #' @param bylayer For raster::writeRaster param bylayer. Default TRUE.
 #' @param overwrite For raster::writeRaster param overwrite. Default TRUE.
 #' @param scalefolder Folder to save outputs to. Default "Scaled".
@@ -30,7 +30,7 @@
 #' @param returnObj Logical. Return the scaled object to the parent environment? Default FALSE.
 #' 
 #' @details We here provide the movegroup::scaleraster() function that automates the following steps to scale individual-level
-#' utiliszation distribution (UD) rasters from 0 to 1 for intepretation as relative insensity of utilization, and to subsequently
+#' utilisation distribution (UD) rasters from 0 to 1 for interpretation as relative intensity of utilization, and to subsequently
 #' aggregate scaled individual-level rasters into one single group-level UD raster:
 #' 
 #' Step 1. Scale rasters.
@@ -61,7 +61,7 @@
 #' 
 #' Step 8. Export the projected-CRS group-level raster.
 #' 
-#' ## Errrors and their origins:
+#' ## Errors and their origins:
 #' 
 #' 1. Error in (function (cond): error in evaluating the argument 'x' in selecting a method for 
 #' function 'res': subscript out of bounds. Probably path can't find any files of type=pattern:

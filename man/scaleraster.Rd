@@ -38,7 +38,7 @@ individual-level volume areas also become weighted. Default is 1 for no weightin
 \item{format}{Character. Output file type for raster::writeRaster param format. Default "ascii".}
 
 \item{datatype}{Character. Data type for writing values to disk for raster::writeRaster param
-Datatype. Default "FLT4S".}
+datatype. Default "FLT4S".}
 
 \item{bylayer}{For raster::writeRaster param bylayer. Default TRUE.}
 
@@ -68,7 +68,7 @@ suggestions. There is an option to account for bias in acoustic receiver array s
 }
 \details{
 We here provide the movegroup::scaleraster() function that automates the following steps to scale individual-level
-utiliszation distribution (UD) rasters from 0 to 1 for intepretation as relative insensity of utilization, and to subsequently
+utilisation distribution (UD) rasters from 0 to 1 for interpretation as relative intensity of utilization, and to subsequently
 aggregate scaled individual-level rasters into one single group-level UD raster:
 
 Step 1. Scale rasters.
@@ -98,7 +98,7 @@ For each scaled individual-level UD raster, estimate 50 and 95pct contour volume
 deviation. Additionally, the 50 and 95pct volume area is estimated for the group-level UD raster.
 
 Step 8. Export the projected-CRS group-level raster.
-\subsection{Errrors and their origins:}{
+\subsection{Errors and their origins:}{
 \enumerate{
 \item Error in (function (cond): error in evaluating the argument 'x' in selecting a method for
 function 'res': subscript out of bounds. Probably path can't find any files of type=pattern:

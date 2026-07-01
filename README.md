@@ -83,7 +83,7 @@ al. (2007)](https://esajournals.onlinelibrary.wiley.com/doi/10.1890/06-0957.1)
 describe the use of movement models that incorporate Brownian motion
 (Brownian bridge moment model, BBMM), which offers a more sophisticated
 way to estimate space use. The traditional BBMM integrates the temporal
-component of tracking data by explicitly modeling movements between
+component of tracking data by explicitly modelling movements between
 consecutive relocations. This is achieved by accounting for both the
 order of subsequent relocations as well as the travel time between them.
 The BBMM reconstructs the movement path by computing biased random walk
@@ -164,7 +164,7 @@ heterogeneous animal movement. Journal of Animal Ecology.
 
 [Kranstauber](https://link.springer.com/article/10.1186/2051-3933-2-5),
 B., Safi, K. & Bartumeus, F. (2014) Bivariate Gaussian bridges:
-directioal factorization of diffusion in Brownian bridge movement
+directional factorization of diffusion in Brownian bridge movement
 models. Movement Ecology.
 
 [Kranstauber](https://CRAN.R-project.org/package=move), B., M. Smolla &
@@ -198,8 +198,8 @@ Visualizing and Quantifying Space Use Data for Groups of Animals
 Automates dynamic Brownian bridge movement model calculation for
 utilization distribution (UD) estimation for multiple individuals
 simultaneously, using functions in the ‘move’ package. The authors are
-indebted to the move package authors Bart Kraunstauber, Marco Smolla,
-and Anne K Scharf, and to Sarah Becker for seed code which inspired the
+indebted to the move package authors Bart Kranstauber, Marco Smolla, and
+Anne K Scharf, and to Sarah Becker for seed code which inspired the
 development of the movegroup::movegroup function.
 
 The movegroup function takes a dataframe of positions, datetimes, and

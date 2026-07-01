@@ -14,7 +14,7 @@
 #'
 #' @export stitchraster
 #'
-#' @param data Data frame object containing the data. Requires columns Lat Lon DateTime ID and
+#' @param data Data frame object containing the data. Requires columns Lat Lon Datetime ID and
 #' potentially a grouping column (not currently implemented, email to request). Column names
 #' specified in later parameters.
 #' @param ID Name of animal tag ID column in data. "Character".
@@ -31,7 +31,7 @@
 #' @author Simon Dedman, \email{simondedman@@gmail.com}
 #'
 stitchraster <- function(
-  data = NULL, # Data frame object containing the data. Requires columns Lat Lon DateTime ID and optionally a grouping column.
+  data = NULL, # Data frame object containing the data. Requires columns Lat Lon Datetime ID and optionally a grouping column.
   ID = NULL, # Name of animal tag ID column in data.
   absVolumeAreaSaveName = "VolumeArea_AbsoluteScale.csv",
   savedir = tempdir() # save outputs to a temporary directory (default) else change to current

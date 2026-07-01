@@ -25,7 +25,7 @@ data(argosFiltered)
 }
 \description{
 Tracks of 2 great hammerhead sharks tagged in Jupiter, and The Keys, Florida, USA, in 2022 and
-2023 respectively, by Saving The Blue (savingtheblue.org), filtered by argosfilter::sdafilter and
+2023 respectively, by Saving The Blue (SavingTheBlue.org), filtered by argosfilter::sdafilter and
 with state space model applied using aniMotum package, using scripts by Vital Heim, see
 https://github.com/SimonDedman/SavingTheBlue/blob/main/R/06A_Filter_SPOT_data.R and
 https://github.com/SimonDedman/SavingTheBlue/blob/main/R/06B_CTCRW_SPOT_data_usin_animotum.R .

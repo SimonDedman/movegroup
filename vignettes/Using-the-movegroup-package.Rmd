@@ -37,7 +37,7 @@ The UD is an improvement upon the MCP-derived home range estimation because this
 
 ![Relocations and UD](../vignettes/figures/relocationsUDvignette.png)
 
-[Horne et al. (2007)](https://esajournals.onlinelibrary.wiley.com/doi/10.1890/06-0957.1) describe the use of movement models that incorporate Brownian motion (Brownian bridge moment model, BBMM), which offers a more sophisticated way to estimate space use. The traditional BBMM integrates the temporal component of tracking data by explicitly modeling movements between consecutive relocations. This is achieved by accounting for both the order of subsequent relocations as well as the travel time between them. The BBMM reconstructs the movement path by computing biased random walk iterations, creating a probability density distribution or “bridge” between two consecutive relocations where the animal could have been when it was not detected.
+[Horne et al. (2007)](https://esajournals.onlinelibrary.wiley.com/doi/10.1890/06-0957.1) describe the use of movement models that incorporate Brownian motion (Brownian bridge moment model, BBMM), which offers a more sophisticated way to estimate space use. The traditional BBMM integrates the temporal component of tracking data by explicitly modelling movements between consecutive relocations. This is achieved by accounting for both the order of subsequent relocations as well as the travel time between them. The BBMM reconstructs the movement path by computing biased random walk iterations, creating a probability density distribution or “bridge” between two consecutive relocations where the animal could have been when it was not detected.
 
 ![KUD vs BBUD](../vignettes/figures/BBtrajectoryvignette.png)
 
@@ -67,7 +67,7 @@ Also it's imperative you read the R help files for each function before you use 
 
 Visualizing and Quantifying Space Use Data for Groups of Animals
 
-Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple individuals simultaneously, using functions in the 'move' package. The authors are indebted to the move package authors Bart Kraunstauber, Marco Smolla, and Anne K Scharf, and to Sarah Becker for seed code which inspired the development of the movegroup::movegroup function.
+Automates dynamic Brownian bridge movement model calculation for utilization distribution (UD) estimation for multiple individuals simultaneously, using functions in the 'move' package. The authors are indebted to the move package authors Bart Kranstauber, Marco Smolla, and Anne K Scharf, and to Sarah Becker for seed code which inspired the development of the movegroup::movegroup function.
 
 The movegroup function takes a dataframe of positions, datetimes, and IDs, e.g. from marine species, such as sharks or turtles being tracked by satellite or acoustic tags. These data are filtered to remove individuals with too few data to process, a group-level basemap raster is created upon which to calculate and later plot dBBMM utilisation distribution hotspots, then each individual has a movement track calculated using the move package, data gaps are assessed and the track split into multiple segments if gaps are too long, those segments have a dynamic Brownian Bridge Movement Model and variance calculated on them again using the move package, then the 50 and 95% utilisation distribution volume areas are calculated. Finally the outputs are saved on a per-unique-ID basis.
 

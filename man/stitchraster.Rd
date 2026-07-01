@@ -12,7 +12,7 @@ stitchraster(
 )
 }
 \arguments{
-\item{data}{Data frame object containing the data. Requires columns Lat Lon DateTime ID and
+\item{data}{Data frame object containing the data. Requires columns Lat Lon Datetime ID and
 potentially a grouping column (not currently implemented, email to request). Column names
 specified in later parameters.}
 

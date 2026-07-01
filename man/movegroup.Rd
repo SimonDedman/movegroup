@@ -82,7 +82,7 @@ The here provided function automatically divides your chosen duration by 15 or 2
 
 \item{moveLocError}{location.error (m) in the 'brownian.bridge.dyn' function and locErr (m) in the 'dynBGB' function
 in the 'move' package. Numeric. Either single or a vector of length nrow data. If using passive acoustic data
-this is the detection range of the receiver(s). Default 1. See MoveLocErrorCalc function for
+this is the detection range of the receiver(s). Default 1. See moveLocErrorCalc function for
 satellite data with state space modelled locations with 95\% confidence intervals for latlon i.e.
 lat and lon025 and 975.}
 
@@ -125,7 +125,7 @@ Higher resolution will lead to more precision in the volume areas calculations. 
 
 \item{movemargin}{Margin size for variance calc in move::brownian.motion.variance.dyn and
 behavioural change point analysis in move::brownian.bridge.dyn. It is also used in move::dynBGBvariance
-for the behavioral change point analysis and in move::dynBGB. Must be an odd number. Depending on model choice
+for the behavioural change point analysis and in move::dynBGB. Must be an odd number. Depending on model choice
 there are different defaults: dbbmm - 11, dbgb - 15.
 Motion variance based on only the middle section of the trajectory; the ends
 of the movement trajectory where no changes are allowed because at some stage
@@ -154,7 +154,7 @@ Default "ascii". TO DEPRECIATE.}
 extension. Default ".asc". TO DEPRECIATE.}
 
 \item{writeRasterDatatype}{Character. Data type for writing values to disk for
-raster::writeRaster param Datatype. Default "FLT4S". TO DEPRECIATE.}
+raster::writeRaster param datatype. Default "FLT4S". TO DEPRECIATE.}
 
 \item{absVolumeAreaSaveName}{File name plus extension where UD estimates are saved. Default
 "VolumeArea_AbsoluteScale.csv".}
@@ -180,7 +180,7 @@ movegroup()", good: "movegroup()".
 \description{
 Automates dynamic Brownian bridge movement model (dBBMM) and dynamic bivariate Gaussian bridge (dBGB) calculation for
 utilization distribution (UD) estimation for multiple individuals simultaneously, using functions in the 'move' package.
-The authors are indebted to the move package authors Bart Kraunstauber, Marco Smolla, and Anne K
+The authors are indebted to the move package authors Bart Kranstauber, Marco Smolla, and Anne K
 Scharf, and to Sarah Becker for seed code which inspired the development of the
 movegroup::movegroup function.
 }
@@ -264,7 +264,7 @@ Environment tab. If unsuccessful, run function in chunks of individuals until
 all (of length >= windowsize) are saved to disc as asc files, then produce
 final summary stats with stitchraster.
 \item Error in validityMethod(as(object, superClass)) : The used raster is not a UD (sum unequal to 1), sum is: NaN One possible cause is
-loss of accuracy due to writing raster to disk with dataType FLT4S this can be solved preventing disk usage or changing data type.
+loss of accuracy due to writing raster to disk with datatype FLT4S this can be solved preventing disk usage or changing data type.
 Same error message as in nr. 8 above. This error can also occur if you are calculating dBGBs and set your timeDiffLong shorter than the shortest
 segment. Check your time gaps between locations and compare to timeDiffLong, check the timeDiffUnits parameter and make sure you chose the correct unit.
 Try shorter timeDiffLong options.
@@ -297,7 +297,7 @@ animal movement. Journal of Animal Ecology. doi: 10.1111/j.1365-2656.2012.01955.
 Kranstauber, B., Safi, K., and Bartumeus, F. (2014). Bivariate Gaussian bridges: directional
 factorization of diffusion in Brownian bridge models. Movement Ecology. https://doi.org/10.1186/2051-3933-2-5
 
-Kranstauber, B., M. Smolla & A. K. Scharf. 2019. Move: visualizing and analyzing animal track
+Kranstauber, B., M. Smolla & A. K. Scharf. 2019. Move: visualising and analysing animal track
 data. R package version 4.2.4 (at 2023-08-15). https://CRAN.R-project.org/package=move.
 }
 \author{
