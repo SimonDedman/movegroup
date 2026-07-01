@@ -6,7 +6,6 @@
 #' Scharf, and to Sarah Becker for seed code which inspired the development of the
 #' movegroup::movegroup function.
 #'
-#' @import utils
 #' @importFrom lubridate is.POSIXt
 #' @importFrom sp CRS SpatialPoints spTransform proj4string
 #' @importFrom beepr beep
@@ -309,10 +308,7 @@ movegroup <- function(
     # stitch the results together later with stitchraster.
     alerts = TRUE # audio warning for failures
 ) {
-  
-  # define global variables for general.use.new and core.use.new
-  utils::globalVariables(c("general.use.new", "core.use.new"))
-  
+
   # first, validate a valid model choice
   model <- match.arg(model, choices = c("dbbmm", "dbgb"))
   

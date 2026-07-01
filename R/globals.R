@@ -1,0 +1,1 @@
+utils::globalVariables(c("general.use.new", "core.use.new", "n"))

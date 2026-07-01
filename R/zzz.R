@@ -1,6 +1,6 @@
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage(
-    "We strongly recommend that prior to using this package, you familiarize", 
+    "We strongly recommend that prior to using this package, you familiarise ", 
     "yourself with the underlying concepts of dBBMMs and dBGB.\n",
     "Based on the characteristics of your data, your data may be ",
     "inadequate for your model choice.\n",
