@@ -232,9 +232,17 @@ movegroup(
  savedir = mysavedir)
 ```
 
-However please appraise yourself of the meaning of the various
-parameters as they pertain to your data, most notably movement error
-distance (see moveLocErrorCalc below), and variously buffpct,
+The function does not contain a parameter to define grouping variables,
+i.e. the option to automatically aggregate individual utilization
+distributions (UDs) within multiple treatment groups (e.g. species, sex,
+season, etc.) into a single group-level UD for each of those treatment
+groups. However, we provide an example code how this can be achieved and
+automated without having to specify a parameter withing the function.
+Please see inst/Misc/example_groups.R.
+
+It is imperative that you appraise yourself of the meaning of the
+various parameters as they pertain to your data, most notably movement
+error distance (see moveLocErrorCalc below), and variously buffpct,
 rasterExtent, rasterResolution, centre for sizing your data and rasters,
 which has implications for later plotting. It might be that you need to
 adjust these elements after later seeing the resulting plots from
