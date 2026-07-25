@@ -481,7 +481,7 @@ plotraster <- function(
   if (!is.null(xlatlon)) {
     # Import raster
     # xlatlon <- stars::read_stars(xlatlon) # UDScaled
-    xlalton <- raster::raster(xlatlon)
+    xlatlon <- raster::raster(xlatlon)
     # ISSUE1 ####
     # Comment above says UDScaled but param guide says LatLon.
     # If it was LatLon it wouldn't need dataCRS which is AEQD not latlon,
