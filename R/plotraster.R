@@ -534,7 +534,8 @@ plotraster <- function(
     
     # Import points
     locationpoints <- locationpoints |>
-      dplyr::mutate(Index = 1:length("lat")) # add unique index for later
+      # dplyr::mutate(Index = 1:length("lat")) # add unique index for later
+      dplyr::mutate(Index = 1:nrow("locationpoints")) # add unique index for later - fix 20260725 to deal with csv labelling every location as true
     mypointssf <- sf::st_as_sf(locationpoints, coords = c("lon","lat")) |> sf::st_set_crs(4326) #points by day, # Convert points to sf
     
     if (calcCOA) { # Calculate central place / centre of activity
