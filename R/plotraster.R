@@ -552,6 +552,9 @@ plotraster <- function(
     locationpoints[locationpoints$Index %in% pointsin50$Index, paste0("UD",coreUDpct*100)] <- as.logical(TRUE)
     pointsin95 <- mypointssf[UD95poly, ]
     locationpoints[locationpoints$Index %in% pointsin95$Index, paste0("UD", generalUDpct*100)] <- as.logical(TRUE)
+    # and label NA values as FALSE
+    locationpoints[[paste0("UD", coreUDpct * 100)]][is.na(locationpoints[[paste0("UD", coreUDpct * 100)]])] <- FALSE
+    locationpoints[[paste0("UD", generalUDpct * 100)]][is.na(locationpoints[[paste0("UD", generalUDpct * 100)]])] <- FALSE
     # if savedir doesn't exist, can't save into it, therefore create it
     if (!file.exists(savedir)) dir.create(savedir)
     # if pointsincontourssave wasn't entered, autogenerate
